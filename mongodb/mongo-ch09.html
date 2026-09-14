@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 09 — Curseur & exercices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 09</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 09</div>
+    <span class="lbadge">Chapitre 09 / 17</span>
+    <h1>Le curseur &amp; exercices</h1>
+    <p class="intro"><code>find()</code> ne renvoie pas directement les documents mais un <b>curseur</b>&nbsp;: un objet sur lequel on enchaîne des méthodes (<code>sort</code>, <code>limit</code>, <code>skip</code>…). Ce chapitre fait aussi le point avec des exercices de synthèse sur les chapitres 1 à 8.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#curseur">1 · Le curseur</a>
+    <a href="#sort">2 · sort</a>
+    <a href="#pagination">3 · limit &amp; skip</a>
+    <a href="#compter">4 · count &amp; distinct</a>
+    <a href="#chainer">5 · Enchaîner</a>
+    <a href="#exercices">6 · Exercices</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="curseur">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce qu'un curseur&nbsp;?</h2>
+    <p class="goal">Un <b>curseur</b> est un pointeur vers le résultat d'une requête. MongoDB ne charge pas tout d'un coup&nbsp;: il fournit les documents au fur et à mesure. Dans <code>mongosh</code>, le curseur affiche les premiers résultats et propose « <code>it</code> » pour la suite.</p>
+    <div class="hint"><strong>À retenir —</strong> les méthodes <code>sort</code>, <code>limit</code>, <code>skip</code> s'appliquent <em>sur le curseur</em>, avant que les documents ne soient réellement renvoyés. Elles se chaînent.</div>
+  </section>
+
+  <section class="step" id="sort">
+    <span class="snum"><span class="dotnum">2</span> Méthode</span>
+    <h2>sort() — trier</h2>
+    <p class="goal"><code>1</code> = croissant, <code>-1</code> = décroissant. On peut trier sur plusieurs champs.</p>
+<pre>db.clients.find().sort({ points: <span class="tn">-1</span> })                 <span class="tc">// + de points d'abord</span>
+db.clients.find().sort({ ville: <span class="tn">1</span>, points: <span class="tn">-1</span> })    <span class="tc">// ville A→Z, puis points</span></pre>
+  </section>
+
+  <section class="step" id="pagination">
+    <span class="snum"><span class="dotnum">3</span> Méthode</span>
+    <h2>limit() &amp; skip() — paginer</h2>
+    <p class="goal"><code>limit(n)</code> borne le nombre de résultats&nbsp;; <code>skip(n)</code> en saute. Ensemble, ils réalisent la pagination.</p>
+<pre><span class="tc">// top 3</span>
+db.clients.find().sort({ points: <span class="tn">-1</span> }).limit(<span class="tn">3</span>)
+
+<span class="tc">// page 2, 10 par page</span>
+db.clients.find().skip(<span class="tn">10</span>).limit(<span class="tn">10</span>)</pre>
+    <div class="hint"><strong>Ordre logique —</strong> quel que soit l'ordre d'écriture, MongoDB applique <b>sort → skip → limit</b>.</div>
+  </section>
+
+  <section class="step" id="compter">
+    <span class="snum"><span class="dotnum">4</span> Méthode</span>
+    <h2>countDocuments() &amp; distinct()</h2>
+    <p class="goal"><code>countDocuments(filtre)</code> compte les documents correspondants&nbsp;; <code>distinct(champ)</code> liste les valeurs uniques d'un champ.</p>
+<pre>db.campagnes.countDocuments({ statut: <span class="ts">"OUVERTE"</span> })   <span class="tc">// combien de campagnes ouvertes</span>
+db.clients.distinct(<span class="ts">"ville"</span>)                        <span class="tc">// liste des villes distinctes</span></pre>
+  </section>
+
+  <section class="step" id="chainer">
+    <span class="snum"><span class="dotnum">5</span> Pratique</span>
+    <h2>Tout enchaîner</h2>
+    <p class="goal">Filtre + projection + tri + pagination dans une seule requête&nbsp;:</p>
+<pre>db.campagnes.find(
+  { statut: <span class="ts">"OUVERTE"</span> },              <span class="tc">// filtre</span>
+  { zone: <span class="tn">1</span>, dateLimite: <span class="tn">1</span>, _id: <span class="tn">0</span> } <span class="tc">// projection</span>
+).sort({ dateLimite: <span class="tn">1</span> }).limit(<span class="tn">5</span>)   <span class="tc">// 5 plus urgentes</span></pre>
+  </section>
+
+  <section class="step" id="exercices">
+    <span class="snum"><span class="dotnum">6</span> Exercices</span>
+    <h2>Exercices de synthèse (ch. 1 → 8)</h2>
+    <p class="goal">Sur ta base <code>fioul</code> (avec quelques campagnes et fournisseurs), écris les requêtes suivantes&nbsp;:</p>
+    <ul class="check">
+      <li>Les 3 campagnes ouvertes dont la <b>date limite</b> est la plus proche.</li>
+      <li>Le <b>nombre</b> de campagnes par statut (<code>countDocuments</code> pour chaque, ou attendre l'agrégation du ch. 14).</li>
+      <li>La liste des <b>communes distinctes</b> présentes dans les commandes.</li>
+      <li>Ajouter une commande à une campagne (<code>$push</code>), puis afficher la campagne avec seulement <code>zone</code> et ses 2 premières <code>commandes</code> (<code>$slice</code>).</li>
+      <li>Passer une campagne à <code>CLOTUREE</code> et l'horodater (<code>$set</code> + <code>$currentDate</code>).</li>
+    </ul>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Ces requêtes préfigurent les fonctionnalités de l'appli&nbsp;: liste triée des campagnes urgentes, pagination de la liste, statistiques par statut. Garde-les dans un playground VS Code&nbsp;: elles serviront de spécification quand tu écriras l'API.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li><code>find()</code> renvoie un <b>curseur</b>&nbsp;; on y chaîne <code>sort</code>, <code>skip</code>, <code>limit</code>.</li>
+        <li>Ordre appliqué&nbsp;: sort → skip → limit.</li>
+        <li><code>countDocuments()</code> compte&nbsp;; <code>distinct()</code> liste les valeurs uniques.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch08.html">← Chapitre 08</a>
+    <a class="next" href="mongodb-chapitres.html">Chapitre 10 (à venir) · Sommaire →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 09 — Curseur &amp; exercices. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

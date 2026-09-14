@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 01 — Introduction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 01</small></span></a>
+  <nav class="nav" id="nav">
+    <a href="../index.html">Accueil</a>
+    <a href="spring-chapitres.html">Chapitres</a>
+    <a href="tuto-spring.html">Cours de base</a>
+    <a href="parcours-api-spring.html">Guide pas à pas</a>
+  </nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button>
+  <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 01</div>
+  <span class="lbadge">Chapitre 01 / 19</span>
+  <h1>Introduction à Spring Boot</h1>
+  <p class="intro">Comprendre ce qu'est Spring, pourquoi Spring Boot a tout simplifié, et de quoi se compose l'écosystème qu'on utilisera pour construire l'API du projet.</p>
+</div></section>
+
+<nav class="stepnav" id="stepnav"><div class="wrap">
+  <a href="#spring">1 · Spring</a>
+  <a href="#boot">2 · Spring Boot</a>
+  <a href="#ioc">3 · Injection (IoC)</a>
+  <a href="#archi">4 · Architecture</a>
+  <a href="#env">5 · Environnement</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="step" id="spring">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Spring, le framework</h2>
+    <p class="goal">Spring est un <b>framework</b> Java pour bâtir des applications robustes. Son cœur repose sur le conteneur <b>IoC</b> (inversion de contrôle) qui crée et relie les objets à ta place. Autour, une galaxie de modules&nbsp;: Spring MVC (web), Spring Data (persistance), Spring Security (authentification)…</p>
+    <div class="hint"><strong>Le problème historique —</strong> Spring « classique » demandait beaucoup de configuration (fichiers XML, versions à accorder). Spring Boot est né pour supprimer cette friction.</div>
+  </section>
+  <section class="step" id="boot">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Ce qu'apporte Spring Boot</h2>
+    <p class="goal">Spring Boot, c'est Spring « prêt à l'emploi »&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Starters</b> — des dépendances groupées et compatibles (<code>spring-boot-starter-web</code>…).</li>
+      <li><b>Auto-configuration</b> — Spring configure les composants d'après les dépendances présentes.</li>
+      <li><b>Serveur intégré</b> — l'appli est un <code>.jar</code> exécutable qui démarre Tomcat sur le port 8080.</li>
+      <li><b>Actuator</b> — endpoints de supervision prêts (chapitre 16).</li>
+    </ul>
+  </section>
+  <section class="step" id="ioc">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>L'injection de dépendances</h2>
+    <p class="goal">Plutôt que de faire <code>new</code>, tes classes <b>déclarent</b> ce dont elles ont besoin&nbsp;; Spring le leur fournit (les <b>beans</b>). Résultat&nbsp;: du code découplé et testable.</p>
+<pre><span class="tn">@Service</span>
+<span class="tk">public class</span> <span class="tf">CampagneService</span> {
+    <span class="tk">private final</span> CampagneRepository repo;
+    <span class="tk">public</span> CampagneService(CampagneRepository repo) { <span class="tk">this</span>.repo = repo; }  <span class="tc">// injecté</span>
+}</pre>
+  </section>
+  <section class="step" id="archi">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>L'architecture en couches</h2>
+    <p class="goal">Une API Spring s'organise en trois couches, chacune avec un rôle clair&nbsp;:</p>
+<pre>HTTP → <span class="tf">Controller</span> → <span class="tf">Service</span> → <span class="tf">Repository</span> → Base de données</pre>
+    <p style="color:var(--ink-soft)">Le contrôleur reçoit/renvoie, le service décide (logique métier), le repository accède aux données. On les construira une par une dans les chapitres suivants.</p>
+  </section>
+  <section class="step" id="env">
+    <span class="snum"><span class="dotnum">5</span> Pratique</span>
+    <h2>L'environnement de travail</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>JDK 21</b> (Java), <b>Maven</b> (gestion des dépendances et build).</li>
+      <li>Un IDE&nbsp;: IntelliJ IDEA ou VS Code.</li>
+      <li><b>Spring Initializr</b> (<code>start.spring.io</code>) pour générer le projet.</li>
+    </ul>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Tu vas construire <code>fioul-api</code>&nbsp;: une API REST qui expose les campagnes stockées dans MongoDB (parcours 1) et que l'appli Flutter (parcours 3) consommera. Ce chapitre pose le décor&nbsp;; dès le chapitre 2, on écrit du code.</p></div>
+    <div class="recap"><strong>À retenir</strong>
+      <ul><li>Spring = framework Java à base d'injection de dépendances (IoC).</li>
+      <li>Spring Boot = starters + auto-configuration + serveur intégré.</li>
+      <li>Architecture&nbsp;: Controller → Service → Repository.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-chapitres.html">← Sommaire</a><a class="next" href="spring-ch02.html">Chapitre 02 · Mise en place →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 01 — Introduction. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

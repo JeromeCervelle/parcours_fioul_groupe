@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 06 — Docker Compose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 06</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 06</div>
+  <span class="lbadge">Chapitre 06 / 08</span>
+  <h1>Docker Compose</h1>
+  <p class="intro">Lancer trois conteneurs à la main devient vite pénible. <b>Docker Compose</b> décrit toute l'application dans un seul fichier YAML et la démarre d'une commande.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#pourquoi">1 · Pourquoi</a><a href="#fichier">2 · Le fichier</a><a href="#commandes">3 · up / down</a><a href="#depends">4 · Dépendances</a></div></nav>
+<main class="wrap">
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>D'une commande par conteneur à un fichier</h2>
+    <p class="goal">Compose remplace les longues commandes <code>docker run</code> par une <b>description déclarative</b>&nbsp;: on liste les <b>services</b>, leurs images, ports, volumes, variables — et Compose crée le réseau, les volumes et démarre tout dans le bon ordre.</p>
+  </section>
+  <section class="step" id="fichier">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Le fichier compose.yaml</h2>
+    <p class="goal">Un premier exemple à deux services (base + API)&nbsp;:</p>
+<pre><span class="tn">services</span>:
+  <span class="tn">mongo</span>:
+    image: mongo:7
+    volumes: [ <span class="ts">"fioul-data:/data/db"</span> ]
+  <span class="tn">api</span>:
+    build: ./api
+    ports: [ <span class="ts">"8080:8080"</span> ]
+    environment:
+      SPRING_DATA_MONGODB_URI: <span class="ts">mongodb://mongo:27017/fioul</span>
+
+<span class="tn">volumes</span>:
+  fioul-data:</pre>
+    <div class="hint"><strong>Le nom du service = le nom réseau —</strong> ici l'API joint la base via <code>mongo</code> (le nom du service), pas <code>localhost</code> (rappel du chapitre 5).</div>
+  </section>
+  <section class="step" id="commandes">
+    <span class="snum"><span class="dotnum">3</span> Commande</span>
+    <h2>Démarrer &amp; arrêter</h2>
+<pre>docker compose up -d      <span class="tc"># build + démarre tout en arrière-plan</span>
+docker compose ps         <span class="tc"># état des services</span>
+docker compose logs -f api
+docker compose down       <span class="tc"># arrête et supprime (garde les volumes)</span></pre>
+  </section>
+  <section class="step" id="depends">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Ordonner le démarrage</h2>
+    <p class="goal"><code>depends_on</code> démarre la base avant l'API. Pour attendre qu'elle soit <em>prête</em> (et pas seulement démarrée), on combine avec un <b>healthcheck</b> — vu au chapitre 7.</p>
+<pre>  api:
+    depends_on: [ mongo ]</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris un premier <code>compose.yaml</code> à deux services (mongo + api) et lance-le avec <code>docker compose up -d</code>. Vérifie que l'API répond sur <code>localhost:8080</code> et lit bien la base. Le chapitre 7 ajoute la 3<sup>e</sup> couche et les réglages de production.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Compose décrit toute l'appli (services, volumes, réseau) en un fichier YAML.</li>
+      <li><code>docker compose up -d</code> / <code>down</code> pour tout démarrer / arrêter.</li>
+      <li>Les services se joignent par leur nom&nbsp;; <code>depends_on</code> ordonne le démarrage.</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-ch05.html">← Chapitre 05</a><a class="next" href="docker-ch07.html">Chapitre 07 · Le projet en Compose →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 06 — Docker Compose. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

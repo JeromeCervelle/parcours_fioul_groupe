@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 08 — Date, BottomNav & cycle de vie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 08</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 08</div>
+  <span class="lbadge">Chapitre 08 / 19</span>
+  <h1>Date, BottomNavigationBar &amp; cycle de vie</h1>
+  <p class="intro">Manipuler les dates (utile pour les dates limites), organiser l'appli en onglets avec la barre du bas, et comprendre le cycle de vie d'un widget à état.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#date">1 · DateTime</a><a href="#intl">2 · Formater (intl)</a><a href="#bottomnav">3 · BottomNav</a><a href="#cycle">4 · Cycle de vie</a></div></nav>
+<main class="wrap">
+  <section class="step" id="date">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>DateTime</h2>
+    <p class="goal"><code>DateTime</code> représente une date/heure&nbsp;; on calcule des écarts avec <code>Duration</code> et on compare avec <code>isBefore</code>/<code>isAfter</code>.</p>
+<pre><span class="tk">final</span> limite = DateTime.parse(<span class="ts">'2026-11-30'</span>);
+<span class="tk">final</span> ouverte = DateTime.now().isBefore(limite);</pre>
+  </section>
+  <section class="step" id="intl">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Formater avec intl</h2>
+    <p class="goal">Le paquet <code>intl</code> met en forme dates et nombres selon la locale (français).</p>
+<pre>DateFormat(<span class="ts">'d MMMM yyyy'</span>, <span class="ts">'fr'</span>).format(limite);  <span class="tc">// 30 novembre 2026</span></pre>
+  </section>
+  <section class="step" id="bottomnav">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>BottomNavigationBar</h2>
+    <p class="goal">La barre d'onglets en bas de l'écran&nbsp;: on garde l'index sélectionné dans l'état et on affiche l'écran correspondant.</p>
+<pre>bottomNavigationBar: BottomNavigationBar(
+  currentIndex: _index,
+  onTap: (i) =&gt; setState(() =&gt; _index = i),
+  items: <span class="tk">const</span> [
+    BottomNavigationBarItem(icon: Icon(Icons.list), label: <span class="ts">'Campagnes'</span>),
+    BottomNavigationBarItem(icon: Icon(Icons.person), label: <span class="ts">'Profil'</span>),
+  ],
+)</pre>
+  </section>
+  <section class="step" id="cycle">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Le cycle de vie d'un State</h2>
+    <p class="goal">Les méthodes clés d'un <code>State</code>&nbsp;: <code>initState()</code> (une fois, au début — idéal pour lancer un chargement), <code>build()</code> (à chaque rendu), <code>dispose()</code> (nettoyage&nbsp;: contrôleurs, abonnements).</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Affiche la date limite formatée en français sur chaque carte, calcule si la campagne est encore ouverte, et organise l'appli en onglets (Campagnes / Mes commandes / Profil) avec une <code>BottomNavigationBar</code>. Charge les campagnes dans <code>initState()</code> (chapitre 13).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>DateTime</code> + <code>intl</code> (<code>DateFormat</code>) pour les dates en français.</li>
+      <li><code>BottomNavigationBar</code> pour les onglets (index dans l'état).</li>
+      <li>Cycle de vie&nbsp;: <code>initState</code> / <code>build</code> / <code>dispose</code>.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch07.html">← Chapitre 07</a><a class="next" href="flutter-ch09.html">Chapitre 09 · Fonctionnement approfondi →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 08 — Date, BottomNav &amp; cycle de vie. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

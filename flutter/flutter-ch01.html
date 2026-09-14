@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 01 — Introduction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 01</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 01</div>
+  <span class="lbadge">Chapitre 01 / 19</span>
+  <h1>Introduction à Flutter</h1>
+  <p class="intro">Découvrir Flutter et Dart, le principe « tout est widget », le hot reload, et pourquoi un seul code sert plusieurs plateformes. On installe l'environnement de développement.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#quoi">1 · Qu'est-ce</a><a href="#dart">2 · Dart</a><a href="#widget">3 · Tout est widget</a><a href="#hotreload">4 · Hot reload</a><a href="#install">5 · Installer</a></div></nav>
+<main class="wrap">
+  <section class="step" id="quoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce que Flutter&nbsp;?</h2>
+    <p class="goal">Flutter est un <b>framework de Google</b> pour créer des applications <b>multiplateformes</b> (Android, iOS, web, desktop) à partir d'<b>un seul code source</b>. Il dessine lui-même l'interface (moteur de rendu Skia/Impeller), ce qui donne un rendu cohérent partout.</p>
+  </section>
+  <section class="step" id="dart">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Le langage Dart</h2>
+    <p class="goal">Flutter utilise <b>Dart</b>, un langage orienté objet, typé, proche de Java/JavaScript. Il compile en code natif (pour le mobile) et gère bien l'asynchrone (<code>async</code>/<code>await</code>) — utile pour les appels réseau.</p>
+  </section>
+  <section class="step" id="widget">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Tout est widget</h2>
+    <p class="goal">En Flutter, chaque élément de l'interface est un <b>widget</b>&nbsp;: le texte, un bouton, une marge, un écran entier. On décrit l'UI comme un <b>arbre de widgets</b> imbriqués.</p>
+<pre>Center(
+  child: Text(<span class="ts">'Bonjour Fioul Groupé'</span>),
+)</pre>
+  </section>
+  <section class="step" id="hotreload">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Le hot reload</h2>
+    <p class="goal">Modifier le code et voir le résultat en &lt; 1 seconde, sans perdre l'état de l'appli&nbsp;: c'est le <b>hot reload</b>, l'un des grands atouts de Flutter pour apprendre et itérer vite.</p>
+  </section>
+  <section class="step" id="install">
+    <span class="snum"><span class="dotnum">5</span> Pratique</span>
+    <h2>Installer l'environnement</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li>Le <b>SDK Flutter</b> (qui inclut Dart).</li>
+      <li>Un éditeur&nbsp;: VS Code (extension Flutter) ou Android Studio.</li>
+      <li>Un émulateur Android / un iPhone simulé, ou un vrai appareil.</li>
+      <li>Vérifier avec <code>flutter doctor</code>.</li>
+    </ul>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Tu vas construire l'appli mobile des <b>particuliers</b>&nbsp;: parcourir les campagnes ouvertes, s'inscrire, suivre le volume et le prix. Elle consommera l'API Spring (parcours 2). Ce chapitre installe le décor&nbsp;; dès le chapitre 2, on écrit du Dart.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Flutter = UI multiplateforme à partir d'un seul code (langage Dart).</li>
+      <li>Tout est widget&nbsp;; l'UI est un arbre de widgets.</li>
+      <li>Hot reload pour itérer vite&nbsp;; <code>flutter doctor</code> vérifie l'install.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-chapitres.html">← Sommaire</a><a class="next" href="flutter-ch02.html">Chapitre 02 · Les bases de Dart →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 01 — Introduction. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

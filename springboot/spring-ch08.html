@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 08 — Projet : couche Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 08</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 08</div>
+  <span class="lbadge">Chapitre 08 / 19 · projet</span>
+  <h1>Projet — la couche Services</h1>
+  <p class="intro">On écrit la vraie logique métier du fioul groupé&nbsp;: rejoindre une campagne, calculer le volume et le palier de prix, appliquer les règles de gestion.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#rejoindre">1 · Rejoindre</a><a href="#palier">2 · Calcul du palier</a><a href="#regles">3 · Règles métier</a><a href="#mapping">4 · Mapping DTO</a></div></nav>
+<main class="wrap">
+  <section class="step" id="rejoindre">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Rejoindre une campagne</h2>
+    <p class="goal">Le service ajoute une commande à la campagne (le <code>$push</code> vu côté Mongo), après vérifications.</p>
+<pre><span class="tk">public</span> CampagneDTO rejoindre(String id, CreerCommandeDTO dto) {
+    Campagne c = repo.findById(id)
+        .orElseThrow(() -&gt; <span class="tk">new</span> CampagneIntrouvable(id));
+    <span class="tk">if</span> (c.getStatut() != Statut.OUVERTE)
+        <span class="tk">throw new</span> CampagneFermee(id);
+    c.getCommandes().add(<span class="tk">new</span> Commande(dto.litres(), dto.commune(), dto.adresse()));
+    repo.save(c);
+    <span class="tk">return</span> versDTO(c);
+}</pre>
+  </section>
+  <section class="step" id="palier">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Calculer volume &amp; palier de prix</h2>
+    <p class="goal">On somme les litres, puis on choisit le palier du fournisseur — la logique de l'agrégation Mongo, ici en Java.</p>
+<pre><span class="tk">private</span> BigDecimal calculerPrix(<span class="tk">int</span> volume, Fournisseur f) {
+    <span class="tk">return</span> f.getPaliers().stream()
+        .filter(p -&gt; volume &gt;= p.volumeMin())
+        .max(Comparator.comparingInt(Palier::volumeMin))
+        .map(Palier::prixLitre)
+        .orElse(f.getPrixBase());
+}</pre>
+  </section>
+  <section class="step" id="regles">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les règles de gestion</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li>Refuser une inscription si la campagne est <code>CLOTUREE</code> ou la date dépassée → <b>409</b>.</li>
+      <li>Quantité minimale de commande (ex. 500 L) → validée en amont (chapitre 5/DTO).</li>
+      <li>Seul le coordinateur peut ouvrir/clôturer → contrôlé par la sécurité (chapitre 12).</li>
+    </ul>
+  </section>
+  <section class="step" id="mapping">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Le mapping entité → DTO</h2>
+    <p class="goal">C'est le service qui calcule <code>volumeTotal</code> et <code>prixLitre</code> pour remplir le DTO exposé.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris <code>listerOuvertes</code>, <code>consulter</code>, <code>rejoindre</code>, <code>cloturer</code> et <code>calculerPrix</code>. Ajoute des exceptions métier (<code>CampagneIntrouvable</code>, <code>CampagneFermee</code>) reliées aux codes 404/409 du chapitre 5.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>La logique vit dans le service&nbsp;: rejoindre, calculer, valider les règles.</li>
+      <li>Le calcul du palier reprend l'agrégation Mongo, en Java.</li>
+      <li>Exceptions métier → codes HTTP via le <code>@RestControllerAdvice</code>.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch07.html">← Chapitre 07</a><a class="next" href="spring-ch09.html">Chapitre 09 · Partie Data →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 08 — Projet : couche Services. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

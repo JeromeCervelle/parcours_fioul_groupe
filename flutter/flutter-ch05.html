@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 05 — Introduction à Material</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 05</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 05</div>
+  <span class="lbadge">Chapitre 05 / 19</span>
+  <h1>Introduction à Material</h1>
+  <p class="intro">Material Design est le système de composants prêts à l'emploi de Flutter&nbsp;: la structure d'écran (Scaffold), la barre du haut (AppBar), les boutons et le thème.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#materialapp">1 · MaterialApp</a><a href="#scaffold">2 · Scaffold</a><a href="#appbar">3 · AppBar &amp; FAB</a><a href="#boutons">4 · Boutons</a><a href="#theme">5 · Thème</a></div></nav>
+<main class="wrap">
+  <section class="step" id="materialapp">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>MaterialApp, la racine</h2>
+    <p class="goal"><code>MaterialApp</code> englobe l'application&nbsp;: elle apporte le style Material, la navigation, le thème et la locale.</p>
+<pre>MaterialApp(
+  title: <span class="ts">'Fioul Groupé'</span>,
+  home: AccueilScreen(),
+)</pre>
+  </section>
+  <section class="step" id="scaffold">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Scaffold, la structure d'écran</h2>
+    <p class="goal"><code>Scaffold</code> fournit la charpente d'un écran&nbsp;: <code>appBar</code> (haut), <code>body</code> (contenu), <code>floatingActionButton</code>, <code>bottomNavigationBar</code>, <code>drawer</code>.</p>
+<pre>Scaffold(
+  appBar: AppBar(title: <span class="tk">const</span> Text(<span class="ts">'Campagnes'</span>)),
+  body: <span class="tc">/* la liste */</span>,
+)</pre>
+  </section>
+  <section class="step" id="appbar">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>AppBar &amp; FloatingActionButton</h2>
+    <p class="goal">L'<code>AppBar</code> porte le titre et des actions&nbsp;; le <code>FloatingActionButton</code> est le bouton d'action principal (ex. « nouvelle campagne » pour un coordinateur).</p>
+<pre>floatingActionButton: FloatingActionButton(
+  onPressed: () {},
+  child: <span class="tk">const</span> Icon(Icons.add),
+)</pre>
+  </section>
+  <section class="step" id="boutons">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Les boutons</h2>
+    <p class="goal"><code>ElevatedButton</code> (bouton plein), <code>TextButton</code> (plat), <code>OutlinedButton</code> (contour). Tous prennent <code>onPressed</code> et un <code>child</code>.</p>
+<pre>ElevatedButton(onPressed: () {}, child: <span class="tk">const</span> Text(<span class="ts">'Rejoindre'</span>))</pre>
+  </section>
+  <section class="step" id="theme">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Le thème</h2>
+    <p class="goal">On centralise couleurs et polices dans <code>ThemeData</code> (couleur d'accent, mode clair/sombre), appliqué à toute l'appli via <code>MaterialApp</code>.</p>
+<pre>theme: ThemeData(colorSchemeSeed: Colors.teal, useMaterial3: <span class="tk">true</span>)</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Monte le squelette de l'appli&nbsp;: <code>MaterialApp</code> + <code>Scaffold</code> avec une <code>AppBar</code> « Fioul Groupé », un thème aux couleurs du projet, et un <code>FloatingActionButton</code> (réservé au coordinateur, plus tard). Tu tiens la coquille de tous les écrans à venir.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>MaterialApp</code> (racine) → <code>Scaffold</code> (écran) → <code>AppBar</code>/<code>body</code>/FAB.</li>
+      <li>Boutons&nbsp;: Elevated / Text / Outlined, avec <code>onPressed</code>.</li>
+      <li>Thème centralisé dans <code>ThemeData</code>.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch04.html">← Chapitre 04</a><a class="next" href="flutter-ch06.html">Chapitre 06 · Stateless / Stateful →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 05 — Introduction à Material. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

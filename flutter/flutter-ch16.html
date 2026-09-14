@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 16 — Interaction avec le hardware</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 16</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 16</div>
+  <span class="lbadge">Chapitre 16 / 19</span>
+  <h1>Interaction avec le hardware</h1>
+  <p class="intro">Utiliser les capacités du téléphone via des paquets&nbsp;: appareil photo/galerie, géolocalisation, et la gestion des permissions.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#paquets">1 · Les paquets</a><a href="#permissions">2 · Permissions</a><a href="#photo">3 · Photo</a><a href="#gps">4 · GPS</a></div></nav>
+<main class="wrap">
+  <section class="step" id="paquets">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les paquets pub.dev</h2>
+    <p class="goal">Flutter accède au matériel via des <b>plugins</b> publiés sur <code>pub.dev</code>&nbsp;: <code>image_picker</code> (photo), <code>geolocator</code> (position), <code>permission_handler</code> (permissions). On les ajoute à <code>pubspec.yaml</code>.</p>
+  </section>
+  <section class="step" id="permissions">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Les permissions</h2>
+    <p class="goal">Caméra et localisation exigent l'autorisation de l'utilisateur, à déclarer dans <code>AndroidManifest.xml</code> / <code>Info.plist</code> et à demander à l'exécution.</p>
+    <div class="warn"><strong>Cyber &amp; RGPD —</strong> ne demander que les permissions nécessaires, expliquer pourquoi, et gérer le refus proprement.</div>
+  </section>
+  <section class="step" id="photo">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Prendre / choisir une photo</h2>
+    <p class="goal"><code>image_picker</code> ouvre l'appareil photo ou la galerie et renvoie un fichier.</p>
+<pre><span class="tk">final</span> photo = <span class="tk">await</span> ImagePicker().pickImage(source: ImageSource.camera);</pre>
+  </section>
+  <section class="step" id="gps">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Obtenir la position</h2>
+    <p class="goal"><code>geolocator</code> donne la position GPS courante — la clé de la recherche de campagnes « autour de moi ».</p>
+<pre><span class="tk">final</span> pos = <span class="tk">await</span> Geolocator.getCurrentPosition();
+<span class="tc">// pos.latitude, pos.longitude → envoyés à l'API ($near côté Mongo)</span></pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Récupère la position du particulier avec <code>geolocator</code> (après permission), envoie-la à l'API, qui lance la requête géospatiale <code>$near</code> (parcours MongoDB, ch. 13) pour proposer les campagnes proches. Boucle complète GPS → API → Mongo.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Le hardware s'utilise via des plugins pub.dev.</li>
+      <li>Déclarer et demander les permissions&nbsp;; gérer le refus.</li>
+      <li><code>image_picker</code> (photo), <code>geolocator</code> (position GPS).</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch15.html">← Chapitre 15</a><a class="next" href="flutter-ch17.html">Chapitre 17 · Google Maps →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 16 — Interaction avec le hardware. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

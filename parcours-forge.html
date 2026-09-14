@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours Forge & Git — 8 séances — Fioul Groupé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* petits ajouts propres à la page Forge (séances de TD détaillées) */
+.meta-line{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-size:.74rem;font-weight:600;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-soft);border-radius:999px;padding:4px 11px}
+.chip b{color:var(--accent-ink)}
+.step h4{font-family:"Instrument Sans";font-weight:700;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:26px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.ui{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--t-forge);border-radius:10px;padding:14px 16px;margin:14px 0}
+.ui .ttl{font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ui ol{margin:0;padding-left:20px;font-size:.93rem;color:var(--ink-soft)}
+.ui li{margin:6px 0}
+.path{font-family:"JetBrains Mono";font-size:.85em;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 7px;white-space:nowrap;color:var(--ink)}
+.term-cap{font-family:"JetBrains Mono";font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:16px 0 -6px}
+.deliver{background:var(--fioul-wash);border:1px solid color-mix(in srgb,var(--fioul) 30%,var(--line));border-radius:12px;padding:16px 18px;margin-top:20px}
+.deliver .ttl{font-weight:700;color:var(--fioul-ink);display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.95rem}
+.deliver ul{margin:0;padding-left:20px;font-size:.93rem;color:var(--ink-soft)}
+.deliver li{margin:5px 0}
+.cmd{color:#8fd9b7}
+</style>
+</head>
+<body data-track="forge">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Parcours 0 — Forge &amp; Git (GitHub)</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="index.html">Accueil</a>
+      <a href="parcours-forge.html" class="on">0 · Forge</a>
+      <a href="mongodb/parcours-mongodb.html">1 · MongoDB</a>
+      <a href="springboot/parcours-api-spring.html">2 · API Spring</a>
+      <a href="flutter/parcours-flutter.html">3 · Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="index.html">Accueil</a> › Parcours 0 · Forge &amp; Git</div>
+    <span class="lbadge">🔧 Parcours 0 — La forge, avant tout le reste</span>
+    <h1>Mettre en place et piloter le projet sur GitHub</h1>
+    <p class="intro">Huit séances d'énoncés, du premier <code>commit</code> jusqu'au déploiement automatisé. On n'apprend pas Git « à vide »&nbsp;: chaque séance fait avancer le vrai dépôt <code>fioul-groupe</code>, avec les <strong>commandes exactes</strong> et le <strong>chemin précis dans l'interface GitHub</strong> à chaque étape.</p>
+    <div class="meta-line">
+      <span class="chip">🎯 <b>Public&nbsp;:</b>&nbsp;BTS SIO 2<sup>e</sup> année</span>
+      <span class="chip">⏱️ <b>8 séances</b>&nbsp;de 2 h</span>
+      <span class="chip">👥 <b>En binôme</b>&nbsp;sur un dépôt commun</span>
+      <span class="chip">🗂️ <b>Fil rouge&nbsp;:</b>&nbsp;fioul-groupe</span>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#s1">1 · Le dépôt</a>
+    <a href="#s2">2 · Commits &amp; branches</a>
+    <a href="#s3">3 · Collaborer (PR)</a>
+    <a href="#s4">4 · Piloter (Issues/Projects)</a>
+    <a href="#s5">5 · Protéger</a>
+    <a href="#s6">6 · CI (Actions)</a>
+    <a href="#s7">7 · Déployer (Pages)</a>
+    <a href="#s8">8 · Sécuriser &amp; finaliser</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <div class="hint" style="margin-top:26px">
+    <strong>Vocabulaire de la forge —</strong> une <b>forge</b> est une plateforme qui héberge le code et outille tout le cycle de vie du projet&nbsp;: <b>dépôt</b> Git, suivi de tâches (<b>issues</b>), revue de code (<b>pull requests</b>), automatisation (<b>Actions</b>), hébergement (<b>Pages</b>). GitHub est une forge&nbsp;; GitLab et la Forge des communs de l'Éducation nationale en sont d'autres. Git est l'outil de gestion de versions&nbsp;; la forge est le service qui l'entoure.
+  </div>
+
+  <!-- SEANCE 1 -->
+  <section class="step" id="s1">
+    <span class="snum"><span class="dotnum">1</span> Séance 1</span>
+    <h2>Créer le dépôt et le premier commit</h2>
+    <p class="goal"><b>Objectifs —</b> installer et configurer Git, comprendre dépôt local / dépôt distant, créer le dépôt <code>fioul-groupe</code> sur GitHub, l'authentifier, et pousser un premier contenu.</p>
+
+    <h4>1 · Installer et configurer Git</h4>
+    <p class="term-cap">Terminal (une seule fois par poste)</p>
+<pre><span class="cmd">git --version</span>                       <span class="tc"># vérifier l'installation</span>
+<span class="cmd">git config --global user.name</span> <span class="ts">"Prénom Nom"</span>
+<span class="cmd">git config --global user.email</span> <span class="ts">"prenom.nom@exemple.fr"</span>
+<span class="cmd">git config --global init.defaultBranch</span> main   <span class="tc"># branche par défaut = main</span>
+<span class="cmd">git config --global core.autocrlf</span> input        <span class="tc"># fins de ligne (Windows)</span></pre>
+    <div class="tip"><strong>Pourquoi ces réglages —</strong> le nom et l'e-mail sont inscrits dans <em>chaque</em> commit&nbsp;: c'est ainsi que la forge attribue le travail à son auteur. Utilise le <b>même e-mail</b> que ton compte GitHub pour que tes commits te soient reconnus.</p></div>
+
+    <h4>2 · Créer un compte et le dépôt sur GitHub</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans l'interface GitHub</div>
+      <ol>
+        <li>Crée un compte sur <span class="path">github.com</span> (adresse académique conseillée&nbsp;; pense au <b>GitHub Student Developer Pack</b>, gratuit).</li>
+        <li>En haut à droite&nbsp;: <span class="path">+ ▸ New repository</span>.</li>
+        <li>Nom du dépôt&nbsp;: <span class="path">fioul-groupe</span>. Description&nbsp;: « Commande groupée de fioul — projet SLAM ».</li>
+        <li>Visibilité&nbsp;: <b>Private</b> (on ouvrira plus tard si besoin).</li>
+        <li>Coche <b>Add a README file</b> et choisis un <b>.gitignore</b> (modèle <em>Java</em> pour commencer) et une <b>licence</b> (ex. MIT).</li>
+        <li><span class="path">Create repository</span>.</li>
+      </ol>
+    </div>
+
+    <h4>3 · S'authentifier : SSH ou token</h4>
+    <p>GitHub n'accepte plus le mot de passe en ligne de commande. Deux méthodes&nbsp;:</p>
+    <p class="term-cap">Option A — clé SSH (recommandée)</p>
+<pre><span class="cmd">ssh-keygen -t ed25519 -C</span> <span class="ts">"prenom.nom@exemple.fr"</span>
+<span class="cmd">cat</span> ~/.ssh/id_ed25519.pub          <span class="tc"># copier la clé PUBLIQUE</span></pre>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Photo de profil ▸ Settings ▸ SSH and GPG keys ▸ New SSH key</span>.</li>
+        <li>Colle la clé <b>publique</b>, donne un titre (« PC lycée »), valide.</li>
+        <li>Teste&nbsp;: <span class="path">ssh -T git@github.com</span>.</li>
+      </ol>
+    </div>
+    <p class="term-cap">Option B — jeton d'accès personnel (PAT) pour HTTPS</p>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Settings ▸ Developer settings ▸ Personal access tokens ▸ Fine-grained tokens ▸ Generate new token</span>.</li>
+        <li>Portée&nbsp;: le dépôt <span class="path">fioul-groupe</span>, permission <b>Contents: Read and write</b>, durée limitée.</li>
+        <li>Le jeton s'utilise <b>à la place du mot de passe</b> lors du <code>git push</code> (il ne s'affiche qu'une fois).</li>
+      </ol>
+    </div>
+    <div class="warn"><strong>Sécurité —</strong> un PAT ou une clé privée est un secret&nbsp;: jamais dans le dépôt, jamais partagé, durée d'expiration courte.</div>
+
+    <h4>4 · Relier le local au distant</h4>
+    <p>Le dépôt existe déjà sur GitHub (créé à l'étape 2). On le <b>clone</b> pour en avoir une copie locale&nbsp;:</p>
+<pre><span class="cmd">git clone git@github.com:&lt;compte&gt;/fioul-groupe.git</span>
+<span class="cmd">cd</span> fioul-groupe
+<span class="cmd">git remote -v</span>                  <span class="tc"># origin → l'URL du dépôt distant</span></pre>
+    <p>On ajoute un premier fichier, puis le cycle fondamental <b>modifier → indexer → valider → pousser</b>&nbsp;:</p>
+<pre><span class="cmd">echo</span> <span class="ts">"# Fioul Groupé"</span> &gt;&gt; README.md
+<span class="cmd">git status</span>                     <span class="tc"># voir ce qui a changé</span>
+<span class="cmd">git add</span> README.md              <span class="tc"># indexer (staging)</span>
+<span class="cmd">git commit -m</span> <span class="ts">"docs: présentation du projet"</span>
+<span class="cmd">git push</span>                       <span class="tc"># envoyer vers origin</span></pre>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li>Dépôt <code>fioul-groupe</code> créé, README rédigé (nom du projet, membres du binôme, objectif).</li>
+        <li>Authentification SSH (ou PAT) fonctionnelle&nbsp;: un <code>git push</code> réussi.</li>
+        <li>Capture d'écran du dépôt sur GitHub, ajoutée au dossier.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 2 -->
+  <section class="step" id="s2">
+    <span class="snum"><span class="dotnum">2</span> Séance 2</span>
+    <h2>Commits propres &amp; branches</h2>
+    <p class="goal"><b>Objectifs —</b> écrire un historique lisible (commits atomiques, messages conventionnels), maîtriser <code>.gitignore</code>, et travailler sur des branches sans polluer <code>main</code>.</p>
+
+    <h4>1 · Ignorer ce qui ne doit pas être versionné</h4>
+    <p>On ne versionne <b>jamais</b> les fichiers générés, les dépendances ni les secrets. Le <code>.gitignore</code> les exclut&nbsp;:</p>
+<pre><span class="tc"># .gitignore (extraits)</span>
+target/            <span class="tc"># build Maven</span>
+build/             <span class="tc"># build Flutter/Gradle</span>
+.env               <span class="tc"># variables secrètes</span>
+*.log
+.idea/  .vscode/   <span class="tc"># réglages d'IDE</span></pre>
+    <div class="tip"><strong>Déjà suivi par erreur&nbsp;?</strong> <code>git rm -r --cached target/</code> retire un dossier du suivi sans l'effacer du disque, puis on commit.</div>
+
+    <h4>2 · Des commits atomiques et bien nommés</h4>
+    <p>Un commit = <b>une</b> intention. On adopte la convention <b>Conventional Commits</b> (utile pour la CI et les releases plus tard)&nbsp;:</p>
+<pre><span class="cmd">git add</span> src/model/Campagne.java
+<span class="cmd">git commit -m</span> <span class="ts">"feat: ajoute le modèle Campagne"</span>
+<span class="tc"># types courants : feat, fix, docs, refactor, test, chore</span>
+<span class="cmd">git log --oneline --graph</span>       <span class="tc"># visualiser l'historique</span></pre>
+
+    <h4>3 · Travailler sur une branche</h4>
+    <p><code>main</code> reste stable&nbsp;; chaque fonctionnalité vit sur sa propre branche&nbsp;:</p>
+<pre><span class="cmd">git switch -c</span> feature/modele-campagne   <span class="tc"># créer + basculer</span>
+<span class="tc"># ... on code, on commit sur la branche ...</span>
+<span class="cmd">git push -u origin</span> feature/modele-campagne  <span class="tc"># publier la branche</span>
+<span class="cmd">git branch</span>                              <span class="tc"># lister les branches</span>
+<span class="cmd">git switch</span> main                         <span class="tc"># revenir sur main</span></pre>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Onglet <span class="path">&lt;/&gt; Code</span>&nbsp;: le sélecteur de branche montre <b>main</b> et <b>feature/modele-campagne</b>.</li>
+        <li>L'onglet <span class="path">Insights ▸ Network</span> affiche le graphe des branches et commits.</li>
+      </ol>
+    </div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li><code>.gitignore</code> adapté (Java + Flutter + secrets).</li>
+        <li>Au moins deux branches de fonctionnalité poussées, avec des commits conventionnels.</li>
+        <li><code>git log --oneline</code> lisible (copie dans le dossier).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 3 -->
+  <section class="step" id="s3">
+    <span class="snum"><span class="dotnum">3</span> Séance 3</span>
+    <h2>Collaborer : Pull Requests, revue &amp; conflits</h2>
+    <p class="goal"><b>Objectifs —</b> intégrer le travail via des Pull Requests, faire une revue de code entre binômes, et résoudre un conflit de fusion.</p>
+
+    <h4>1 · Ouvrir une Pull Request</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Après un <code>push</code> de branche, GitHub propose un bandeau <span class="path">Compare &amp; pull request</span>.</li>
+        <li>Sinon&nbsp;: onglet <span class="path">Pull requests ▸ New pull request</span>, base <b>main</b> ← compare <b>feature/…</b>.</li>
+        <li>Titre + description&nbsp;: <em>quoi</em> et <em>pourquoi</em>. Lier une issue avec <span class="path">Closes #3</span>.</li>
+        <li>À droite&nbsp;: <b>Reviewers</b> (le binôme), <b>Labels</b>, <b>Assignees</b>.</li>
+        <li><span class="path">Create pull request</span>.</li>
+      </ol>
+    </div>
+
+    <h4>2 · Faire une revue de code</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Onglet <span class="path">Files changed</span>&nbsp;: commenter une ligne précise en cliquant le <b>+</b> dans la marge.</li>
+        <li><span class="path">Review changes</span>&nbsp;: choisir <b>Comment</b>, <b>Approve</b> ou <b>Request changes</b>.</li>
+        <li>Une fois approuvée&nbsp;: <span class="path">Merge pull request</span> → <b>Squash and merge</b> (historique propre), puis <b>Delete branch</b>.</li>
+      </ol>
+    </div>
+
+    <h4>3 · Récupérer et gérer un conflit</h4>
+    <p>Après une fusion, chacun met à jour sa copie locale&nbsp;:</p>
+<pre><span class="cmd">git switch</span> main
+<span class="cmd">git pull</span>                     <span class="tc"># récupérer main à jour</span>
+<span class="cmd">git switch</span> feature/api
+<span class="cmd">git merge</span> main               <span class="tc"># réintégrer main → conflit possible</span></pre>
+    <p>Git marque les conflits dans le fichier&nbsp;:</p>
+<pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+prixLitre = 1.05;
+=======
+prixLitre = 0.98;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</pre>
+    <p>On choisit la bonne version, on retire les marqueurs, puis&nbsp;:</p>
+<pre><span class="cmd">git add</span> &lt;fichier&gt;
+<span class="cmd">git commit</span>                   <span class="tc"># valide la résolution</span></pre>
+    <div class="tip"><strong>Exercice imposé —</strong> provoquez volontairement un conflit à deux (même ligne modifiée), puis résolvez-le ensemble. C'est la compétence collaborative clé.</div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li>Au moins deux PR fusionnées, chacune <b>relue et commentée</b> par le binôme.</li>
+        <li>Une PR liée à une issue (<code>Closes #n</code>).</li>
+        <li>Un conflit résolu, documenté en une phrase dans la PR.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 4 -->
+  <section class="step" id="s4">
+    <span class="snum"><span class="dotnum">4</span> Séance 4</span>
+    <h2>Piloter le projet : Issues, labels &amp; Projects</h2>
+    <p class="goal"><b>Objectifs —</b> transformer le cahier des charges du fioul en tâches suivies, et piloter l'avancement sur un tableau kanban relié au code.</p>
+
+    <h4>1 · Écrire des issues à partir des user stories</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Onglet <span class="path">Issues ▸ New issue</span>.</li>
+        <li>Titre orienté user story&nbsp;: « En tant que particulier, je rejoins une campagne ».</li>
+        <li>Description&nbsp;: critères d'acceptation sous forme de cases <span class="path">- [ ] …</span>.</li>
+        <li><b>Labels</b>&nbsp;: <span class="path">mongodb</span>, <span class="path">api</span>, <span class="path">flutter</span>, <span class="path">bug</span>, <span class="path">priorité:haute</span> (créés via <span class="path">Issues ▸ Labels</span>).</li>
+        <li><b>Milestone</b>&nbsp;: « Bloc données », « Bloc API », « Bloc mobile » (via <span class="path">Issues ▸ Milestones</span>).</li>
+      </ol>
+    </div>
+
+    <h4>2 · Le tableau de bord (Projects)</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Onglet <span class="path">Projects ▸ New project ▸ Board</span>.</li>
+        <li>Colonnes <b>Todo / In progress / In review / Done</b>.</li>
+        <li><span class="path">Add item</span> pour rattacher les issues&nbsp;; glisser-déposer entre colonnes.</li>
+        <li>Ajoute des champs&nbsp;: <b>Priority</b>, <b>Estimate</b>, <b>Assignee</b>.</li>
+      </ol>
+    </div>
+
+    <h4>3 · Relier le code aux tâches</h4>
+    <p>Dans un message de commit ou une PR, un mot-clé ferme l'issue automatiquement à la fusion&nbsp;:</p>
+<pre><span class="cmd">git commit -m</span> <span class="ts">"feat: endpoint POST /commandes (closes #12)"</span></pre>
+    <div class="tip"><strong>Mots-clés —</strong> <code>closes</code>, <code>fixes</code>, <code>resolves</code> ferment l'issue&nbsp;; l'item passe alors tout seul en <b>Done</b> sur le board.</div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li>≥ 10 issues rédigées, étiquetées et rattachées à des milestones.</li>
+        <li>Un board Projects alimenté, reflétant l'état réel.</li>
+        <li>Une issue fermée automatiquement par une PR (preuve en capture).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 5 -->
+  <section class="step" id="s5">
+    <span class="snum"><span class="dotnum">5</span> Séance 5</span>
+    <h2>Protéger et cadrer la collaboration</h2>
+    <p class="goal"><b>Objectifs —</b> empêcher les erreurs sur <code>main</code>, imposer la revue, et standardiser issues et PR avec des modèles.</p>
+
+    <h4>1 · Protéger la branche main (ruleset)</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Settings ▸ Rules ▸ Rulesets ▸ New branch ruleset</span> (ou <span class="path">Settings ▸ Branches</span> en mode classique).</li>
+        <li>Cible&nbsp;: la branche <span class="path">main</span>.</li>
+        <li>Active&nbsp;: <b>Require a pull request before merging</b> (donc plus de push direct).</li>
+        <li><b>Require approvals</b>&nbsp;: 1 relecteur minimum.</li>
+        <li><b>Require status checks to pass</b>&nbsp;: on cochera la CI à la séance 6.</li>
+        <li>Enregistre&nbsp;: tenter un <code>git push</code> direct sur main est désormais refusé.</li>
+      </ol>
+    </div>
+
+    <h4>2 · Désigner des responsables (CODEOWNERS)</h4>
+    <p>Un fichier <span class="path">.github/CODEOWNERS</span> demande automatiquement la revue des bonnes personnes&nbsp;:</p>
+<pre><span class="tc"># chemin           responsable</span>
+/api/            <span class="ts">@binome-backend</span>
+/mobile/         <span class="ts">@binome-mobile</span></pre>
+
+    <h4>3 · Modèles d'issue et de PR</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Fichiers à ajouter au dépôt</div>
+      <ol>
+        <li><span class="path">.github/ISSUE_TEMPLATE/bug.md</span> et <span class="path">/feature.md</span> — GitHub les propose au clic sur « New issue ».</li>
+        <li><span class="path">.github/pull_request_template.md</span> — pré-remplit chaque PR (résumé, checklist, issue liée).</li>
+      </ol>
+    </div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li><code>main</code> protégée&nbsp;: PR + 1 revue obligatoires, push direct refusé.</li>
+        <li>Fichier <code>CODEOWNERS</code> et modèles d'issue/PR en place.</li>
+        <li>Preuve d'un push direct refusé (capture du message d'erreur).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 6 -->
+  <section class="step" id="s6">
+    <span class="snum"><span class="dotnum">6</span> Séance 6</span>
+    <h2>Intégration continue avec GitHub Actions</h2>
+    <p class="goal"><b>Objectifs —</b> automatiser build et tests à chaque push/PR, pour ne fusionner que du code qui compile et passe les tests.</p>
+
+    <h4>1 · Comprendre un workflow</h4>
+    <p>Un workflow est un fichier YAML dans <span class="path">.github/workflows/</span>. Il définit des <b>déclencheurs</b> (<code>on</code>), des <b>jobs</b> et des <b>steps</b>. GitHub fournit les machines (runners).</p>
+
+    <h4>2 · Workflow build + tests de l'API</h4>
+    <p class="term-cap">.github/workflows/api.yml</p>
+<pre><span class="tn">name</span>: <span class="ts">CI API</span>
+<span class="tn">on</span>:
+  <span class="tn">push</span>: { <span class="tn">branches</span>: [ main ] }
+  <span class="tn">pull_request</span>:
+<span class="tn">jobs</span>:
+  <span class="tn">build</span>:
+    <span class="tn">runs-on</span>: ubuntu-latest
+    <span class="tn">steps</span>:
+      - <span class="tn">uses</span>: actions/checkout@v4
+      - <span class="tn">uses</span>: actions/setup-java@v4
+        <span class="tn">with</span>: { java-version: <span class="ts">'21'</span>, distribution: temurin, cache: maven }
+      - <span class="tn">run</span>: mvn -B verify        <span class="tc"># compile + tests</span></pre>
+
+    <h4>3 · Voir la CI agir</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Onglet <span class="path">Actions</span>&nbsp;: chaque exécution, ses logs step par step.</li>
+        <li>Sur une PR&nbsp;: un ✅ ou ❌ apparaît&nbsp;; clic sur <span class="path">Details</span> pour les logs.</li>
+        <li>Retourne dans le <b>ruleset</b> (séance 5) et coche <b>Require status checks</b> → <span class="path">CI API</span>&nbsp;: une PR rouge ne peut plus être fusionnée.</li>
+        <li>Ajoute un <b>badge</b> de statut dans le README (menu <span class="path">… ▸ Create status badge</span> depuis Actions).</li>
+      </ol>
+    </div>
+    <div class="tip"><strong>Bonus Flutter —</strong> un second workflow <code>mobile.yml</code> avec <code>subosito/flutter-action</code> lance <code>flutter analyze</code> et <code>flutter test</code>.</div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li>Workflow CI qui compile et teste, vert sur <code>main</code>.</li>
+        <li>Statut de CI obligatoire pour fusionner (relié au ruleset).</li>
+        <li>Badge de build affiché dans le README.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 7 -->
+  <section class="step" id="s7">
+    <span class="snum"><span class="dotnum">7</span> Séance 7</span>
+    <h2>Déployer : GitHub Pages, secrets &amp; releases</h2>
+    <p class="goal"><b>Objectifs —</b> publier le site du cours en ligne, gérer les secrets proprement, et versionner des livrables avec les releases.</p>
+
+    <h4>1 · Publier le portail sur GitHub Pages</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li>Place ce portail (index.html + assets) dans un dossier <span class="path">/site</span> du dépôt, puis pousse.</li>
+        <li><span class="path">Settings ▸ Pages</span>.</li>
+        <li><b>Source</b>&nbsp;: <span class="path">Deploy from a branch</span>, branche <b>main</b>, dossier <span class="path">/site</span> (ou <span class="path">/root</span>).</li>
+        <li>Après ~1 min&nbsp;: le site est en ligne sur <span class="path">https://&lt;compte&gt;.github.io/fioul-groupe/</span>.</li>
+      </ol>
+    </div>
+    <div class="tip"><strong>Le déclic —</strong> c'est la première mise en production du parcours. Les étudiants voient leur travail public dès la séance 1 du contenu technique.</div>
+
+    <h4>2 · Gérer les secrets (jamais dans le code)</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Settings ▸ Secrets and variables ▸ Actions ▸ New repository secret</span>.</li>
+        <li>Ex.&nbsp;: <span class="path">MONGODB_URI</span> = l'URI Atlas (avec mot de passe).</li>
+        <li>Dans un workflow, on y accède par <span class="path">${{ secrets.MONGODB_URI }}</span> — la valeur n'apparaît jamais dans les logs.</li>
+      </ol>
+    </div>
+
+    <h4>3 · Publier une release</h4>
+    <p>Un <b>tag</b> marque une version&nbsp;; la <b>release</b> l'accompagne d'une note et de fichiers (ex. l'APK Flutter)&nbsp;:</p>
+<pre><span class="cmd">git tag -a</span> v1.0.0 <span class="cmd">-m</span> <span class="ts">"Première version démo"</span>
+<span class="cmd">git push origin</span> v1.0.0</pre>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Releases ▸ Draft a new release</span>, choisir le tag <span class="path">v1.0.0</span>.</li>
+        <li>Rédiger les notes de version&nbsp;; joindre l'<b>APK</b> dans <b>Assets</b>.</li>
+      </ol>
+    </div>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable de la séance</div>
+      <ul>
+        <li>Portail en ligne via GitHub Pages (URL dans le README).</li>
+        <li>Un secret configuré et utilisé par un workflow.</li>
+        <li>Une release <code>v1.0.0</code> avec notes (et APK si disponible).</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SEANCE 8 -->
+  <section class="step" id="s8">
+    <span class="snum"><span class="dotnum">8</span> Séance 8</span>
+    <h2>Sécuriser, réparer &amp; finaliser</h2>
+    <p class="goal"><b>Objectifs —</b> durcir le dépôt, savoir revenir en arrière proprement, et livrer un projet documenté prêt pour la soutenance.</p>
+
+    <h4>1 · Sécurité du dépôt</h4>
+    <div class="ui">
+      <div class="ttl">🖱️ Dans GitHub</div>
+      <ol>
+        <li><span class="path">Settings ▸ Advanced Security</span>&nbsp;: active <b>Dependabot alerts</b> et <b>Secret scanning</b>.</li>
+        <li>Dependabot ouvre automatiquement des PR de mise à jour des dépendances vulnérables.</li>
+        <li>Ajoute <span class="path">.github/dependabot.yml</span> pour surveiller Maven et pub (Flutter).</li>
+      </ol>
+    </div>
+    <div class="warn"><strong>Un secret a fuité&nbsp;?</strong> le retirer d'un commit ne suffit pas&nbsp;: il reste dans l'historique. Il faut <b>révoquer</b> le secret et le régénérer. À relier à ton cours de cybersécurité.</div>
+
+    <h4>2 · Revenir en arrière sans casser l'historique</h4>
+<pre><span class="cmd">git revert</span> &lt;hash&gt;      <span class="tc"># annule un commit en créant un commit inverse (sûr, partagé)</span>
+<span class="cmd">git restore</span> &lt;fichier&gt;  <span class="tc"># annule des modifs non validées</span>
+<span class="cmd">git reset --soft</span> HEAD~1 <span class="tc"># défait le dernier commit local (avant push)</span></pre>
+    <div class="tip"><strong>Règle d'or —</strong> sur du code déjà poussé et partagé, on utilise <code>revert</code> (non destructif). On réserve <code>reset</code> à ce qui est encore purement local.</div>
+
+    <h4>3 · Finaliser la documentation</h4>
+    <ul class="check">
+      <li>README complet&nbsp;: présentation, prérequis, <b>comment lancer</b> l'API et l'appli, URL Pages, badge CI, captures.</li>
+      <li>Un <b>Wiki</b> ou un dossier <span class="path">/docs</span> pour la doc détaillée.</li>
+      <li>Vérifier licence, <code>.gitignore</code>, absence de secret dans l'historique.</li>
+      <li>Board Projects entièrement en <b>Done</b>, milestones clôturés.</li>
+    </ul>
+
+    <div class="deliver">
+      <div class="ttl">📦 Livrable final du parcours Forge</div>
+      <ul>
+        <li>Dépôt sécurisé (Dependabot, secret scanning actifs).</li>
+        <li>Historique propre, un <code>revert</code> démontré.</li>
+        <li>README professionnel + site en ligne + release&nbsp;: le dépôt est prêt pour la soutenance.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="index.html">← Retour au portail</a>
+    <a class="next" href="mongodb/parcours-mongodb.html">Parcours 1 · MongoDB →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Parcours 0 — Forge &amp; Git sur GitHub, appliqué au dépôt du projet. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="assets/js/parcours.js"></script>
+</body>
+</html>

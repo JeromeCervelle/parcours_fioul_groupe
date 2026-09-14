@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 17 — Projet : surveillance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 17</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 17</div>
+  <span class="lbadge">Chapitre 17 / 19 · projet</span>
+  <h1>Projet — la surveillance</h1>
+  <p class="intro">On rend l'API Fioul Groupé observable en conditions réelles&nbsp;: gestion homogène des exceptions, logs utiles, health check pour l'hébergeur, et centralisation des logs.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#exceptions">1 · Exceptions</a><a href="#logsutiles">2 · Logs utiles</a><a href="#health">3 · Health check</a><a href="#central">4 · Centraliser</a></div></nav>
+<main class="wrap">
+  <section class="step" id="exceptions">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Gestion homogène des exceptions</h2>
+    <p class="goal">On complète le <code>@RestControllerAdvice</code> (chapitre 5) pour couvrir toutes les erreurs métier et renvoyer un corps d'erreur uniforme.</p>
+<pre>{ "erreur": "Campagne clôturée", "code": "CAMPAGNE_FERMEE", "statut": 409 }</pre>
+  </section>
+  <section class="step" id="logsutiles">
+    <span class="snum"><span class="dotnum">2</span> Bonne pratique</span>
+    <h2>Journaliser ce qui compte</h2>
+    <p class="goal">On loggue les événements métier importants (campagne ouverte/clôturée, inscription) en <code>INFO</code>, les erreurs en <code>ERROR</code> avec la pile. On évite le bruit.</p>
+  </section>
+  <section class="step" id="health">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Health check pour l'hébergeur</h2>
+    <p class="goal"><code>/actuator/health</code> renseigne l'état de l'appli <b>et</b> de ses dépendances (dont MongoDB). L'hébergeur s'en sert pour redémarrer l'appli si elle tombe.</p>
+    <div class="res-out">GET /actuator/health
+{ "status": "UP", "components": { "mongo": { "status": "UP" } } }</div>
+  </section>
+  <section class="step" id="central">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Centraliser les logs</h2>
+    <p class="goal">En production multi-instances, on envoie les logs vers un collecteur (Graylog, ELK, ou le service de logs de l'hébergeur) pour les rechercher et poser des alertes.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Uniformise les réponses d'erreur, ajoute des logs métier lisibles, expose un health check qui remonte l'état de MongoDB. Tu obtiens une API qu'on peut exploiter et diagnostiquer — pas seulement démontrer.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Réponses d'erreur uniformes via <code>@RestControllerAdvice</code>.</li>
+      <li>Logs métier (INFO) + erreurs (ERROR)&nbsp;; health check avec dépendances.</li>
+      <li>Centralisation des logs en production.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch16.html">← Chapitre 16</a><a class="next" href="spring-ch18.html">Chapitre 18 · Nouvelles fonctionnalités →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 17 — Surveillance. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

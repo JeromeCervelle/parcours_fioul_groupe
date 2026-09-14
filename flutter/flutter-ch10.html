@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 10 — La navigation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 10</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 10</div>
+  <span class="lbadge">Chapitre 10 / 19</span>
+  <h1>La navigation</h1>
+  <p class="intro">Passer d'un écran à l'autre avec le Navigator, transmettre des données à l'écran suivant, et récupérer un résultat au retour.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#push">1 · push / pop</a><a href="#donnees">2 · Passer des données</a><a href="#retour">3 · Récupérer un résultat</a><a href="#nommees">4 · Routes nommées</a></div></nav>
+<main class="wrap">
+  <section class="step" id="push">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Navigator : push &amp; pop</h2>
+    <p class="goal">La navigation fonctionne comme une <b>pile</b>&nbsp;: <code>push</code> empile un écran, <code>pop</code> revient au précédent.</p>
+<pre>Navigator.push(context,
+  MaterialPageRoute(builder: (_) =&gt; DetailCampagne()));
+<span class="tc">// pour revenir :</span> Navigator.pop(context);</pre>
+  </section>
+  <section class="step" id="donnees">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Passer des données à l'écran suivant</h2>
+    <p class="goal">On passe les données par le constructeur de l'écran cible.</p>
+<pre>Navigator.push(context, MaterialPageRoute(
+  builder: (_) =&gt; DetailCampagne(id: c.id),
+));</pre>
+  </section>
+  <section class="step" id="retour">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Récupérer un résultat au retour</h2>
+    <p class="goal"><code>push</code> renvoie un <code>Future</code>&nbsp;: on <code>await</code> le résultat que l'écran suivant renvoie via <code>pop(valeur)</code>.</p>
+<pre><span class="tk">final</span> inscrit = <span class="tk">await</span> Navigator.push&lt;<span class="tk">bool</span>&gt;(context,
+  MaterialPageRoute(builder: (_) =&gt; FormulaireInscription(id: c.id)));
+<span class="tk">if</span> (inscrit == <span class="tk">true</span>) rafraichir();</pre>
+  </section>
+  <section class="step" id="nommees">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Les routes nommées</h2>
+    <p class="goal">Pour de plus grosses applis, on déclare des routes nommées dans <code>MaterialApp</code> et on navigue par leur nom (<code>Navigator.pushNamed(context, '/detail')</code>). Des paquets comme <code>go_router</code> vont plus loin.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Depuis la liste, ouvre le détail d'une campagne en lui passant son <code>id</code>. Depuis le détail, ouvre le formulaire d'inscription et, au retour, <b>rafraîchis</b> l'affichage (le volume a changé). Tu relies ainsi les écrans du parcours.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Navigation en pile&nbsp;: <code>push</code> / <code>pop</code>.</li>
+      <li>Données passées par le constructeur&nbsp;; résultat via <code>pop(valeur)</code> + <code>await</code>.</li>
+      <li>Routes nommées / <code>go_router</code> pour les grosses applis.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch09.html">← Chapitre 09</a><a class="next" href="flutter-ch11.html">Chapitre 11 · Dialog, SnackBar, Drawer &amp; Tabs →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 10 — La navigation. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

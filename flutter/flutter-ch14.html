@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 14 — Les formulaires</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 14</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 14</div>
+  <span class="lbadge">Chapitre 14 / 19</span>
+  <h1>Les formulaires</h1>
+  <p class="intro">Saisir et valider des données&nbsp;: le widget Form, les TextFormField avec validateurs, la clé de formulaire et les contrôleurs.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#form">1 · Form &amp; clé</a><a href="#field">2 · TextFormField</a><a href="#valider">3 · Valider</a><a href="#soumettre">4 · Soumettre</a></div></nav>
+<main class="wrap">
+  <section class="step" id="form">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Form &amp; GlobalKey</h2>
+    <p class="goal">Un <code>Form</code> regroupe les champs&nbsp;; une <code>GlobalKey&lt;FormState&gt;</code> permet de le valider et de le soumettre d'un coup.</p>
+<pre><span class="tk">final</span> _cle = GlobalKey&lt;FormState&gt;();
+Form(key: _cle, child: Column(children: [ <span class="tc">/* champs */</span> ]))</pre>
+  </section>
+  <section class="step" id="field">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>TextFormField &amp; contrôleur</h2>
+    <p class="goal">Un <code>TextEditingController</code> lit la saisie&nbsp;; <code>InputDecoration</code> ajoute label et aide.</p>
+<pre><span class="tk">final</span> _litres = TextEditingController();
+TextFormField(
+  controller: _litres,
+  keyboardType: TextInputType.number,
+  decoration: <span class="tk">const</span> InputDecoration(labelText: <span class="ts">'Litres'</span>),
+)</pre>
+  </section>
+  <section class="step" id="valider">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Valider les champs</h2>
+    <p class="goal">Chaque champ a un <code>validator</code> qui renvoie un message d'erreur (ou <code>null</code> si valide). Aligné sur les règles du serveur (chapitre Spring 5).</p>
+<pre>validator: (v) {
+  <span class="tk">final</span> n = int.tryParse(v ?? <span class="ts">''</span>);
+  <span class="tk">if</span> (n == <span class="tk">null</span> || n &lt; <span class="tn">500</span>) <span class="tk">return</span> <span class="ts">'Minimum 500 L'</span>;
+  <span class="tk">return</span> <span class="tk">null</span>;
+}</pre>
+  </section>
+  <section class="step" id="soumettre">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Soumettre le formulaire</h2>
+    <p class="goal">On valide, puis on envoie à l'API (POST du chapitre 13).</p>
+<pre>onPressed: () <span class="tk">async</span> {
+  <span class="tk">if</span> (_cle.currentState!.validate()) {
+    <span class="tk">await</span> service.rejoindre(id, Commande(
+      litres: int.parse(_litres.text), commune: ..., adresse: ...));
+    <span class="tk">if</span> (context.mounted) Navigator.pop(context, <span class="tk">true</span>);
+  }
+}</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Construis le formulaire « rejoindre »&nbsp;: litres (≥ 500), commune, adresse, avec validation. À la soumission, POST vers l'API et retour à l'écran de détail (rafraîchi). Double validation client + serveur (sécurité).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>Form</code> + <code>GlobalKey&lt;FormState&gt;</code> pour valider/soumettre.</li>
+      <li><code>TextFormField</code> + <code>TextEditingController</code> + <code>validator</code>.</li>
+      <li>Valider avant d'envoyer&nbsp;; règles alignées sur le serveur.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch13.html">← Chapitre 13</a><a class="next" href="flutter-ch15.html">Chapitre 15 · Animations →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 14 — Les formulaires. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

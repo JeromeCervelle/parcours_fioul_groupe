@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 01 — Introduction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 01</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 01</div>
+  <span class="lbadge">Chapitre 01 / 08</span>
+  <h1>Introduction à Docker</h1>
+  <p class="intro">Comprendre ce qu'est un conteneur, en quoi il diffère d'une machine virtuelle, et pourquoi Docker est devenu incontournable pour livrer une application reproductible — comme les trois couches du projet Fioul Groupé.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#pourquoi">1 · Le problème</a><a href="#conteneur">2 · Le conteneur</a><a href="#vsvm">3 · vs VM</a><a href="#imgcont">4 · Image vs conteneur</a><a href="#ecosysteme">5 · L'écosystème</a></div></nav>
+<main class="wrap">
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>« Ça marche sur ma machine »</h2>
+    <p class="goal">Le problème classique&nbsp;: une appli fonctionne chez le développeur mais casse ailleurs (versions différentes, dépendances manquantes, config). Docker règle cela en <b>empaquetant l'application avec tout son environnement</b> dans un conteneur qui tourne à l'identique partout.</p>
+  </section>
+  <section class="step" id="conteneur">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Qu'est-ce qu'un conteneur&nbsp;?</h2>
+    <p class="goal">Un <b>conteneur</b> est un processus isolé qui embarque son code, ses dépendances et sa configuration. Il partage le noyau du système hôte mais s'exécute dans sa propre bulle (fichiers, réseau, processus). Léger et rapide à démarrer.</p>
+    <div class="hint"><strong>Image mentale —</strong> un conteneur, c'est comme un « colis » scellé et autonome de ton application&nbsp;: on l'ouvre et il tourne, sans rien installer d'autre sur la machine.</div>
+  </section>
+  <section class="step" id="vsvm">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Conteneur vs machine virtuelle</h2>
+    <p class="goal">Une <b>VM</b> virtualise une machine entière (avec son propre OS complet)&nbsp;: lourde, lente à démarrer. Un <b>conteneur</b> partage le noyau de l'hôte&nbsp;: quelques Mo, démarrage en secondes.</p>
+    <table class="maptab">
+      <thead><tr><th>Machine virtuelle</th><th>Conteneur</th></tr></thead>
+      <tbody>
+        <tr><td>OS complet par VM</td><td>partage le noyau hôte</td></tr>
+        <tr><td>Go, démarrage en minutes</td><td>Mo, démarrage en secondes</td></tr>
+        <tr><td>isolation forte</td><td>isolation légère, très efficace</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="step" id="imgcont">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Image vs conteneur</h2>
+    <p class="goal">Deux mots à ne pas confondre&nbsp;: une <b>image</b> est le modèle figé (le « moule »), un <b>conteneur</b> est une instance en cours d'exécution de cette image. On peut lancer plusieurs conteneurs à partir d'une même image.</p>
+    <div class="hint"><strong>Analogie POO —</strong> l'image est à la <em>classe</em> ce que le conteneur est à l'<em>objet</em>&nbsp;: on instancie des conteneurs à partir d'une image.</div>
+  </section>
+  <section class="step" id="ecosysteme">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>L'écosystème Docker</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Docker Engine</b> — le moteur qui construit et exécute les conteneurs.</li>
+      <li><b>Docker CLI</b> — les commandes <code>docker ...</code>.</li>
+      <li><b>Docker Hub</b> / registre — la bibliothèque publique d'images (mongo, eclipse-temurin, nginx…).</li>
+      <li><b>Docker Compose</b> — orchestrer plusieurs conteneurs (chapitres 6-7).</li>
+    </ul>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Le projet a trois couches à faire tourner ensemble&nbsp;: la <b>base MongoDB</b>, l'<b>API Spring</b> et le <b>front web/mobile</b>. Docker va permettre de les démarrer d'une seule commande, à l'identique sur n'importe quelle machine — fini les installations manuelles poste par poste.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Un conteneur empaquette l'appli + son environnement (reproductible).</li>
+      <li>Plus léger et rapide qu'une VM (partage le noyau hôte).</li>
+      <li>Image = moule figé&nbsp;; conteneur = instance en exécution.</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-chapitres.html">← Sommaire</a><a class="next" href="docker-ch02.html">Chapitre 02 · Images &amp; conteneurs →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 01 — Introduction. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

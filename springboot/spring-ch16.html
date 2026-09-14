@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 16 — Partie Monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 16</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 16</div>
+  <span class="lbadge">Chapitre 16 / 19</span>
+  <h1>Spring Boot — le monitoring</h1>
+  <p class="intro">Une application en production doit être observable&nbsp;: savoir si elle est en bonne santé, ce qu'elle fait, et pourquoi elle échoue. Logs, exceptions et <b>Actuator</b>.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#logs">1 · Les logs</a><a href="#niveaux">2 · Niveaux</a><a href="#actuator">3 · Actuator</a><a href="#metrics">4 · Métriques</a></div></nav>
+<main class="wrap">
+  <section class="step" id="logs">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Journaliser (logs)</h2>
+    <p class="goal">Spring Boot intègre SLF4J + Logback. On journalise via un <code>Logger</code>, jamais avec des <code>System.out.println</code>.</p>
+<pre><span class="tk">private static final</span> Logger log = LoggerFactory.getLogger(CampagneService.<span class="tk">class</span>);
+log.info(<span class="ts">"Campagne {} clôturée, volume={}"</span>, id, volume);</pre>
+    <div class="warn"><strong>Cyber —</strong> ne jamais journaliser de données sensibles (mots de passe, JWT, données personnelles).</div>
+  </section>
+  <section class="step" id="niveaux">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Les niveaux de log</h2>
+    <p class="goal"><code>ERROR</code> &gt; <code>WARN</code> &gt; <code>INFO</code> &gt; <code>DEBUG</code> &gt; <code>TRACE</code>. On règle le niveau par package dans les properties&nbsp;: verbeux en dev, sobre en prod.</p>
+<pre>logging.level.com.fioul=DEBUG
+logging.level.org.springframework=INFO</pre>
+  </section>
+  <section class="step" id="actuator">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Spring Boot Actuator</h2>
+    <p class="goal">Le starter <code>spring-boot-starter-actuator</code> expose des endpoints de supervision prêts à l'emploi.</p>
+<pre>management.endpoints.web.exposure.include=health,info,metrics</pre>
+    <div class="res-out">GET /actuator/health   → { "status": "UP" }
+GET /actuator/metrics  → liste des métriques disponibles</div>
+  </section>
+  <section class="step" id="metrics">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Métriques &amp; supervision</h2>
+    <p class="goal">Actuator publie des métriques (mémoire, requêtes, temps de réponse) exploitables par des outils comme Prometheus/Grafana. Les logs peuvent être centralisés (ex. Graylog) — sujet du chapitre 17.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Active Actuator sur <code>fioul-api</code>&nbsp;; expose <code>health</code> pour que l'hébergeur vérifie que l'appli est vivante, et <code>metrics</code> pour surveiller les temps de réponse des endpoints campagnes.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Logger SLF4J (pas de <code>println</code>)&nbsp;; niveaux réglés par package.</li>
+      <li>Actuator expose <code>/actuator/health</code>, <code>/metrics</code>, <code>/info</code>.</li>
+      <li>Ne jamais journaliser de données sensibles.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch15.html">← Chapitre 15</a><a class="next" href="spring-ch17.html">Chapitre 17 · Projet — surveillance →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 16 — Monitoring. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

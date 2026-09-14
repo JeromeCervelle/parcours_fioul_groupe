@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 05 — Les réseaux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 05</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 05</div>
+  <span class="lbadge">Chapitre 05 / 08</span>
+  <h1>Les réseaux</h1>
+  <p class="intro">Comment l'API parle-t-elle à la base&nbsp;? Docker crée des réseaux virtuels où les conteneurs se joignent <b>par leur nom</b>. C'est la clé pour relier les trois couches.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#pourquoi">1 · Pourquoi</a><a href="#bridge">2 · Réseau bridge</a><a href="#dns">3 · Résolution par nom</a><a href="#projet">4 · Relier API ↔ base</a></div></nav>
+<main class="wrap">
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Isoler puis relier</h2>
+    <p class="goal">Chaque conteneur a son propre réseau isolé. Pour que l'API atteigne MongoDB, il faut les placer sur un <b>même réseau Docker</b>. Ensuite ils communiquent sans exposer de port vers l'extérieur.</p>
+  </section>
+  <section class="step" id="bridge">
+    <span class="snum"><span class="dotnum">2</span> Commande</span>
+    <h2>Créer un réseau &amp; y attacher</h2>
+    <p class="goal">On crée un réseau <code>bridge</code> et on y lance les conteneurs avec <code>--network</code>.</p>
+<pre>docker network create fioul-net
+docker run -d --name fioul-mongo --network fioul-net mongo:7
+docker run -d --name fioul-api  --network fioul-net -p 8080:8080 fioul-api:1.0</pre>
+  </section>
+  <section class="step" id="dns">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>La résolution par nom de conteneur</h2>
+    <p class="goal">Sur un réseau Docker, un conteneur en joint un autre par son <b>nom</b> (Docker fournit un DNS interne). L'API n'utilise donc pas <code>localhost</code> mais le nom du service base.</p>
+<pre><span class="tc"># côté API (application.properties)</span>
+spring.data.mongodb.uri=mongodb://fioul-mongo:27017/fioul</pre>
+    <div class="warn"><strong>À comprendre —</strong> <code>localhost</code> dans un conteneur désigne le conteneur lui-même, pas l'hôte ni les voisins. Entre conteneurs, on utilise le <b>nom</b> (<code>fioul-mongo</code>), pas <code>localhost</code>.</div>
+  </section>
+  <section class="step" id="projet">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Relier l'API et la base</h2>
+    <p class="goal">Seule l'API publie un port vers l'extérieur (<code>-p 8080:8080</code>)&nbsp;; la base reste privée sur le réseau interne, jointe par l'API via son nom.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Mets <code>fioul-mongo</code> et <code>fioul-api</code> sur <code>fioul-net</code>&nbsp;; configure l'API avec <code>mongodb://fioul-mongo:27017/fioul</code>. La base n'est pas exposée à l'extérieur (plus sûr). Le chapitre 7 automatise tout ça avec Compose (qui crée le réseau tout seul).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Les conteneurs sur un même réseau Docker se joignent <b>par leur nom</b>.</li>
+      <li>Entre conteneurs, jamais <code>localhost</code> — le nom du service.</li>
+      <li>On n'expose (<code>-p</code>) que ce qui doit être public&nbsp;; la base reste interne.</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-ch04.html">← Chapitre 04</a><a class="next" href="docker-ch06.html">Chapitre 06 · Docker Compose →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 05 — Les réseaux. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

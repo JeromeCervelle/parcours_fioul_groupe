@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 06 — Projet : couche Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 06</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 06</div>
+  <span class="lbadge">Chapitre 06 / 19 · projet</span>
+  <h1>Projet — la couche Web</h1>
+  <p class="intro">On construit les contrôleurs de l'API Fioul Groupé et les DTO d'entrée/sortie, avec un contrat clair et des réponses bien typées.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#dto">1 · DTO</a><a href="#controleur">2 · Le contrôleur</a><a href="#sousres">3 · Sous-ressource</a><a href="#contrat">4 · Le contrat</a></div></nav>
+<main class="wrap">
+  <section class="step" id="dto">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Les DTO d'entrée et de sortie</h2>
+    <p class="goal">On sépare l'objet exposé (DTO) de l'entité stockée. En sortie, un <code>CampagneDTO</code> avec les champs calculés&nbsp;; en entrée, des DTO de création.</p>
+<pre><span class="tk">public record</span> <span class="tf">CampagneDTO</span>(String id, String zone, Statut statut,
+    Instant dateLimite, <span class="tk">int</span> volumeTotal, BigDecimal prixLitre) {}
+
+<span class="tk">public record</span> <span class="tf">CreerCommandeDTO</span>(<span class="tk">int</span> litres, String commune, String adresse) {}</pre>
+  </section>
+  <section class="step" id="controleur">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Le CampagneController</h2>
+    <p class="goal">Il délègue tout au service&nbsp;; aucune logique métier ici.</p>
+<pre><span class="tn">@RestController</span> <span class="tn">@RequestMapping</span>(<span class="ts">"/api/campagnes"</span>)
+<span class="tk">public class</span> <span class="tf">CampagneController</span> {
+    <span class="tk">private final</span> CampagneService service;
+    <span class="tk">public</span> CampagneController(CampagneService s) { service = s; }
+
+    <span class="tn">@GetMapping</span>
+    <span class="tk">public</span> List&lt;CampagneDTO&gt; lister(<span class="tn">@RequestParam</span>(required=<span class="tk">false</span>) String zone) {
+        <span class="tk">return</span> service.listerOuvertes(zone);
+    }
+    <span class="tn">@GetMapping</span>(<span class="ts">"/{id}"</span>)
+    <span class="tk">public</span> CampagneDTO consulter(<span class="tn">@PathVariable</span> String id) { <span class="tk">return</span> service.consulter(id); }
+}</pre>
+  </section>
+  <section class="step" id="sousres">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Une sous-ressource : les commandes</h2>
+    <p class="goal">« Rejoindre une campagne » agit sur une sous-ressource&nbsp;: <code>POST /campagnes/{id}/commandes</code>.</p>
+<pre><span class="tn">@PostMapping</span>(<span class="ts">"/{id}/commandes"</span>)
+<span class="tn">@ResponseStatus</span>(HttpStatus.CREATED)
+<span class="tk">public</span> CampagneDTO rejoindre(<span class="tn">@PathVariable</span> String id, <span class="tn">@RequestBody</span> CreerCommandeDTO dto) {
+    <span class="tk">return</span> service.rejoindre(id, dto);
+}</pre>
+  </section>
+  <section class="step" id="contrat">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Formaliser le contrat</h2>
+    <p class="goal">On documente chaque endpoint&nbsp;: URL, entrée, sortie, codes. Swagger sert de contrat vivant, testable depuis le navigateur.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Implémente les contrôleurs et DTO, teste dans Swagger. À ce stade le service peut renvoyer des données factices&nbsp;; on branchera la vraie base aux chapitres 9-10.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>DTO séparés de l'entité, en entrée et en sortie.</li>
+      <li>Le contrôleur délègue au service, sans logique métier.</li>
+      <li>Sous-ressource pour « rejoindre »&nbsp;; contrat documenté via Swagger.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch05.html">← Chapitre 05</a><a class="next" href="spring-ch07.html">Chapitre 07 · Partie Services →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 06 — Projet : couche Web. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

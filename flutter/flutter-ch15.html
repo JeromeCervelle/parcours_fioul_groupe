@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 15 — Animations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 15</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 15</div>
+  <span class="lbadge">Chapitre 15 / 19</span>
+  <h1>Animations</h1>
+  <p class="intro">Donner vie à l'interface&nbsp;: des animations implicites simples aux animations contrôlées, et la transition Hero entre écrans.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#implicites">1 · Implicites</a><a href="#controller">2 · Contrôlées</a><a href="#tween">3 · Tween</a><a href="#hero">4 · Hero</a></div></nav>
+<main class="wrap">
+  <section class="step" id="implicites">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les animations implicites</h2>
+    <p class="goal">Le plus simple&nbsp;: les widgets <code>AnimatedXxx</code> animent tout seuls un changement de valeur. Ex. <code>AnimatedContainer</code> anime une taille/couleur quand on change ses propriétés dans <code>setState</code>.</p>
+<pre>AnimatedContainer(
+  duration: <span class="tk">const</span> Duration(milliseconds: <span class="tn">400</span>),
+  width: _plein ? <span class="tn">200</span> : <span class="tn">100</span>,
+  color: _plein ? Colors.green : Colors.grey,
+)</pre>
+  </section>
+  <section class="step" id="controller">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Les animations contrôlées</h2>
+    <p class="goal">Pour un contrôle fin, un <code>AnimationController</code> (avec un <code>TickerProvider</code>) pilote la progression&nbsp;: <code>forward()</code>, <code>reverse()</code>, <code>repeat()</code>.</p>
+  </section>
+  <section class="step" id="tween">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les Tween</h2>
+    <p class="goal">Un <code>Tween</code> définit l'intervalle de valeurs (début → fin) que l'animation interpole (une opacité de 0 à 1, une position…).</p>
+  </section>
+  <section class="step" id="hero">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>La transition Hero</h2>
+    <p class="goal"><code>Hero</code> anime en douceur un élément partagé d'un écran à l'autre (une image de liste qui « vole » vers l'écran détail), via un même <code>tag</code>.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Anime la <b>jauge de volume</b> avec <code>AnimatedContainer</code> quand une inscription fait monter le total. Optionnel&nbsp;: un <code>Hero</code> sur l'icône de la campagne entre la liste et le détail. Les animations doivent rester sobres&nbsp;: elles servent la lisibilité.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Implicites (<code>AnimatedContainer</code>…) pour les cas simples.</li>
+      <li>Contrôlées&nbsp;: <code>AnimationController</code> + <code>Tween</code>.</li>
+      <li><code>Hero</code> pour une transition d'élément partagé entre écrans.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch14.html">← Chapitre 14</a><a class="next" href="flutter-ch16.html">Chapitre 16 · Interaction hardware →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 15 — Animations. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

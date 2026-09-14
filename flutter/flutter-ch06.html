@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 06 — Stateless / Stateful</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 06</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 06</div>
+  <span class="lbadge">Chapitre 06 / 19</span>
+  <h1>Stateless, Stateful, Card &amp; InkWell</h1>
+  <p class="intro">La distinction fondamentale entre widgets figés et widgets à état, comment mettre à jour l'écran avec setState, et deux widgets utiles&nbsp;: Card et InkWell.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#stateless">1 · Stateless</a><a href="#stateful">2 · Stateful</a><a href="#setstate">3 · setState</a><a href="#card">4 · Card &amp; InkWell</a></div></nav>
+<main class="wrap">
+  <section class="step" id="stateless">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>StatelessWidget</h2>
+    <p class="goal">Un widget <b>sans état</b>&nbsp;: son apparence dépend uniquement de ses paramètres. Il ne change pas après affichage (sauf si son parent le reconstruit avec d'autres valeurs).</p>
+<pre><span class="tk">class</span> <span class="tf">CarteCampagne</span> <span class="tk">extends</span> StatelessWidget {
+  <span class="tk">final</span> String zone;
+  <span class="tk">const</span> CarteCampagne(<span class="tk">this</span>.zone, {super.key});
+  <span class="tn">@override</span> Widget build(BuildContext c) =&gt; Text(zone);
+}</pre>
+  </section>
+  <section class="step" id="stateful">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>StatefulWidget</h2>
+    <p class="goal">Un widget <b>avec état</b> mutable&nbsp;: il possède un objet <code>State</code> qui conserve des données pouvant évoluer (une saisie, un compteur, un chargement).</p>
+<pre><span class="tk">class</span> <span class="tf">Inscription</span> <span class="tk">extends</span> StatefulWidget {
+  <span class="tn">@override</span> State&lt;Inscription&gt; createState() =&gt; _InscriptionState();
+}</pre>
+  </section>
+  <section class="step" id="setstate">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Mettre à jour avec setState</h2>
+    <p class="goal">Modifier une variable d'état ne suffit pas&nbsp;: il faut appeler <code>setState()</code> pour que Flutter reconstruise l'écran.</p>
+<pre><span class="tk">int</span> _litres = <span class="tn">0</span>;
+ElevatedButton(
+  onPressed: () =&gt; setState(() =&gt; _litres += <span class="tn">100</span>),
+  child: Text(<span class="ts">'+100 L (total : $_litres)'</span>),
+)</pre>
+  </section>
+  <section class="step" id="card">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Card &amp; InkWell</h2>
+    <p class="goal"><code>Card</code> affiche un contenu dans une carte surélevée (ombre, coins arrondis). <code>InkWell</code> rend une zone <b>cliquable</b> avec un effet d'onde au tap.</p>
+<pre>Card(child: InkWell(
+  onTap: () { <span class="tc">/* ouvrir le détail */</span> },
+  child: Padding(padding: EdgeInsets.all(<span class="tn">16</span>), child: Text(<span class="ts">'Ladignac'</span>)),
+))</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Fais de <code>CarteCampagne</code> un <code>StatelessWidget</code> (elle ne fait qu'afficher), et enveloppe-la dans une <code>Card</code> + <code>InkWell</code> pour ouvrir le détail au tap. L'écran d'inscription, lui, sera <code>Stateful</code> (il gère la saisie).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Stateless = figé&nbsp;; Stateful = état mutable.</li>
+      <li><code>setState()</code> déclenche la reconstruction de l'écran.</li>
+      <li><code>Card</code> pour la présentation&nbsp;; <code>InkWell</code> pour rendre cliquable.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch05.html">← Chapitre 05</a><a class="next" href="flutter-ch07.html">Chapitre 07 · Widgets de listes →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 06 — Stateless / Stateful. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

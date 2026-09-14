@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours API Spring pas à pas — Fioul Groupé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Guide pas à pas — API Spring Boot</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="../mongodb/parcours-mongodb.html">1 · MongoDB</a>
+      <a href="parcours-api-spring.html" class="on">2 · API Spring</a>
+      <a href="../flutter/parcours-flutter.html">3 · Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Parcours 2 · API Spring Boot</div>
+    <span class="lbadge">🌱 Parcours 2 — API REST en couches</span>
+    <h1>Construire l'API, couche par couche</h1>
+    <p class="intro">On empile l'architecture dans l'ordre&nbsp;: <strong>entité → repository → DTO → service → contrôleur</strong>, puis <strong>validation</strong> et <strong>Swagger</strong>. À chaque couche&nbsp;: l'exemple médiathèque, puis à toi de l'écrire pour le fioul. L'API se pose sur la base MongoDB du parcours&nbsp;1.</p>
+    <div class="howto">
+      <div class="h ex"><span class="b">1</span><div><strong>J'observe la couche</strong><span>Code Spring commenté sur l'exemple « Livre ».</span></div></div>
+      <div class="h ad"><span class="b">2</span><div><strong>J'écris la mienne</strong><span>La même couche pour « Campagne » et « Commande ».</span></div></div>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#e0">0 · Le projet</a>
+    <a href="#e1">1 · Entité</a>
+    <a href="#e2">2 · Repository</a>
+    <a href="#e3">3 · DTO</a>
+    <a href="#e4">4 · Service</a>
+    <a href="#e5">5 · Contrôleur</a>
+    <a href="#e6">6 · Validation</a>
+    <a href="#e7">7 · Swagger</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <div class="hint" style="margin-top:26px">
+    <strong>Architecture cible —</strong> le flux d'une requête traverse les couches dans cet ordre&nbsp;:
+    <pre style="margin-top:10px">HTTP → <span class="tf">Controller</span> → <span class="tf">Service</span> → <span class="tf">Repository</span> → MongoDB
+                 ↕
+             <span class="tf">DTO</span> (entrée/sortie)      <span class="tf">Entity</span> (@Document)</pre>
+    On code de l'intérieur vers l'extérieur&nbsp;: d'abord ce qui touche la base (entité, repository), puis la logique (service), enfin l'exposition (contrôleur).
+  </div>
+
+  <!-- ETAPE 0 -->
+  <section class="step" id="e0">
+    <span class="snum"><span class="dotnum">0</span> Étape 0</span>
+    <h2>Créer le projet Spring Boot</h2>
+    <p class="goal">Générer un projet propre avec les bonnes dépendances, avant d'écrire la moindre classe.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> start.spring.io</div>
+        <div class="pbody">
+          <p>Sur <b>Spring Initializr</b>, projet Maven / Java 21, puis on ajoute les dépendances :</p>
+          <ul>
+            <li><b>Spring Web</b> — les contrôleurs REST</li>
+            <li><b>Spring Data MongoDB</b> — l'accès à la base</li>
+            <li><b>Validation</b> — <code>@Valid</code>, <code>@NotNull</code>…</li>
+            <li><b>Lombok</b> (optionnel) — moins de code répétitif</li>
+          </ul>
+<pre><span class="tc"># application.properties</span>
+spring.data.mongodb.uri=mongodb://localhost:27017/mediatheque</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Le projet du back-end</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Génère un projet <code>fioul-api</code> avec les mêmes dépendances + <b>springdoc-openapi</b> (étape 7).</li>
+            <li>Configure l'URI vers ta base <code>fioul</code> (locale, puis Atlas plus tard).</li>
+            <li>Ajoute le projet dans le dépôt <code>fioul-groupe</code> (dossier <code>api/</code>).</li>
+            <li>Vérifie que l'application démarre (<code>mvn spring-boot:run</code>).</li>
+          </ul>
+          <div class="warn"><strong>Sécurité —</strong> ne mets jamais l'URI Atlas (avec mot de passe) en clair dans le dépôt. Utilise une variable d'environnement ou un secret GitHub.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 1 -->
+  <section class="step" id="e1">
+    <span class="snum"><span class="dotnum">1</span> Étape 1</span>
+    <h2>L'entité — le reflet du document</h2>
+    <p class="goal">Une classe annotée <code>@Document</code> représente une collection MongoDB. C'est le miroir Java du document modélisé au parcours&nbsp;1.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreEntity</div>
+        <div class="pbody">
+<pre><span class="tn">@Document</span>(collection = <span class="ts">"livres"</span>)
+<span class="tk">public class</span> <span class="tf">LivreEntity</span> {
+    <span class="tn">@Id</span>
+    <span class="tk">private</span> String id;
+    <span class="tk">private</span> String titre;
+    <span class="tk">private</span> String isbn;
+    <span class="tk">private</span> <span class="tk">int</span> anneePublication;
+    <span class="tk">private</span> String auteurId;        <span class="tc">// référence</span>
+    <span class="tk">private</span> List&lt;Avis&gt; avis;       <span class="tc">// embarqué</span>
+    <span class="tc">// getters / setters</span>
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneEntity</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagneEntity</code> annotée <code>@Document("campagnes")</code>.</li>
+            <li>Champs&nbsp;: <code>id</code>, <code>zone</code>, <code>statut</code> (enum <code>Statut</code>), <code>dateLimite</code>, <code>fournisseurId</code>.</li>
+            <li>Ajoute <code>List&lt;Commande&gt; commandes</code> (classe embarquée avec <code>litres</code>, <code>commune</code>, <code>adresse</code>).</li>
+            <li>Crée <code>FournisseurEntity</code> avec sa liste de <code>Palier</code>.</li>
+          </ul>
+          <div class="tip"><strong>Rappel —</strong> ta décision « embarquer / référencer » du parcours 1 se retrouve <em>telle quelle</em> ici&nbsp;: <code>List&lt;Commande&gt;</code> embarquée, <code>fournisseurId</code> référencé.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 2 -->
+  <section class="step" id="e2">
+    <span class="snum"><span class="dotnum">2</span> Étape 2</span>
+    <h2>Le repository — l'accès aux données</h2>
+    <p class="goal">Une interface qui étend <code>MongoRepository</code> fournit le CRUD gratuitement. On y ajoute des <b>méthodes dérivées</b> dont Spring devine l'implémentation d'après le nom.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreRepository</div>
+        <div class="pbody">
+<pre><span class="tk">public interface</span> <span class="tf">LivreRepository</span>
+        <span class="tk">extends</span> MongoRepository&lt;LivreEntity, String&gt; {
+
+    List&lt;LivreEntity&gt; findByAnneePublicationGreaterThan(<span class="tk">int</span> annee);
+    Optional&lt;LivreEntity&gt; findByIsbn(String isbn);
+}</pre>
+          <p><code>findAll()</code>, <code>findById()</code>, <code>save()</code>, <code>deleteById()</code> existent déjà, sans code.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneRepository</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagneRepository extends MongoRepository&lt;CampagneEntity, String&gt;</code>.</li>
+            <li>Ajoute <code>findByStatut(Statut statut)</code>.</li>
+            <li>Ajoute <code>findByZoneAndStatut(String zone, Statut statut)</code>.</li>
+            <li>Crée aussi <code>FournisseurRepository</code>.</li>
+          </ul>
+          <div class="hint"><strong>Le lien avec le parcours 1 —</strong> <code>findByZoneAndStatut</code> produit exactement la requête que tu as écrite à la main en mongosh (étape 5).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 3 -->
+  <section class="step" id="e3">
+    <span class="snum"><span class="dotnum">3</span> Étape 3</span>
+    <h2>Le DTO — ce que voit le client</h2>
+    <p class="goal">On n'expose <b>jamais</b> l'entité directement. Un <b>DTO</b> (Data Transfer Object) définit précisément ce qui entre et ce qui sort de l'API&nbsp;: on masque certains champs, on en calcule d'autres.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreDTO (record)</div>
+        <div class="pbody">
+<pre><span class="tk">public record</span> <span class="tf">LivreDTO</span>(
+    String id,
+    String titre,
+    String isbn,
+    <span class="tk">double</span> noteMoyenne,   <span class="tc">// calculé, pas stocké</span>
+    <span class="tk">int</span> nbAvis
+) {}</pre>
+          <p>Le <code>record</code> Java est parfait pour un DTO&nbsp;: immuable et concis.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneDTO</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée un <code>record CampagneDTO</code> exposé en lecture.</li>
+            <li>Champs stockés&nbsp;: <code>id</code>, <code>zone</code>, <code>statut</code>, <code>dateLimite</code>.</li>
+            <li>Champs <b>calculés</b>&nbsp;: <code>volumeTotal</code> et <code>prixLitre</code> (l'agrégation du parcours 1&nbsp;!).</li>
+            <li>Crée un <code>CreerCommandeDTO</code> (entrée)&nbsp;: <code>litres</code>, <code>commune</code>, <code>adresse</code>.</li>
+          </ul>
+          <div class="tip"><strong>Pourquoi séparer —</strong> le client n'a pas à connaître <code>fournisseurId</code> ni la liste brute des commandes&nbsp;; il veut le volume et le prix. Le DTO fait ce tri.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 4 -->
+  <section class="step" id="e4">
+    <span class="snum"><span class="dotnum">4</span> Étape 4</span>
+    <h2>Le service — la logique métier</h2>
+    <p class="goal">Le service orchestre&nbsp;: il appelle le repository, applique les règles métier et transforme les entités en DTO. C'est le cerveau, entre le contrôleur et la base.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreService</div>
+        <div class="pbody">
+<pre><span class="tn">@Service</span>
+<span class="tk">public class</span> <span class="tf">LivreService</span> {
+    <span class="tk">private final</span> LivreRepository repo;
+    <span class="tc">// injection par constructeur</span>
+    <span class="tk">public</span> LivreService(LivreRepository r){ <span class="tk">this</span>.repo=r; }
+
+    <span class="tk">public</span> List&lt;LivreDTO&gt; lister(){
+        <span class="tk">return</span> repo.findAll().stream()
+                   .map(<span class="tk">this</span>::versDTO).toList();
+    }
+    <span class="tk">private</span> LivreDTO versDTO(LivreEntity e){
+        <span class="tk">double</span> moy = e.getAvis().stream()
+              .mapToInt(Avis::getNote).average().orElse(<span class="tn">0</span>);
+        <span class="tk">return new</span> LivreDTO(e.getId(), e.getTitre(),
+              e.getIsbn(), moy, e.getAvis().size());
+    }
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneService</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagneService</code> avec injection par constructeur.</li>
+            <li><code>listerOuvertes(zone)</code> → appelle le repository, mappe en DTO.</li>
+            <li><code>rejoindre(id, CreerCommandeDTO)</code> → ajoute une commande (le <code>$push</code> de l'étape 4 MongoDB).</li>
+            <li>Écris <code>calculerPrix(volume, fournisseur)</code> qui choisit le bon <b>palier</b>.</li>
+            <li>Règle métier&nbsp;: refuser une inscription si la campagne est <code>CLOTUREE</code> ou la date dépassée.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 5 -->
+  <section class="step" id="e5">
+    <span class="snum"><span class="dotnum">5</span> Étape 5</span>
+    <h2>Le contrôleur — la porte d'entrée REST</h2>
+    <p class="goal">Le contrôleur relie les URLs HTTP aux méthodes du service. Il ne contient <b>aucune logique métier</b>&nbsp;: il reçoit, délègue, renvoie.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreController</div>
+        <div class="pbody">
+<pre><span class="tn">@RestController</span>
+<span class="tn">@RequestMapping</span>(<span class="ts">"/api/livres"</span>)
+<span class="tk">public class</span> <span class="tf">LivreController</span> {
+    <span class="tk">private final</span> LivreService service;
+    <span class="tk">public</span> LivreController(LivreService s){ <span class="tk">this</span>.service=s; }
+
+    <span class="tn">@GetMapping</span>
+    <span class="tk">public</span> List&lt;LivreDTO&gt; lister(){ <span class="tk">return</span> service.lister(); }
+
+    <span class="tn">@GetMapping</span>(<span class="ts">"/{id}"</span>)
+    <span class="tk">public</span> LivreDTO consulter(<span class="tn">@PathVariable</span> String id){
+        <span class="tk">return</span> service.consulter(id);
+    }
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneController</div>
+        <div class="pbody">
+          <p>Implémente les endpoints du projet :</p>
+          <ul class="check">
+            <li><code>GET /api/campagnes</code> (filtre <code>?zone=</code>)</li>
+            <li><code>GET /api/campagnes/{id}</code></li>
+            <li><code>POST /api/campagnes</code> (ouvrir)</li>
+            <li><code>POST /api/campagnes/{id}/commandes</code> (rejoindre)</li>
+            <li><code>PUT /api/campagnes/{id}/cloturer</code></li>
+          </ul>
+          <div class="hint"><strong>Teste tout de suite —</strong> avec Postman ou <code>curl</code>, vérifie chaque endpoint avant de passer à Flutter.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 6 -->
+  <section class="step" id="e6">
+    <span class="snum"><span class="dotnum">6</span> Étape 6</span>
+    <h2>Valider les entrées</h2>
+    <p class="goal">On ne fait <b>jamais</b> confiance aux données reçues. Les annotations de validation (<code>@NotBlank</code>, <code>@Min</code>…) + <code>@Valid</code> rejettent proprement les requêtes invalides.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Contraintes sur le DTO</div>
+        <div class="pbody">
+<pre><span class="tk">public record</span> <span class="tf">CreerAvisDTO</span>(
+    <span class="tn">@NotBlank</span> String pseudo,
+    <span class="tn">@Min</span>(<span class="tn">0</span>) <span class="tn">@Max</span>(<span class="tn">5</span>) <span class="tk">int</span> note,
+    <span class="tn">@Size</span>(max=<span class="tn">500</span>) String commentaire
+) {}
+
+<span class="tc">// dans le contrôleur :</span>
+<span class="tk">public</span> ... ajouter(<span class="tn">@Valid @RequestBody</span> CreerAvisDTO dto){ ... }</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Sécuriser les inscriptions</div>
+        <div class="pbody">
+          <ul class="check">
+            <li><code>@Min(500)</code> sur <code>litres</code> (quantité minimale de commande).</li>
+            <li><code>@NotBlank</code> sur <code>commune</code> et <code>adresse</code>.</li>
+            <li>Ajoute un <code>@RestControllerAdvice</code> qui renvoie un <b>400</b> lisible en cas d'erreur.</li>
+            <li>Règle métier (dans le service)&nbsp;: renvoyer <b>409</b> si la campagne est clôturée.</li>
+          </ul>
+          <div class="warn"><strong>Passerelle Cyber —</strong> la validation d'entrée est ta première ligne de défense (injection, données aberrantes). À relier à ton cours de cybersécurité.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 7 -->
+  <section class="step" id="e7">
+    <span class="snum"><span class="dotnum">7</span> Étape 7</span>
+    <h2>Documenter avec Swagger / OpenAPI</h2>
+    <p class="goal">Une seule dépendance déploie une interface web qui documente <b>et teste</b> l'API. On enrichit avec quelques annotations.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> springdoc-openapi</div>
+        <div class="pbody">
+<pre><span class="tc">&lt;!-- pom.xml --&gt;</span>
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+  &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+  &lt;version&gt;2.6.0&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+          <p>Sans configuration&nbsp;:</p>
+          <ul>
+            <li>UI sur <code>/swagger-ui/index.html</code></li>
+            <li>Description JSON sur <code>/v3/api-docs</code></li>
+          </ul>
+<pre><span class="tn">@Tag</span>(name = <span class="ts">"Livres"</span>)
+<span class="tn">@RestController</span>
+<span class="tk">public class</span> <span class="tf">LivreController</span> { ... }</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Documenter l'API fioul</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Ajoute la dépendance et lance Swagger UI.</li>
+            <li>Annote tes contrôleurs avec <code>@Tag</code> et <code>@Operation(summary=...)</code>.</li>
+            <li>Teste <code>POST /campagnes/{id}/commandes</code> depuis « Try it out ».</li>
+            <li>Capture d'écran de Swagger → dans le README du projet.</li>
+          </ul>
+          <div class="hint"><strong>Bilan —</strong> l'API est complète, validée, documentée et testable. C'est <em>elle</em> que l'appli Flutter va consommer au parcours 3.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="../mongodb/parcours-mongodb.html">← Parcours 1 · MongoDB</a>
+    <a class="next" href="../flutter/parcours-flutter.html">Parcours 3 · Flutter →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Guide pas à pas Spring Boot — exemple médiathèque à transposer au projet. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

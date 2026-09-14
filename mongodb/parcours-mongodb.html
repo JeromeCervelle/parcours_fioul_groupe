@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours MongoDB pas à pas — Fioul Groupé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Guide pas à pas — MongoDB</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="parcours-mongodb.html" class="on">1 · MongoDB</a>
+      <a href="../springboot/parcours-api-spring.html">2 · API Spring</a>
+      <a href="../flutter/parcours-flutter.html">3 · Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Parcours 1 · MongoDB</div>
+    <span class="lbadge">🍃 Parcours 1 — Modélisation NoSQL</span>
+    <h1>Modéliser une base MongoDB, pas à pas</h1>
+    <p class="intro">Un guide progressif pour construire un modèle de données propre. À chaque étape&nbsp;: <strong>un exemple complet</strong> sur une médiathèque, puis <strong>à toi de l'adapter</strong> au projet Fioul Groupé. On part de l'analyse du domaine et on va jusqu'aux agrégations et aux index.</p>
+    <div class="howto">
+      <div class="h ex"><span class="b">1</span><div><strong>J'observe l'exemple</strong><span>Une médiathèque : livres, auteurs, avis. Code complet et commenté.</span></div></div>
+      <div class="h ad"><span class="b">2</span><div><strong>J'adapte au fioul</strong><span>Je transpose la même idée aux campagnes, commandes et fournisseurs.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#e1">1 · Analyser</a>
+    <a href="#e2">2 · Premier document</a>
+    <a href="#e3">3 · Embarquer ou référencer</a>
+    <a href="#e4">4 · CRUD & tableaux</a>
+    <a href="#e5">5 · Interroger</a>
+    <a href="#e6">6 · Agréger</a>
+    <a href="#e7">7 · Fiabiliser</a>
+    <a href="#ressources">＋ Ressources</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- MAPPING RAPPEL -->
+  <div class="hint" style="margin-top:26px">
+    <strong>La clé du parcours —</strong> l'exemple « médiathèque » et le projet « fioul » ont la <em>même forme</em>. Garde cette correspondance sous les yeux :
+    <table class="maptab">
+      <thead><tr><th>Médiathèque (exemple)</th><th>Rôle structurel</th><th>Fioul Groupé (à toi)</th></tr></thead>
+      <tbody>
+        <tr><td>Livre</td><td>document racine</td><td>Campagne</td></tr>
+        <tr><td>Avis</td><td>sous-documents embarqués</td><td>Commande</td></tr>
+        <tr><td>Auteur</td><td>entité référencée</td><td>Fournisseur</td></tr>
+        <tr><td>note moyenne</td><td>valeur calculée (agrégation)</td><td>volume total → palier de prix</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ETAPE 1 -->
+  <section class="step" id="e1">
+    <span class="snum"><span class="dotnum">1</span> Étape 1</span>
+    <h2>Analyser le domaine avant de coder</h2>
+    <p class="goal">Avant toute requête, on identifie les <b>entités</b>, leurs <b>attributs</b> et surtout leurs <b>relations</b> (un-à-plusieurs, plusieurs-à-plusieurs). C'est cette analyse qui décidera, à l'étape 3, de ce qu'on embarque et de ce qu'on référence.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Médiathèque</div>
+        <div class="pbody">
+          <p>Trois notions ressortent de l'énoncé « une médiathèque gère des livres, écrits par des auteurs, que les lecteurs notent » :</p>
+          <ul>
+            <li><b>Auteur</b> — nom, prénom, nationalité.</li>
+            <li><b>Livre</b> — titre, ISBN, année&nbsp;; écrit par <u>un</u> auteur.</li>
+            <li><b>Avis</b> — pseudo, note /5, commentaire&nbsp;; rattaché à <u>un</u> livre.</li>
+          </ul>
+          <h4>Relations</h4>
+          <ul>
+            <li>Un auteur écrit <b>plusieurs</b> livres (1‑N).</li>
+            <li>Un livre reçoit <b>plusieurs</b> avis (1‑N), qui n'existent pas sans lui.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Le domaine du projet</div>
+        <div class="pbody">
+          <p>Reprends la démarche sur l'énoncé du fioul groupé et liste les entités, attributs et relations.</p>
+          <ul class="check">
+            <li>Identifie les <b>entités</b> : Campagne, Commande, Fournisseur, Utilisateur.</li>
+            <li>Pour chacune, écris ses <b>attributs</b> (ex. Campagne&nbsp;: <code>zone</code>, <code>dateLimite</code>, <code>statut</code>…).</li>
+            <li>Note les <b>relations</b>&nbsp;: une campagne a plusieurs commandes&nbsp;; un fournisseur dessert plusieurs campagnes.</li>
+            <li>Repère celles qui <b>n'existent pas sans leur parent</b> (une commande sans campagne&nbsp;?).</li>
+          </ul>
+          <div class="tip"><strong>Indice —</strong> une commande ressemble beaucoup à un avis&nbsp;: elle n'a de sens qu'à l'intérieur d'une campagne.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 2 -->
+  <section class="step" id="e2">
+    <span class="snum"><span class="dotnum">2</span> Étape 2</span>
+    <h2>Écrire et insérer le premier document</h2>
+    <p class="goal">On traduit une entité en <b>document JSON/BSON</b> et on l'insère avec <code>insertOne</code>. Objectif&nbsp;: manipuler la structure de base d'un document et voir l'<code>_id</code> généré.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Un livre</div>
+        <div class="pbody">
+<pre><span class="tc">// base "mediatheque", collection "livres"</span>
+use mediatheque
+
+db.livres.insertOne({
+  <span class="ts">titre</span>: <span class="ts">"Le Comte de Monte-Cristo"</span>,
+  <span class="ts">isbn</span>: <span class="ts">"978-2070409709"</span>,
+  <span class="ts">anneePublication</span>: <span class="tn">1844</span>,
+  <span class="ts">genres</span>: [<span class="ts">"aventure"</span>, <span class="ts">"roman"</span>]
+})</pre>
+          <p>MongoDB ajoute automatiquement un <code>_id</code> (un <code>ObjectId</code>) : c'est la clé du document.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Une campagne</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée la base <code>fioul</code> et la collection <code>campagnes</code>.</li>
+            <li>Insère une campagne pour <b>Ladignac-le-Long</b> avec <code>zone</code>, <code>statut: "OUVERTE"</code>, <code>dateLimite</code>.</li>
+            <li>Utilise le type date&nbsp;: <code>dateLimite: ISODate("2026-11-30")</code>.</li>
+            <li>Vérifie l'insertion avec <code>db.campagnes.find()</code>.</li>
+          </ul>
+          <div class="warn"><strong>Attention —</strong> une date écrite entre guillemets est une <em>chaîne</em>, pas une date. Utilise <code>ISODate(...)</code> pour pouvoir comparer et trier ensuite.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 3 -->
+  <section class="step" id="e3">
+    <span class="snum"><span class="dotnum">3</span> Étape 3</span>
+    <h2>Embarquer ou référencer &nbsp;? La décision centrale</h2>
+    <p class="goal">En NoSQL, on ne « normalise » pas par réflexe. La règle&nbsp;: <b>on embarque ce qu'on lit toujours ensemble</b> et qui appartient au parent&nbsp;; <b>on référence ce qui est partagé</b> ou volumineux. C'est le choix qui structure toute la suite.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Avis embarqués, auteur référencé</div>
+        <div class="pbody">
+          <p>On lit toujours un livre <em>avec</em> ses avis → on les <b>embarque</b>. Un auteur est partagé par plusieurs livres → on le <b>référence</b> par son <code>_id</code>.</p>
+<pre>db.auteurs.insertOne({ _id: <span class="ts">"dumas"</span>,
+  nom: <span class="ts">"Dumas"</span>, prenom: <span class="ts">"Alexandre"</span> })
+
+db.livres.updateOne(
+  { isbn: <span class="ts">"978-2070409709"</span> },
+  { $set: {
+    <span class="ts">auteurId</span>: <span class="ts">"dumas"</span>,          <span class="tc">// référence</span>
+    <span class="ts">avis</span>: [                    <span class="tc">// embarqué</span>
+      { pseudo: <span class="ts">"Léa"</span>, note: <span class="tn">5</span>,
+        commentaire: <span class="ts">"Un classique !"</span> }
+    ]
+  }}
+)</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Commandes &amp; fournisseur</div>
+        <div class="pbody">
+          <ul class="check">
+            <li><b>Embarque</b> les <code>commandes</code> dans la campagne (on affiche toujours une campagne avec ses inscriptions).</li>
+            <li><b>Référence</b> le <code>fournisseur</code> par un <code>fournisseurId</code> (il sert plusieurs campagnes).</li>
+            <li>Crée un document <code>fournisseurs</code> avec ses <code>paliers</code> (volumeMin → prixLitre).</li>
+            <li><b>Justifie</b> chaque choix en une phrase dans ton README.</li>
+          </ul>
+          <div class="tip"><strong>À débattre en classe —</strong> et si une campagne pouvait dépasser des milliers de commandes&nbsp;? À partir de quel volume l'embarquement devient-il un problème&nbsp;? (limite des 16&nbsp;Mo par document).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 4 -->
+  <section class="step" id="e4">
+    <span class="snum"><span class="dotnum">4</span> Étape 4</span>
+    <h2>Modifier un tableau embarqué</h2>
+    <p class="goal">Ajouter un sous-document à un tableau sans réécrire tout le document&nbsp;: c'est le rôle des <b>opérateurs de tableaux</b> (<code>$push</code>, <code>$pull</code>, <code>$elemMatch</code>).</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Ajouter un avis</div>
+        <div class="pbody">
+<pre>db.livres.updateOne(
+  { isbn: <span class="ts">"978-2070409709"</span> },
+  { $push: { <span class="ts">avis</span>: {
+      pseudo: <span class="ts">"Karim"</span>, note: <span class="tn">4</span>,
+      commentaire: <span class="ts">"Long mais prenant"</span>,
+      date: new Date()
+  }}}
+)</pre>
+          <p><code>$push</code> ajoute un élément au tableau <code>avis</code>. Pour retirer un avis&nbsp;: <code>$pull</code>.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Rejoindre une campagne</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Avec <code>$push</code>, ajoute une <b>commande</b> (<code>litres</code>, <code>commune</code>, <code>adresse</code>) au tableau <code>commandes</code> d'une campagne.</li>
+            <li>Ajoute-en 3 ou 4 pour préparer l'agrégation de l'étape 6.</li>
+            <li>Teste <code>$pull</code> pour désinscrire un participant.</li>
+          </ul>
+          <div class="hint"><strong>Anticipe l'API —</strong> ce <code>$push</code> deviendra bientôt l'endpoint <code>POST /campagnes/{id}/commandes</code> côté Spring.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 5 -->
+  <section class="step" id="e5">
+    <span class="snum"><span class="dotnum">5</span> Étape 5</span>
+    <h2>Interroger : filtres &amp; projection</h2>
+    <p class="goal">Retrouver les bons documents (<code>find</code> + opérateurs), et ne renvoyer que les champs utiles (<b>projection</b>). C'est la base des futurs endpoints de lecture.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Filtrer des livres</div>
+        <div class="pbody">
+<pre><span class="tc">// livres parus après 1900, triés récents d'abord</span>
+db.livres.find(
+  { anneePublication: { $gt: <span class="tn">1900</span> } },
+  { titre: <span class="tn">1</span>, anneePublication: <span class="tn">1</span>, _id: <span class="tn">0</span> } <span class="tc">// projection</span>
+).sort({ anneePublication: <span class="tn">-1</span> })</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Campagnes ouvertes</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Liste les campagnes <code>statut: "OUVERTE"</code> d'une <code>zone</code> donnée.</li>
+            <li>Ne renvoie que <code>zone</code>, <code>dateLimite</code>, <code>fournisseurId</code> (projection).</li>
+            <li>Trie par <code>dateLimite</code> croissante (les plus urgentes d'abord).</li>
+            <li>Ajoute un filtre&nbsp;: seulement celles dont la <code>dateLimite</code> n'est pas dépassée (<code>$gte: new Date()</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 6 -->
+  <section class="step" id="e6">
+    <span class="snum"><span class="dotnum">6</span> Étape 6</span>
+    <h2>Agréger : le cœur du projet</h2>
+    <p class="goal">Le <b>pipeline d'agrégation</b> transforme les données&nbsp;: on déplie un tableau (<code>$unwind</code>), on regroupe (<code>$group</code>) et on calcule (<code>$sum</code>, <code>$avg</code>). C'est ainsi qu'on obtiendra le volume total d'une campagne et son palier de prix.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Note moyenne par livre</div>
+        <div class="pbody">
+<pre>db.livres.aggregate([
+  { $unwind: <span class="ts">"$avis"</span> },              <span class="tc">// une ligne par avis</span>
+  { $group: {
+      _id: <span class="ts">"$titre"</span>,
+      noteMoyenne: { $avg: <span class="ts">"$avis.note"</span> },
+      nbAvis:      { $sum: <span class="tn">1</span> }
+  }},
+  { $sort: { noteMoyenne: <span class="tn">-1</span> } }
+])</pre>
+          <p>Résultat&nbsp;: chaque livre avec sa note moyenne et son nombre d'avis.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Volume total &amp; palier</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Calcule le <b>volume total</b> par campagne&nbsp;: <code>$unwind: "$commandes"</code> puis <code>$sum: "$commandes.litres"</code>.</li>
+            <li>Compte le <b>nombre de participants</b> (<code>$sum: 1</code>).</li>
+            <li>Déduis le <b>palier de prix</b> atteint&nbsp;: compare le volume aux <code>paliers</code> du fournisseur (<code>$lookup</code> pour joindre le fournisseur, puis logique conditionnelle).</li>
+          </ul>
+          <div class="tip"><strong>Défi bonus —</strong> avec <code>$bucket</code>, range les campagnes par tranche de volume (0‑3000, 3000‑8000, 8000+&nbsp;L).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 7 -->
+  <section class="step" id="e7">
+    <span class="snum"><span class="dotnum">7</span> Étape 7</span>
+    <h2>Fiabiliser : validation, index &amp; géo</h2>
+    <p class="goal">Un modèle prêt pour la production&nbsp;: on <b>valide</b> la forme des documents (<code>$jsonSchema</code>), on <b>indexe</b> les champs interrogés, et on prépare la recherche <b>géospatiale</b> par zone.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Schéma &amp; index</div>
+        <div class="pbody">
+<pre><span class="tc">// imposer titre + isbn, note entre 0 et 5</span>
+db.createCollection(<span class="ts">"livres"</span>, { validator: {
+  $jsonSchema: {
+    required: [<span class="ts">"titre"</span>, <span class="ts">"isbn"</span>],
+    properties: {
+      isbn: { bsonType: <span class="ts">"string"</span> }
+    }
+}}})
+
+db.livres.createIndex({ isbn: <span class="tn">1</span> }, { unique: <span class="tk">true</span> })</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Robustesse du modèle</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Écris un <code>$jsonSchema</code> pour <code>campagnes</code>&nbsp;: <code>zone</code> et <code>statut</code> requis, <code>statut</code> dans une liste (<code>enum</code>).</li>
+            <li>Indexe <code>statut</code> + <code>zone</code> (index composé) pour la recherche de l'étape 5.</li>
+            <li>Ajoute un champ <code>localisation</code> de type <code>Point</code> et un index <code>2dsphere</code>.</li>
+            <li>Écris une requête <code>$near</code>&nbsp;: les campagnes à moins de 20&nbsp;km d'un point.</li>
+          </ul>
+          <div class="hint"><strong>Bilan du parcours —</strong> tu as un modèle validé, indexé, avec les agrégations qui alimenteront l'API. Prochain arrêt&nbsp;: exposer tout ça en REST avec Spring Boot.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESSOURCES -->
+  <section class="step" id="ressources">
+    <span class="snum"><span class="dotnum">＋</span> Pour aller plus loin</span>
+    <h2>Tutoriels &amp; ressources MongoDB</h2>
+    <p class="goal">Des ressources gratuites pour réviser autrement ou approfondir. Commence par <b>W3Schools</b> pour tester vite une requête, et <b>MongoDB University</b> pour un parcours de fond avec labs interactifs.</p>
+    <div class="reslist">
+      <a class="res" href="tuto-mongodb.html">
+        <div class="rtop"><span class="rname">Cours MongoDB — les bases (FR) <span class="ext">→</span></span><span class="tags"><span class="rt">Débutant</span><span class="rt fr">FR</span></span></div>
+        <span class="rdesc">Le cours de base <b>en français, sur cette plateforme</b>&nbsp;: intro, CRUD, filtres, tri, mises à jour et agrégations, avec syntaxe / exemple / résultat.</span>
+        <span class="rurl">tuto-mongodb.html</span>
+      </a>
+      <a class="res" href="https://www.w3schools.com/mongodb/" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">W3Schools — MongoDB <span class="ext">↗</span></span><span class="tags"><span class="rt">Débutant</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Tutoriel très épuré, sans compte&nbsp;: une notion par page, exemples copiables et « Try it ». Idéal pour dépanner rapidement.</span>
+        <span class="rurl">w3schools.com/mongodb</span>
+      </a>
+      <a class="res" href="https://learn.mongodb.com" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">MongoDB University <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Cours officiels gratuits et interactifs (labs dans le navigateur, sans installation), avec certificat. La référence de fond.</span>
+        <span class="rurl">learn.mongodb.com</span>
+      </a>
+      <a class="res" href="https://www.ionos.com/digitalguide/websites/web-development/mongodb-tutorial-first-steps/" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">IONOS — Tutoriel MongoDB <span class="ext">↗</span></span><span class="tags"><span class="rt fr">FR</span><span class="rt">Débutant</span></span></div>
+        <span class="rdesc">Installation et premiers pas expliqués clairement, en français. Bon point de départ hors ligne de commande.</span>
+        <span class="rurl">ionos.com — digitalguide</span>
+      </a>
+      <a class="res" href="https://geekflare.com/fr/getting-started-mongodb/" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Geekflare — Démarrer avec MongoDB <span class="ext">↗</span></span><span class="tags"><span class="rt fr">FR</span><span class="rt">Débutant</span></span></div>
+        <span class="rdesc">Introduction douce en français&nbsp;: concepts, documents, premières requêtes, sans prérequis.</span>
+        <span class="rurl">geekflare.com/fr</span>
+      </a>
+      <a class="res" href="https://www.geeksforgeeks.org/mongodb/mongodb-tutorial/" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">GeeksforGeeks — MongoDB <span class="ext">↗</span></span><span class="tags"><span class="rt">Intermédiaire</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Référence structurée et gratuite, du CRUD aux agrégations et index. Utile pour approfondir chaque étape.</span>
+        <span class="rurl">geeksforgeeks.org/mongodb</span>
+      </a>
+      <a class="res" href="https://www.mongodb.com/docs/manual/" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Documentation officielle <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Le manuel de référence&nbsp;: syntaxe exacte des opérateurs, agrégations, index. Le réflexe « source de vérité ».</span>
+        <span class="rurl">mongodb.com/docs/manual</span>
+      </a>
+    </div>
+    <div class="tip" style="margin-top:18px"><strong>Conseil d'usage —</strong> ces ressources <em>complètent</em> le parcours mais ne remplacent pas l'adaptation au projet fioul&nbsp;: quel que soit le tutoriel suivi, l'objectif reste de transposer les notions aux <code>campagnes</code>, <code>commandes</code> et <code>fournisseurs</code>.</div>
+  </section>
+
+  <div class="pager">
+    <a href="../index.html">← Retour au portail</a>
+    <a class="next" href="../springboot/parcours-api-spring.html">Parcours 2 · API Spring →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Guide pas à pas MongoDB — exemple médiathèque à transposer au projet. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

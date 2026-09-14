@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 06 — Les opérateurs de mise à jour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 06</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 06</div>
+    <span class="lbadge">Chapitre 06 / 17</span>
+    <h1>Les opérateurs de mise à jour</h1>
+    <p class="intro">Au chapitre 3, on a vu <code>$set</code> et <code>$inc</code>. Voici le catalogue complet des opérateurs qui, à l'intérieur d'un <code>updateOne</code>/<code>updateMany</code>, disent <b>comment</b> modifier les champs.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#set">1 · $set / $unset</a>
+    <a href="#nombres">2 · $inc / $mul</a>
+    <a href="#minmax">3 · $min / $max</a>
+    <a href="#rename">4 · $rename</a>
+    <a href="#date">5 · $currentDate</a>
+    <a href="#combiner">6 · Combiner</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="set">
+    <span class="snum"><span class="dotnum">1</span> Opérateur</span>
+    <h2>$set et $unset</h2>
+    <p class="goal"><code>$set</code> fixe (ou ajoute) la valeur d'un champ&nbsp;; <code>$unset</code> supprime un champ du document.</p>
+<pre>db.campagnes.updateOne({ zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$set</span>:   { statut: <span class="ts">"CLOTUREE"</span> } })
+
+db.campagnes.updateOne({ zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$unset</span>: { commentaire: <span class="ts">""</span> } })   <span class="tc">// la valeur est ignorée</span></pre>
+    <div class="hint"><strong>À retenir —</strong> <code>$set</code> sur un champ inexistant le <em>crée</em>. C'est normal en NoSQL&nbsp;: on fait évoluer la forme des documents au fil du temps.</div>
+  </section>
+
+  <section class="step" id="nombres">
+    <span class="snum"><span class="dotnum">2</span> Opérateur</span>
+    <h2>$inc et $mul</h2>
+    <p class="goal"><code>$inc</code> ajoute une valeur (positive ou négative)&nbsp;; <code>$mul</code> multiplie. Pratique pour des compteurs et des calculs, sans relire la valeur au préalable.</p>
+<pre>db.clients.updateMany({ ville: <span class="ts">"Limoges"</span> },
+  { <span class="ts">$inc</span>: { points: <span class="tn">10</span> } })      <span class="tc">// +10</span>
+
+db.produits.updateMany({},
+  { <span class="ts">$mul</span>: { prix: <span class="tn">1.05</span> } })      <span class="tc">// +5 % sur tous les prix</span></pre>
+    <div class="hint"><strong>Atomicité —</strong> <code>$inc</code> est <em>atomique</em> côté serveur&nbsp;: pas de risque que deux mises à jour simultanées « écrasent » le compteur. À privilégier sur un « lire puis réécrire ».</div>
+  </section>
+
+  <section class="step" id="minmax">
+    <span class="snum"><span class="dotnum">3</span> Opérateur</span>
+    <h2>$min et $max</h2>
+    <p class="goal"><code>$min</code> ne met à jour que si la nouvelle valeur est <b>plus petite</b> que l'actuelle&nbsp;; <code>$max</code> que si elle est <b>plus grande</b>.</p>
+<pre><span class="tc">// n'abaisse le prix que si 0.98 est inférieur au prix actuel</span>
+db.fournisseurs.updateOne({ _id: <span class="ts">"total-energies"</span> },
+  { <span class="ts">$min</span>: { meilleurPrix: <span class="tn">0.98</span> } })</pre>
+  </section>
+
+  <section class="step" id="rename">
+    <span class="snum"><span class="dotnum">4</span> Opérateur</span>
+    <h2>$rename</h2>
+    <p class="goal"><code>$rename</code> renomme un champ. Utile pour corriger un modèle sans tout réinsérer.</p>
+<pre>db.clients.updateMany({},
+  { <span class="ts">$rename</span>: { <span class="ts">"ville"</span>: <span class="ts">"commune"</span> } })</pre>
+    <div class="warn"><strong>Prudence —</strong> renommer un champ touche potentiellement tous les documents. À faire sur une base de test d'abord, et à versionner (script de migration).</div>
+  </section>
+
+  <section class="step" id="date">
+    <span class="snum"><span class="dotnum">5</span> Opérateur</span>
+    <h2>$currentDate</h2>
+    <p class="goal"><code>$currentDate</code> inscrit la date/heure du serveur dans un champ — idéal pour un <code>modifieLe</code> automatique.</p>
+<pre>db.campagnes.updateOne({ zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$set</span>: { statut: <span class="ts">"CLOTUREE"</span> },
+    <span class="ts">$currentDate</span>: { modifieLe: <span class="tk">true</span> } })</pre>
+  </section>
+
+  <section class="step" id="combiner">
+    <span class="snum"><span class="dotnum">6</span> Pratique</span>
+    <h2>Combiner plusieurs opérateurs</h2>
+    <p class="goal">Une même mise à jour peut enchaîner plusieurs opérateurs&nbsp;: ils s'appliquent tous en une opération atomique.</p>
+<pre>db.campagnes.updateOne(
+  { zone: <span class="ts">"Ladignac-le-Long"</span> },
+  {
+    <span class="ts">$set</span>:  { statut: <span class="ts">"OUVERTE"</span> },
+    <span class="ts">$inc</span>:  { nbVues: <span class="tn">1</span> },
+    <span class="ts">$currentDate</span>: { modifieLe: <span class="tk">true</span> }
+  }
+)</pre>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>À la clôture d'une campagne&nbsp;: passer <code>statut</code> à <code>"CLOTUREE"</code> (<code>$set</code>), horodater avec <code>$currentDate</code>, et incrémenter un compteur de campagnes clôturées côté fournisseur (<code>$inc</code>). Une seule opération, atomique.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Valeurs&nbsp;: <code>$set</code>, <code>$unset</code>.</li>
+        <li>Nombres&nbsp;: <code>$inc</code>, <code>$mul</code> (atomiques), <code>$min</code>, <code>$max</code>.</li>
+        <li>Champs&nbsp;: <code>$rename</code>&nbsp;; dates&nbsp;: <code>$currentDate</code>.</li>
+        <li>On peut combiner plusieurs opérateurs en une mise à jour.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch05.html">← Chapitre 05</a>
+    <a class="next" href="mongo-ch07.html">Chapitre 07 · Les projections →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 06 — Les opérateurs de mise à jour. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

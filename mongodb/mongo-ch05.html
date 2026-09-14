@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 05 — Les opérateurs de tableaux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 05</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 05</div>
+    <span class="lbadge">Chapitre 05 / 17</span>
+    <h1>Les opérateurs de tableaux</h1>
+    <p class="intro">Les documents contiennent souvent des <b>tableaux</b> (une liste de commandes, de tags, de notes…). MongoDB offre des opérateurs dédiés pour les interroger et les modifier sans réécrire tout le document. C'est essentiel pour notre modèle « campagne + commandes embarquées ».</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#rappel">1 · Un tableau dans un doc</a>
+    <a href="#chercher">2 · $all &amp; $size</a>
+    <a href="#elemmatch">3 · $elemMatch</a>
+    <a href="#modifier">4 · $push / $pull</a>
+    <a href="#addtoset">5 · $addToSet / $pop</a>
+    <a href="#positionnel">6 · L'opérateur $</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="rappel">
+    <span class="snum"><span class="dotnum">1</span> Rappel</span>
+    <h2>Un tableau dans un document</h2>
+    <p class="goal">Un champ peut contenir une liste de valeurs simples, ou une liste de <b>sous-documents</b>. Exemple avec une campagne et ses commandes embarquées&nbsp;:</p>
+<pre>{
+  <span class="ts">"zone"</span>: <span class="ts">"Ladignac-le-Long"</span>,
+  <span class="ts">"commandes"</span>: [
+    { <span class="ts">"litres"</span>: <span class="tn">1500</span>, <span class="ts">"commune"</span>: <span class="ts">"Ladignac"</span> },
+    { <span class="ts">"litres"</span>: <span class="tn">800</span>,  <span class="ts">"commune"</span>: <span class="ts">"Nexon"</span> }
+  ]
+}</pre>
+  </section>
+
+  <section class="step" id="chercher">
+    <span class="snum"><span class="dotnum">2</span> Chercher</span>
+    <h2>$all et $size</h2>
+    <p class="goal"><code>$all</code> exige que le tableau contienne <b>toutes</b> les valeurs listées&nbsp;; <code>$size</code> filtre sur le <b>nombre</b> d'éléments.</p>
+<pre><span class="tc">// documents dont le tableau tags contient à la fois "urgent" et "hiver"</span>
+db.campagnes.find({ tags: { <span class="ts">$all</span>: [<span class="ts">"urgent"</span>, <span class="ts">"hiver"</span>] } })
+
+<span class="tc">// campagnes ayant exactement 2 commandes</span>
+db.campagnes.find({ commandes: { <span class="ts">$size</span>: <span class="tn">2</span> } })</pre>
+    <div class="hint"><strong>Nuance —</strong> une égalité simple sur un tableau (<code>{ tags: "hiver" }</code>) teste la <em>présence</em> d'une valeur&nbsp;; <code>$all</code> teste la présence de <em>plusieurs</em> valeurs à la fois.</div>
+  </section>
+
+  <section class="step" id="elemmatch">
+    <span class="snum"><span class="dotnum">3</span> Chercher</span>
+    <h2>$elemMatch — une condition sur un élément</h2>
+    <p class="goal">Pour un tableau de sous-documents, <code>$elemMatch</code> exige qu'<b>un même élément</b> satisfasse plusieurs conditions à la fois.</p>
+<pre><span class="tc">// campagnes ayant AU MOINS une commande de + de 1000 L à Ladignac</span>
+db.campagnes.find({
+  commandes: { <span class="ts">$elemMatch</span>: {
+    litres: { <span class="ts">$gt</span>: <span class="tn">1000</span> },
+    commune: <span class="ts">"Ladignac"</span>
+  }}
+})</pre>
+    <div class="warn"><strong>Piège —</strong> sans <code>$elemMatch</code>, écrire les deux conditions séparément accepterait un document où <em>un</em> élément a &gt; 1000 L et un <em>autre</em> est à Ladignac. <code>$elemMatch</code> force le même élément à remplir les deux.</div>
+  </section>
+
+  <section class="step" id="modifier">
+    <span class="snum"><span class="dotnum">4</span> Modifier</span>
+    <h2>Ajouter / retirer : $push et $pull</h2>
+    <p class="goal"><code>$push</code> ajoute un élément à un tableau&nbsp;; <code>$pull</code> retire les éléments qui correspondent à une condition. On les utilise dans un <code>updateOne</code>/<code>updateMany</code>.</p>
+<pre><span class="tc">// ajouter une commande à une campagne</span>
+db.campagnes.updateOne(
+  { zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$push</span>: { commandes: { litres: <span class="tn">1200</span>, commune: <span class="ts">"Saint-Yrieix"</span> } } }
+)
+
+<span class="tc">// retirer les commandes de Nexon</span>
+db.campagnes.updateOne(
+  { zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$pull</span>: { commandes: { commune: <span class="ts">"Nexon"</span> } } }
+)</pre>
+  </section>
+
+  <section class="step" id="addtoset">
+    <span class="snum"><span class="dotnum">5</span> Modifier</span>
+    <h2>$addToSet et $pop</h2>
+    <p class="goal"><code>$addToSet</code> ajoute une valeur <b>seulement si</b> elle n'y est pas déjà (évite les doublons)&nbsp;; <code>$pop</code> retire le premier (<code>-1</code>) ou le dernier (<code>1</code>) élément.</p>
+<pre>db.campagnes.updateOne({ zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$addToSet</span>: { tags: <span class="ts">"prioritaire"</span> } })   <span class="tc">// pas de doublon</span>
+
+db.campagnes.updateOne({ zone: <span class="ts">"Ladignac-le-Long"</span> },
+  { <span class="ts">$pop</span>: { commandes: <span class="tn">1</span> } })               <span class="tc">// retire la dernière</span></pre>
+  </section>
+
+  <section class="step" id="positionnel">
+    <span class="snum"><span class="dotnum">6</span> Modifier</span>
+    <h2>L'opérateur positionnel $</h2>
+    <p class="goal">Comment modifier <b>un</b> élément précis d'un tableau&nbsp;? L'opérateur positionnel <code>$</code> désigne l'élément qui a correspondu au filtre.</p>
+<pre><span class="tc">// passer la commande de Ladignac à 1600 L</span>
+db.campagnes.updateOne(
+  { zone: <span class="ts">"Ladignac-le-Long"</span>, <span class="ts">"commandes.commune"</span>: <span class="ts">"Ladignac"</span> },
+  { <span class="ts">$set</span>: { <span class="ts">"commandes.$.litres"</span>: <span class="tn">1600</span> } }
+)</pre>
+    <div class="hint"><strong>À retenir —</strong> le <code>$</code> reprend la position de l'élément trouvé par le filtre. Pour modifier <em>tous</em> les éléments correspondants, il existe l'opérateur <code>$[]</code> et les filtres <code>arrayFilters</code>.</div>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>C'est le chapitre clé pour le fil rouge&nbsp;! « Rejoindre une campagne » = un <code>$push</code> dans <code>commandes</code>. « Se désinscrire » = un <code>$pull</code>. « Corriger sa quantité » = l'opérateur positionnel <code>$</code>. Écris ces trois opérations&nbsp;: elles deviendront l'endpoint <code>POST /campagnes/{id}/commandes</code> et ses variantes dans l'API Spring.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Chercher&nbsp;: <code>$all</code>, <code>$size</code>, <code>$elemMatch</code> (même élément).</li>
+        <li>Ajouter/retirer&nbsp;: <code>$push</code>, <code>$pull</code>, <code>$addToSet</code>, <code>$pop</code>.</li>
+        <li>Modifier un élément ciblé&nbsp;: l'opérateur positionnel <code>$</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch04.html">← Chapitre 04</a>
+    <a class="next" href="mongodb-chapitres.html">Chapitre 06 (à venir) · Sommaire →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 05 — Les opérateurs de tableaux. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

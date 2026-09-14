@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 11 — Les index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 11</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 11</div>
+    <span class="lbadge">Chapitre 11 / 17</span>
+    <h1>Les index</h1>
+    <p class="intro">Un <b>index</b> accélère les recherches, comme l'index d'un livre évite de le lire en entier. Sans index, MongoDB parcourt tous les documents (<i>collection scan</i>). Bien indexer, c'est la clé de la performance.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#pourquoi">1 · Pourquoi</a>
+    <a href="#creer">2 · Créer un index</a>
+    <a href="#explain">3 · explain()</a>
+    <a href="#composes">4 · Index composés</a>
+    <a href="#speciaux">5 · Unique, TTL, partiels</a>
+    <a href="#cout">6 · Le coût</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Pourquoi indexer&nbsp;?</h2>
+    <p class="goal">Une requête sur un champ non indexé oblige MongoDB à examiner <b>chaque</b> document. Sur des milliers de documents, c'est lent. Un index sur ce champ permet de retrouver directement les bons documents.</p>
+    <div class="hint"><strong>Analogie —</strong> chercher « Ladignac » dans un annuaire non trié = tout lire&nbsp;; avec un index alphabétique = aller droit au but. Chaque collection a déjà un index sur <code>_id</code>.</div>
+  </section>
+
+  <section class="step" id="creer">
+    <span class="snum"><span class="dotnum">2</span> Méthode</span>
+    <h2>Créer un index</h2>
+    <p class="goal"><code>createIndex()</code> crée un index sur un ou plusieurs champs (<code>1</code> croissant, <code>-1</code> décroissant).</p>
+<pre>db.campagnes.createIndex({ statut: <span class="tn">1</span> })
+db.campagnes.getIndexes()      <span class="tc">// lister les index</span>
+db.campagnes.dropIndex(<span class="ts">"statut_1"</span>)   <span class="tc">// supprimer</span></pre>
+  </section>
+
+  <section class="step" id="explain">
+    <span class="snum"><span class="dotnum">3</span> Outil</span>
+    <h2>Mesurer avec explain()</h2>
+    <p class="goal"><code>explain("executionStats")</code> montre comment MongoDB exécute une requête&nbsp;: a-t-il utilisé un index (<code>IXSCAN</code>) ou parcouru toute la collection (<code>COLLSCAN</code>)&nbsp;?</p>
+<pre>db.campagnes.find({ statut: <span class="ts">"OUVERTE"</span> }).explain(<span class="ts">"executionStats"</span>)</pre>
+    <div class="hint"><strong>Le réflexe pro —</strong> devant une requête lente, on lance <code>explain()</code>. Voir <code>COLLSCAN</code> sur une grande collection = il manque probablement un index.</div>
+  </section>
+
+  <section class="step" id="composes">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Index composés</h2>
+    <p class="goal">Un index sur <b>plusieurs</b> champs sert les requêtes qui filtrent sur ces champs. L'<b>ordre</b> compte&nbsp;: l'index <code>{zone:1, statut:1}</code> sert « zone » et « zone + statut », mais pas « statut » seul.</p>
+<pre>db.campagnes.createIndex({ zone: <span class="tn">1</span>, statut: <span class="tn">1</span> })</pre>
+    <div class="hint"><strong>Règle « ESR » —</strong> dans un index composé, on place d'abord les champs d'<b>É</b>galité, puis ceux de <b>S</b>ort (tri), puis ceux de <b>R</b>ange (plage). Un bon moyen mnémotechnique pour ordonner les champs.</div>
+  </section>
+
+  <section class="step" id="speciaux">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Index unique, TTL, partiels</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Unique</b> — interdit les doublons sur un champ (ex. l'e-mail d'un utilisateur).</li>
+      <li><b>TTL</b> (<i>Time To Live</i>) — supprime automatiquement les documents après un délai (ex. des jetons temporaires).</li>
+      <li><b>Partiel</b> — n'indexe qu'un sous-ensemble (ex. seulement les campagnes ouvertes).</li>
+    </ul>
+<pre>db.utilisateurs.createIndex({ email: <span class="tn">1</span> }, { unique: <span class="tk">true</span> })
+
+db.jetons.createIndex({ creeLe: <span class="tn">1</span> }, { expireAfterSeconds: <span class="tn">3600</span> })
+
+db.campagnes.createIndex(
+  { zone: <span class="tn">1</span> },
+  { partialFilterExpression: { statut: <span class="ts">"OUVERTE"</span> } }
+)</pre>
+  </section>
+
+  <section class="step" id="cout">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Le coût d'un index</h2>
+    <p class="goal">Un index accélère les <b>lectures</b> mais ralentit un peu les <b>écritures</b> (il faut le tenir à jour) et occupe de l'espace. On indexe donc les champs réellement interrogés/triés, pas tous les champs.</p>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Crée un index composé <code>{ statut: 1, zone: 1 }</code> pour l'écran « campagnes ouvertes d'une zone », et un index <b>unique</b> sur <code>email</code> dans <code>utilisateurs</code>. Vérifie avec <code>explain()</code> que ta requête de liste passe bien en <code>IXSCAN</code>. Au chapitre 13, on ajoutera un index géospatial <code>2dsphere</code>.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Un index évite le parcours complet (<code>COLLSCAN</code> → <code>IXSCAN</code>).</li>
+        <li><code>createIndex()</code>&nbsp;; on mesure avec <code>explain("executionStats")</code>.</li>
+        <li>Index composés&nbsp;: l'ordre compte (règle ESR).</li>
+        <li>Variantes&nbsp;: unique, TTL, partiel. Un index a un coût en écriture/espace.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch10.html">← Chapitre 10</a>
+    <a class="next" href="mongo-ch12.html">Chapitre 12 · Recherches textuelles →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 11 — Les index. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

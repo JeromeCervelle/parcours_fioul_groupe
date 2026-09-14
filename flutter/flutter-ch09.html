@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 09 — Fonctionnement approfondi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 09</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 09</div>
+  <span class="lbadge">Chapitre 09 / 19</span>
+  <h1>Fonctionnement approfondi de Flutter</h1>
+  <p class="intro">Comprendre ce qui se passe sous le capot&nbsp;: les trois arbres (Widget/Element/RenderObject), le rôle du BuildContext, des keys, et l'accès au contexte (MediaQuery, Theme).</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#arbres">1 · Trois arbres</a><a href="#context">2 · BuildContext</a><a href="#keys">3 · Les keys</a><a href="#mediaquery">4 · MediaQuery &amp; Theme</a></div></nav>
+<main class="wrap">
+  <section class="step" id="arbres">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Widget, Element, RenderObject</h2>
+    <p class="goal">Flutter maintient trois arbres&nbsp;: les <b>Widgets</b> (descriptions immuables et jetables), les <b>Elements</b> (instances vivantes qui font le lien), les <b>RenderObjects</b> (qui mesurent et dessinent). On travaille avec les widgets&nbsp;; Flutter gère le reste.</p>
+    <div class="hint"><strong>Pourquoi c'est efficace —</strong> reconstruire des widgets est bon marché&nbsp;; Flutter réutilise les Elements et ne redessine que ce qui a changé.</div>
+  </section>
+  <section class="step" id="context">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Le BuildContext</h2>
+    <p class="goal">Le <code>context</code> reçu dans <code>build()</code> est la position du widget dans l'arbre. Il sert à remonter l'arbre pour trouver des données (thème, navigateur, providers).</p>
+  </section>
+  <section class="step" id="keys">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les keys</h2>
+    <p class="goal">Une <code>Key</code> aide Flutter à identifier un widget quand une liste change (réordonnancement, suppression). En général optionnelles&nbsp;; utiles pour préserver l'état d'éléments dans une liste dynamique.</p>
+  </section>
+  <section class="step" id="mediaquery">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>MediaQuery &amp; Theme</h2>
+    <p class="goal">Via le context&nbsp;: <code>MediaQuery.of(context).size</code> donne la taille de l'écran (pour un design responsive)&nbsp;; <code>Theme.of(context)</code> donne les couleurs/typo du thème.</p>
+<pre><span class="tk">final</span> largeur = MediaQuery.of(context).size.width;
+<span class="tk">final</span> couleur = Theme.of(context).colorScheme.primary;</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Rends la liste des campagnes adaptable&nbsp;: une colonne sur téléphone, une grille sur tablette (via <code>MediaQuery</code>). Utilise <code>Theme.of(context)</code> pour la couleur de la jauge, plutôt que des couleurs en dur.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Trois arbres&nbsp;: Widget (jetable) / Element (vivant) / RenderObject (dessin).</li>
+      <li>Le <code>BuildContext</code> localise le widget et donne accès à l'arbre.</li>
+      <li><code>MediaQuery</code> (taille écran) et <code>Theme.of</code> (thème) via le context.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch08.html">← Chapitre 08</a><a class="next" href="flutter-ch10.html">Chapitre 10 · La navigation →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 09 — Fonctionnement approfondi. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

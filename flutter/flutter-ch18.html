@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 18 — Publication sur le Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 18</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 18</div>
+  <span class="lbadge">Chapitre 18 / 19</span>
+  <h1>Publication d'une application</h1>
+  <p class="intro">Préparer et générer une version distribuable&nbsp;: icône, écran de démarrage, signature, et le format attendu par le Play Store.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#finitions">1 · Finitions</a><a href="#signer">2 · Signer</a><a href="#build">3 · Build release</a><a href="#store">4 · Le Store</a></div></nav>
+<main class="wrap">
+  <section class="step" id="finitions">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Icône &amp; écran de démarrage</h2>
+    <p class="goal">On personnalise l'<b>icône</b> (paquet <code>flutter_launcher_icons</code>) et l'<b>écran de démarrage</b> (<code>flutter_native_splash</code>), on fixe le nom et la version dans <code>pubspec.yaml</code>.</p>
+  </section>
+  <section class="step" id="signer">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Signer l'application</h2>
+    <p class="goal">Android exige une <b>signature</b>&nbsp;: on génère un keystore et on configure la signature de release. Le keystore est un secret précieux (à ne jamais committer).</p>
+  </section>
+  <section class="step" id="build">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Générer la version release</h2>
+    <p class="goal">Pour le Play Store, on produit un <b>App Bundle</b> (<code>.aab</code>)&nbsp;; pour un test direct, un APK.</p>
+<pre>flutter build appbundle --release   <span class="tc"># pour le Play Store</span>
+flutter build apk --release         <span class="tc"># pour installer directement</span></pre>
+  </section>
+  <section class="step" id="store">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Le dépôt sur le Store</h2>
+    <p class="goal">Sur la <b>Play Console</b>&nbsp;: fiche de l'app (description, captures), politique de confidentialité, puis test interne avant production. (iOS&nbsp;: App Store Connect, compte payant.)</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Pour l'évaluation, un <b>APK release</b> suffit&nbsp;: génère-le, attache-le à la release GitHub <code>v1.0.0</code> (parcours Forge, séance 7). Une vraie publication Play Store est une ouverture facultative.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Finitions&nbsp;: icône, splash, nom, version.</li>
+      <li>Signature obligatoire (keystore secret).</li>
+      <li><code>build appbundle</code> (Store) / <code>build apk</code> (direct)&nbsp;; Play Console.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch17.html">← Chapitre 17</a><a class="next" href="flutter-ch19.html">Chapitre 19 · Authentification JWT →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 18 — Publication sur le Store. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

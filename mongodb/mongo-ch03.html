@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 03 — Les méthodes CRUD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 03</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 03</div>
+    <span class="lbadge">Chapitre 03 / 17</span>
+    <h1>Les méthodes CRUD</h1>
+    <p class="intro">CRUD = <b>C</b>reate, <b>R</b>ead, <b>U</b>pdate, <b>D</b>elete&nbsp;: les quatre opérations fondamentales sur les documents. C'est le cœur du travail quotidien avec MongoDB.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#create">1 · Create (insert)</a>
+    <a href="#id">2 · L'_id</a>
+    <a href="#read">3 · Read (find)</a>
+    <a href="#update">4 · Update</a>
+    <a href="#delete">5 · Delete</a>
+    <a href="#replace">6 · Le piège du replace</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="create">
+    <span class="snum"><span class="dotnum">1</span> Create</span>
+    <h2>Insérer des documents</h2>
+    <p class="goal"><code>insertOne()</code> ajoute un document, <code>insertMany()</code> en ajoute plusieurs (dans un tableau). La collection est créée automatiquement si elle n'existe pas.</p>
+<pre>db.clients.insertOne({ nom: <span class="ts">"Dupont"</span>, ville: <span class="ts">"Limoges"</span>, points: <span class="tn">120</span> })
+
+db.clients.insertMany([
+  { nom: <span class="ts">"Martin"</span>, ville: <span class="ts">"Limoges"</span>, points: <span class="tn">80</span> },
+  { nom: <span class="ts">"Nguyen"</span>, ville: <span class="ts">"Brive"</span>,   points: <span class="tn">200</span> }
+])</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ acknowledged: true, insertedId: ObjectId("652f...") }</div>
+  </section>
+
+  <section class="step" id="id">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Le champ _id</h2>
+    <p class="goal">Chaque document possède un champ <code>_id</code> <b>unique</b> dans sa collection. Si on ne le fournit pas, MongoDB génère un <code>ObjectId</code> (identifiant de 12 octets contenant notamment un horodatage).</p>
+<pre><span class="tc">// _id automatique</span>
+db.clients.insertOne({ nom: <span class="ts">"Petit"</span> })
+<span class="tc">// _id imposé (doit être unique)</span>
+db.fournisseurs.insertOne({ _id: <span class="ts">"total-energies"</span>, nom: <span class="ts">"TotalEnergies"</span> })</pre>
+    <div class="hint"><strong>À retenir —</strong> on peut choisir son propre <code>_id</code> (une chaîne parlante, par exemple), à condition qu'il reste unique. Insérer deux fois le même <code>_id</code> lève une erreur de clé dupliquée.</div>
+  </section>
+
+  <section class="step" id="read">
+    <span class="snum"><span class="dotnum">3</span> Read</span>
+    <h2>Lire des documents</h2>
+    <p class="goal"><code>find(filtre)</code> renvoie tous les documents correspondants&nbsp;; <code>findOne(filtre)</code> renvoie le premier. Sans filtre, <code>find()</code> renvoie tout.</p>
+<pre>db.clients.find()                          <span class="tc">// tous</span>
+db.clients.find({ ville: <span class="ts">"Limoges"</span> })       <span class="tc">// filtrés</span>
+db.clients.findOne({ nom: <span class="ts">"Dupont"</span> })        <span class="tc">// un seul</span></pre>
+    <div class="hint"><strong>Astuce —</strong> dans <code>mongosh</code>, ajoute <code>.pretty()</code> pour un affichage indenté. Le chapitre 4 approfondit les <em>filtres</em> (opérateurs), le chapitre 7 les <em>projections</em> (choix des champs).</div>
+  </section>
+
+  <section class="step" id="update">
+    <span class="snum"><span class="dotnum">4</span> Update</span>
+    <h2>Mettre à jour</h2>
+    <p class="goal"><code>updateOne()</code> modifie le premier document correspondant, <code>updateMany()</code> tous. On indique <b>quoi</b> modifier avec des opérateurs&nbsp;: <code>$set</code> (fixer une valeur), <code>$inc</code> (incrémenter), <code>$unset</code> (retirer un champ).</p>
+<pre>db.clients.updateOne(
+  { nom: <span class="ts">"Dupont"</span> },
+  { <span class="ts">$set</span>: { ville: <span class="ts">"Tulle"</span> } }
+)
+
+db.clients.updateMany(
+  { ville: <span class="ts">"Limoges"</span> },
+  { <span class="ts">$inc</span>: { points: <span class="tn">10</span> } }      <span class="tc">// +10 points à tous</span>
+)</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ acknowledged: true, matchedCount: 2, modifiedCount: 2 }</div>
+    <p style="color:var(--ink-soft)">Option utile&nbsp;: <b>upsert</b> — créer le document s'il n'existe pas.</p>
+<pre>db.clients.updateOne(
+  { nom: <span class="ts">"Roux"</span> },
+  { <span class="ts">$set</span>: { ville: <span class="ts">"Guéret"</span> } },
+  { upsert: <span class="tk">true</span> }        <span class="tc">// crée le client s'il est absent</span>
+)</pre>
+  </section>
+
+  <section class="step" id="delete">
+    <span class="snum"><span class="dotnum">5</span> Delete</span>
+    <h2>Supprimer</h2>
+    <p class="goal"><code>deleteOne()</code> supprime le premier document correspondant, <code>deleteMany()</code> tous ceux qui correspondent.</p>
+<pre>db.clients.deleteOne({ nom: <span class="ts">"Petit"</span> })
+db.clients.deleteMany({ ville: <span class="ts">"Brive"</span> })</pre>
+    <div class="warn"><strong>Attention —</strong> <code>deleteMany({})</code> (filtre vide) supprime <b>tous</b> les documents de la collection. Toujours vérifier son filtre avant d'exécuter.</div>
+  </section>
+
+  <section class="step" id="replace">
+    <span class="snum"><span class="dotnum">6</span> Piège</span>
+    <h2>update avec $set vs remplacement total</h2>
+    <p class="goal">Erreur classique du débutant&nbsp;: oublier <code>$set</code>. Sans opérateur, le second argument <b>remplace tout le document</b>.</p>
+<pre><span class="tc">// ❌ REMPLACE tout : le client perd ville et points !</span>
+db.clients.updateOne({ nom: <span class="ts">"Dupont"</span> }, { points: <span class="tn">200</span> })
+
+<span class="tc">// ✅ Correct : ne change que le champ points</span>
+db.clients.updateOne({ nom: <span class="ts">"Dupont"</span> }, { <span class="ts">$set</span>: { points: <span class="tn">200</span> } })</pre>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Entraîne-toi sur la collection <code>campagnes</code>&nbsp;: <b>insère</b> une campagne pour Ladignac, <b>lis-la</b>, <b>mets à jour</b> son <code>statut</code> de <code>"OUVERTE"</code> à <code>"CLOTUREE"</code> avec <code>$set</code>, puis <b>supprime</b> une campagne de test. Tu retrouveras exactement ces opérations, plus tard, derrière les endpoints de l'API Spring (<code>POST</code>, <code>GET</code>, <code>PUT</code>, <code>DELETE</code>).</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li><b>Create</b>&nbsp;: <code>insertOne</code> / <code>insertMany</code>.</li>
+        <li><b>Read</b>&nbsp;: <code>find</code> / <code>findOne</code>.</li>
+        <li><b>Update</b>&nbsp;: <code>updateOne</code> / <code>updateMany</code> avec <code>$set</code>, <code>$inc</code> (et <code>upsert</code>).</li>
+        <li><b>Delete</b>&nbsp;: <code>deleteOne</code> / <code>deleteMany</code>.</li>
+        <li>Toujours <code>$set</code> pour une modification partielle&nbsp;!</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch02.html">← Chapitre 02</a>
+    <a class="next" href="mongo-ch04.html">Chapitre 04 · Les opérateurs de recherche →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 03 — Les méthodes CRUD. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

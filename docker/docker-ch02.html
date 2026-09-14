@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 02 — Images & conteneurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 02</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 02</div>
+  <span class="lbadge">Chapitre 02 / 08</span>
+  <h1>Images &amp; conteneurs en pratique</h1>
+  <p class="intro">Les commandes du quotidien&nbsp;: récupérer une image, lancer un conteneur, mapper un port, voir les logs, entrer dedans, l'arrêter. On démarre une vraie base MongoDB en une commande.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#run">1 · docker run</a><a href="#ports">2 · Ports &amp; -d</a><a href="#ps">3 · ps &amp; logs</a><a href="#exec">4 · exec</a><a href="#cleanup">5 · stop / rm</a></div></nav>
+<main class="wrap">
+  <section class="step" id="run">
+    <span class="snum"><span class="dotnum">1</span> Commande</span>
+    <h2>Lancer un conteneur</h2>
+    <p class="goal"><code>docker run</code> télécharge l'image si besoin (depuis Docker Hub) puis démarre un conteneur.</p>
+<pre>docker run hello-world           <span class="tc"># test</span>
+docker run mongo:7               <span class="tc"># lance MongoDB (au premier plan)</span></pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">Unable to find image 'mongo:7' locally
+7: Pulling from library/mongo ...
+{"t":..., "msg":"Waiting for connections","attr":{"port":27017}}</div>
+  </section>
+  <section class="step" id="ports">
+    <span class="snum"><span class="dotnum">2</span> Commande</span>
+    <h2>Détacher &amp; publier un port</h2>
+    <p class="goal"><code>-d</code> lance en arrière-plan&nbsp;; <code>-p hôte:conteneur</code> publie un port&nbsp;; <code>--name</code> nomme le conteneur.</p>
+<pre>docker run -d --name fioul-mongo -p 27017:27017 mongo:7</pre>
+    <p style="color:var(--ink-soft)">MongoDB est maintenant accessible depuis l'hôte sur <code>localhost:27017</code>.</p>
+    <div class="hint"><strong>Ports —</strong> <code>-p 27017:27017</code> relie le port 27017 de ta machine au port 27017 <em>dans</em> le conteneur. Sans <code>-p</code>, le service reste enfermé dans le conteneur.</div>
+  </section>
+  <section class="step" id="ps">
+    <span class="snum"><span class="dotnum">3</span> Commande</span>
+    <h2>Lister &amp; suivre les logs</h2>
+<pre>docker ps                    <span class="tc"># conteneurs en cours</span>
+docker ps -a                 <span class="tc"># y compris arrêtés</span>
+docker images                <span class="tc"># images locales</span>
+docker logs -f fioul-mongo   <span class="tc"># suivre les logs</span></pre>
+  </section>
+  <section class="step" id="exec">
+    <span class="snum"><span class="dotnum">4</span> Commande</span>
+    <h2>Entrer dans un conteneur</h2>
+    <p class="goal"><code>docker exec -it</code> ouvre un shell (ou un outil) <b>dans</b> le conteneur — pratique pour lancer <code>mongosh</code> directement.</p>
+<pre>docker exec -it fioul-mongo mongosh</pre>
+  </section>
+  <section class="step" id="cleanup">
+    <span class="snum"><span class="dotnum">5</span> Commande</span>
+    <h2>Arrêter &amp; nettoyer</h2>
+<pre>docker stop fioul-mongo
+docker start fioul-mongo
+docker rm fioul-mongo        <span class="tc"># supprimer (arrêté)</span>
+docker rmi mongo:7           <span class="tc"># supprimer l'image</span></pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Lance la base du projet en une commande&nbsp;: <code>docker run -d --name fioul-mongo -p 27017:27017 mongo:7</code>, entre avec <code>mongosh</code> pour créer la base <code>fioul</code>. Plus besoin d'installer MongoDB sur chaque poste du lycée — l'image suffit.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>docker run -d -p --name</code> lance un service en arrière-plan.</li>
+      <li><code>docker ps</code>, <code>logs -f</code> pour observer&nbsp;; <code>exec -it</code> pour entrer.</li>
+      <li><code>stop</code>/<code>start</code>/<code>rm</code>/<code>rmi</code> pour gérer le cycle de vie.</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-ch01.html">← Chapitre 01</a><a class="next" href="docker-ch03.html">Chapitre 03 · Écrire un Dockerfile →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 02 — Images &amp; conteneurs. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

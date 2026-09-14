@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 13 — Les recherches géospatiales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 13</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 13</div>
+    <span class="lbadge">Chapitre 13 / 17</span>
+    <h1>Les recherches géospatiales</h1>
+    <p class="intro">MongoDB sait stocker des coordonnées et répondre à des questions de proximité&nbsp;: « qu'y a-t-il à moins de 20 km&nbsp;? », « quels points sont dans cette zone&nbsp;? ». Parfait pour trouver les campagnes de fioul autour de chez soi.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#geojson">1 · GeoJSON</a>
+    <a href="#index">2 · L'index 2dsphere</a>
+    <a href="#near">3 · $near</a>
+    <a href="#within">4 · $geoWithin</a>
+    <a href="#intersects">5 · $geoIntersects</a>
+    <a href="#projet">6 · Sur le projet</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="geojson">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Stocker un lieu : le format GeoJSON</h2>
+    <p class="goal">On stocke une position dans un champ au format <b>GeoJSON</b>&nbsp;: un objet <code>{ type, coordinates }</code>. Attention à l'ordre&nbsp;: <b>longitude d'abord, puis latitude</b>.</p>
+<pre>{
+  <span class="ts">"zone"</span>: <span class="ts">"Ladignac-le-Long"</span>,
+  <span class="ts">"localisation"</span>: {
+    <span class="ts">"type"</span>: <span class="ts">"Point"</span>,
+    <span class="ts">"coordinates"</span>: [ <span class="tn">1.1367</span>, <span class="tn">45.6006</span> ]   <span class="tc">// [lon, lat]</span>
+  }
+}</pre>
+    <div class="warn"><strong>Piège classique —</strong> l'ordre est <code>[longitude, latitude]</code>, l'inverse de ce qu'on dit à l'oral (« latitude, longitude »). Une inversion place le point à l'autre bout du monde.</div>
+  </section>
+
+  <section class="step" id="index">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>L'index 2dsphere</h2>
+    <p class="goal">Les requêtes géospatiales exigent un index <code>2dsphere</code> sur le champ de localisation (il modélise la Terre comme une sphère).</p>
+<pre>db.campagnes.createIndex({ localisation: <span class="ts">"2dsphere"</span> })</pre>
+  </section>
+
+  <section class="step" id="near">
+    <span class="snum"><span class="dotnum">3</span> Requête</span>
+    <h2>$near — les plus proches</h2>
+    <p class="goal"><code>$near</code> renvoie les documents triés du plus proche au plus lointain d'un point, avec une distance maximale (en <b>mètres</b>).</p>
+<pre>db.campagnes.find({
+  localisation: {
+    <span class="ts">$near</span>: {
+      <span class="ts">$geometry</span>: { type: <span class="ts">"Point"</span>, coordinates: [<span class="tn">1.1367</span>, <span class="tn">45.6006</span>] },
+      <span class="ts">$maxDistance</span>: <span class="tn">20000</span>            <span class="tc">// 20 km</span>
+    }
+  }
+})</pre>
+    <div class="hint"><strong>Bonus —</strong> <code>$near</code> trie automatiquement par distance croissante&nbsp;: idéal pour « les campagnes les plus proches d'abord ».</div>
+  </section>
+
+  <section class="step" id="within">
+    <span class="snum"><span class="dotnum">4</span> Requête</span>
+    <h2>$geoWithin — à l'intérieur d'une zone</h2>
+    <p class="goal"><code>$geoWithin</code> renvoie les points situés <b>dans</b> une forme (cercle, polygone). Ici, un cercle défini par un centre et un rayon en radians.</p>
+<pre>db.campagnes.find({
+  localisation: {
+    <span class="ts">$geoWithin</span>: {
+      <span class="ts">$centerSphere</span>: [ [<span class="tn">1.1367</span>, <span class="tn">45.6006</span>], <span class="tn">20</span>/<span class="tn">6378.1</span> ]  <span class="tc">// 20 km / rayon Terre</span>
+    }
+  }
+})</pre>
+  </section>
+
+  <section class="step" id="intersects">
+    <span class="snum"><span class="dotnum">5</span> Requête</span>
+    <h2>$geoIntersects — qui croise une forme</h2>
+    <p class="goal"><code>$geoIntersects</code> renvoie les documents dont la géométrie <b>croise</b> un polygone donné — utile pour « quels points tombent dans le périmètre de cette commune&nbsp;? » (défini par un polygone).</p>
+<pre>db.campagnes.find({
+  localisation: {
+    <span class="ts">$geoIntersects</span>: {
+      <span class="ts">$geometry</span>: { type: <span class="ts">"Polygon"</span>, coordinates: [ [ <span class="tc">/* sommets */</span> ] ] }
+    }
+  }
+})</pre>
+  </section>
+
+  <section class="step" id="projet">
+    <span class="snum"><span class="dotnum">6</span> Projet</span>
+    <h2>Application au fil rouge</h2>
+    <p class="goal">La géolocalisation donne à l'appli une fonctionnalité forte&nbsp;: proposer au particulier les campagnes <b>autour de lui</b>.</p>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Ajoute un champ <code>localisation</code> (Point GeoJSON) à chaque campagne et un index <code>2dsphere</code>. Écris la requête <code>$near</code> « campagnes ouvertes à moins de 20 km de ma position ». Côté appli, la position vient du GPS du téléphone (chapitre Flutter 16), passe par l'API Spring, et déclenche cette requête. La carte (Google Maps) affichera les résultats.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Position au format <b>GeoJSON</b> <code>{type:"Point", coordinates:[lon,lat]}</code> — longitude d'abord&nbsp;!</li>
+        <li>Index obligatoire&nbsp;: <code>2dsphere</code>.</li>
+        <li><code>$near</code> (proximité triée), <code>$geoWithin</code> (dans une forme), <code>$geoIntersects</code> (croise une forme).</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch12.html">← Chapitre 12</a>
+    <a class="next" href="mongodb-chapitres.html">Chapitre 14 (à venir) · Sommaire →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 13 — Les recherches géospatiales. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

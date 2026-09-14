@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring Boot — Les bases (cours FR)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+.res-out{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:10px;padding:12px 15px;margin:12px 0;font-family:"JetBrains Mono";font-size:.8rem;color:var(--ink-soft);overflow-x:auto;line-height:1.5;white-space:pre-wrap}
+.mini-toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-top:26px}
+.mini-toc strong{display:block;font-family:"Instrument Sans";font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mini-toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+@media(max-width:600px){.mini-toc ol{columns:1}}
+.mini-toc li{margin:5px 0;font-size:.92rem}
+.reslist{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+@media(max-width:760px){.reslist{grid-template-columns:1fr}}
+</style>
+</head>
+<body data-track="spring">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Cours — Spring Boot, les bases (FR)</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="../mongodb/tuto-mongodb.html">Cours MongoDB</a>
+      <a href="tuto-spring.html" class="on">Cours Spring</a>
+      <a href="parcours-api-spring.html">Guide pas à pas</a>
+      <a href="../flutter/parcours-flutter.html">Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Cours Spring Boot — les bases</div>
+    <span class="lbadge">🌱 Cours de base — en français</span>
+    <h1>Spring Boot, les bases</h1>
+    <p class="intro">Un cours court et progressif pour créer sa première application web avec Spring Boot, dans l'esprit des tutoriels simples&nbsp;: une notion par section, la <strong>syntaxe</strong>, un <strong>exemple</strong> et le <strong>résultat</strong> (réponse HTTP ou console). On construit petit à petit une mini-API de <code>produits</code> en Java.</p>
+    <div class="mini-toc">
+      <strong>Sommaire</strong>
+      <ol>
+        <li><a href="#intro">Qu'est-ce que Spring Boot&nbsp;?</a></li>
+        <li><a href="#projet">Créer un projet</a></li>
+        <li><a href="#lancer">Lancer l'application</a></li>
+        <li><a href="#controleur">Premier contrôleur</a></li>
+        <li><a href="#json">Renvoyer du JSON</a></li>
+        <li><a href="#parametres">Paramètres d'URL</a></li>
+        <li><a href="#post">Recevoir des données (POST)</a></li>
+        <li><a href="#couches">Architecture &amp; injection</a></li>
+        <li><a href="#config">Configuration</a></li>
+        <li><a href="#swagger">Documenter (Swagger)</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#intro">Intro</a>
+    <a href="#projet">Projet</a>
+    <a href="#lancer">Lancer</a>
+    <a href="#controleur">Contrôleur</a>
+    <a href="#json">JSON</a>
+    <a href="#parametres">Paramètres</a>
+    <a href="#post">POST</a>
+    <a href="#couches">Injection</a>
+    <a href="#config">Config</a>
+    <a href="#swagger">Swagger</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="step" id="intro">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce que Spring Boot&nbsp;?</h2>
+    <p class="goal"><b>Spring</b> est un framework Java très répandu pour construire des applications d'entreprise. <b>Spring Boot</b> en est la version « prête à l'emploi »&nbsp;: il fournit un <b>serveur web intégré</b> (Tomcat), l'<b>auto-configuration</b> et des <b>starters</b> (paquets de dépendances tout prêts). Résultat&nbsp;: on écrit une API REST en quelques lignes, sans configuration lourde.</p>
+    <p style="color:var(--ink-soft);margin-top:12px">Les trois idées à retenir&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Starters</b> — une dépendance = un ensemble cohérent (ex. <code>spring-boot-starter-web</code> apporte tout le nécessaire pour le web).</li>
+      <li><b>Auto-configuration</b> — Spring devine et configure les composants d'après les dépendances présentes.</li>
+      <li><b>Serveur intégré</b> — l'application est un simple <code>.jar</code> exécutable qui démarre son propre serveur sur le port <code>8080</code>.</li>
+    </ul>
+    <div class="hint"><strong>À retenir —</strong> avec Spring Boot, « lancer un serveur web » se résume à exécuter une classe Java. Pas d'installation de serveur externe.</div>
+  </section>
+
+  <!-- PROJET -->
+  <section class="step" id="projet">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Créer un projet</h2>
+    <p class="goal">On génère un projet vierge sur <b>Spring Initializr</b> (<code>start.spring.io</code>), en choisissant Java, Maven et les dépendances utiles.</p>
+    <p class="term-cap">Réglages conseillés</p>
+<pre>Project   : Maven          Language : Java (21)
+Packaging : Jar            Dependencies : Spring Web</pre>
+    <p class="term-cap">Structure générée (l'essentiel)</p>
+<pre>src/main/java/com/exemple/demo/
+    DemoApplication.java     <span class="tc">// point d'entrée</span>
+src/main/resources/
+    application.properties   <span class="tc">// configuration</span>
+pom.xml                      <span class="tc">// dépendances Maven</span></pre>
+    <div class="tip"><strong>Astuce —</strong> le bouton <b>Add Dependencies</b> de Spring Initializr évite d'éditer le <code>pom.xml</code> à la main. On ajoutera plus tard <code>Spring Data MongoDB</code>, <code>Validation</code>, etc.</div>
+  </section>
+
+  <!-- LANCER -->
+  <section class="step" id="lancer">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Lancer l'application</h2>
+    <p class="goal">La classe principale, annotée <code>@SpringBootApplication</code>, démarre tout. On l'exécute depuis l'IDE ou en ligne de commande.</p>
+    <p class="term-cap">La classe de démarrage</p>
+<pre><span class="tn">@SpringBootApplication</span>
+<span class="tk">public class</span> <span class="tf">DemoApplication</span> {
+    <span class="tk">public static void</span> <span class="tn">main</span>(String[] args) {
+        SpringApplication.run(DemoApplication.<span class="tk">class</span>, args);
+    }
+}</pre>
+    <p class="term-cap">Lancer en ligne de commande</p>
+<pre>mvn spring-boot:run</pre>
+    <p class="term-cap">Résultat (console)</p>
+    <div class="res-out">Tomcat started on port 8080 (http)
+Started DemoApplication in 1.8 seconds</div>
+    <div class="hint"><strong>À retenir —</strong> l'application écoute sur <code>http://localhost:8080</code>. <code>@SpringBootApplication</code> regroupe trois annotations&nbsp;: configuration, auto-configuration et scan des composants.</div>
+  </section>
+
+  <!-- CONTROLEUR -->
+  <section class="step" id="controleur">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Premier contrôleur REST</h2>
+    <p class="goal">Un <b>contrôleur</b> relie une URL à une méthode Java. <code>@RestController</code> déclare la classe&nbsp;; <code>@GetMapping</code> associe une URL à une méthode répondant aux requêtes <b>GET</b>.</p>
+    <p class="term-cap">Exemple</p>
+<pre><span class="tn">@RestController</span>
+<span class="tk">public class</span> <span class="tf">BonjourController</span> {
+
+    <span class="tn">@GetMapping</span>(<span class="ts">"/bonjour"</span>)
+    <span class="tk">public</span> String <span class="tn">bonjour</span>() {
+        <span class="tk">return</span> <span class="ts">"Bonjour depuis Spring Boot !"</span>;
+    }
+}</pre>
+    <p class="term-cap">Requête</p>
+<pre>GET http://localhost:8080/bonjour</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">Bonjour depuis Spring Boot !</div>
+    <div class="hint"><strong>À retenir —</strong> pas besoin de configurer de « route »&nbsp;: l'annotation <code>@GetMapping("/bonjour")</code> suffit à créer l'URL.</div>
+  </section>
+
+  <!-- JSON -->
+  <section class="step" id="json">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Renvoyer du JSON</h2>
+    <p class="goal">Si une méthode renvoie un <b>objet</b> (ou une liste), Spring le convertit <b>automatiquement en JSON</b>. On utilise volontiers un <code>record</code> Java, concis et immuable.</p>
+    <p class="term-cap">Un record produit</p>
+<pre><span class="tk">public record</span> <span class="tf">Produit</span>(<span class="tk">int</span> id, String nom, <span class="tk">double</span> prix) {}</pre>
+    <p class="term-cap">Le contrôleur</p>
+<pre><span class="tn">@RestController</span>
+<span class="tk">public class</span> <span class="tf">ProduitController</span> {
+
+    <span class="tn">@GetMapping</span>(<span class="ts">"/produits"</span>)
+    <span class="tk">public</span> List&lt;Produit&gt; <span class="tn">lister</span>() {
+        <span class="tk">return</span> List.of(
+            <span class="tk">new</span> Produit(<span class="tn">1</span>, <span class="ts">"Fioul 500L"</span>, <span class="tn">620.0</span>),
+            <span class="tk">new</span> Produit(<span class="tn">2</span>, <span class="ts">"Fioul 1000L"</span>, <span class="tn">1180.0</span>)
+        );
+    }
+}</pre>
+    <p class="term-cap">Résultat (réponse JSON)</p>
+    <div class="res-out">[
+  { "id": 1, "nom": "Fioul 500L",  "prix": 620.0 },
+  { "id": 2, "nom": "Fioul 1000L", "prix": 1180.0 }
+]</div>
+    <div class="hint"><strong>À retenir —</strong> la conversion objet ↔ JSON est automatique (bibliothèque Jackson, incluse dans le starter web). C'est le fondement d'une API REST.</div>
+  </section>
+
+  <!-- PARAMETRES -->
+  <section class="step" id="parametres">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Les paramètres d'URL</h2>
+    <p class="goal">Deux façons de recevoir des valeurs&nbsp;: <code>@PathVariable</code> (dans le chemin) et <code>@RequestParam</code> (après le <code>?</code>).</p>
+    <p class="term-cap">@PathVariable — une valeur dans le chemin</p>
+<pre><span class="tn">@GetMapping</span>(<span class="ts">"/produits/{id}"</span>)
+<span class="tk">public</span> String <span class="tn">consulter</span>(<span class="tn">@PathVariable</span> <span class="tk">int</span> id) {
+    <span class="tk">return</span> <span class="ts">"Produit demandé : "</span> + id;
+}
+<span class="tc">// GET /produits/2   →   "Produit demandé : 2"</span></pre>
+    <p class="term-cap">@RequestParam — après le point d'interrogation</p>
+<pre><span class="tn">@GetMapping</span>(<span class="ts">"/produits"</span>)
+<span class="tk">public</span> String <span class="tn">filtrer</span>(<span class="tn">@RequestParam</span> String ville) {
+    <span class="tk">return</span> <span class="ts">"Filtre ville : "</span> + ville;
+}
+<span class="tc">// GET /produits?ville=Limoges   →   "Filtre ville : Limoges"</span></pre>
+    <div class="hint"><strong>Quand utiliser quoi&nbsp;?</strong> <code>@PathVariable</code> pour identifier une ressource précise (<code>/produits/2</code>)&nbsp;; <code>@RequestParam</code> pour des options de filtre ou de recherche (<code>?ville=…</code>).</div>
+  </section>
+
+  <!-- POST -->
+  <section class="step" id="post">
+    <span class="snum"><span class="dotnum">7</span> Notion</span>
+    <h2>Recevoir des données (POST)</h2>
+    <p class="goal">Pour <b>créer</b> une ressource, le client envoie un corps JSON en <b>POST</b>. <code>@RequestBody</code> transforme ce JSON en objet Java automatiquement.</p>
+    <p class="term-cap">Exemple</p>
+<pre><span class="tn">@PostMapping</span>(<span class="ts">"/produits"</span>)
+<span class="tk">public</span> String <span class="tn">creer</span>(<span class="tn">@RequestBody</span> Produit p) {
+    <span class="tk">return</span> <span class="ts">"Créé : "</span> + p.nom() + <span class="ts">" à "</span> + p.prix() + <span class="ts">" €"</span>;
+}</pre>
+    <p class="term-cap">Requête (corps JSON envoyé par le client)</p>
+<pre>POST http://localhost:8080/produits
+Content-Type: application/json
+
+{ "id": 3, "nom": "Fioul 2000L", "prix": 2300.0 }</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">Créé : Fioul 2000L à 2300.0 €</div>
+    <p style="color:var(--ink-soft);margin-top:14px">Les principaux verbes HTTP et leurs annotations&nbsp;:</p>
+    <table class="maptab">
+      <thead><tr><th>Verbe</th><th>Annotation</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>@GetMapping</td><td>lire</td></tr>
+        <tr><td>POST</td><td>@PostMapping</td><td>créer</td></tr>
+        <tr><td>PUT</td><td>@PutMapping</td><td>modifier</td></tr>
+        <tr><td>DELETE</td><td>@DeleteMapping</td><td>supprimer</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- COUCHES -->
+  <section class="step" id="couches">
+    <span class="snum"><span class="dotnum">8</span> Notion</span>
+    <h2>Architecture en couches &amp; injection</h2>
+    <p class="goal">On ne met pas la logique dans le contrôleur&nbsp;: on la délègue à un <b>service</b>. Spring crée et fournit ces objets tout seul&nbsp;: c'est l'<b>injection de dépendances</b> (le contrôleur ne fait pas <code>new</code>).</p>
+    <p class="term-cap">Le service (@Service)</p>
+<pre><span class="tn">@Service</span>
+<span class="tk">public class</span> <span class="tf">ProduitService</span> {
+    <span class="tk">public</span> List&lt;Produit&gt; <span class="tn">lister</span>() {
+        <span class="tk">return</span> List.of(<span class="tk">new</span> Produit(<span class="tn">1</span>, <span class="ts">"Fioul 500L"</span>, <span class="tn">620.0</span>));
+    }
+}</pre>
+    <p class="term-cap">Le contrôleur reçoit le service (injection par constructeur)</p>
+<pre><span class="tn">@RestController</span>
+<span class="tk">public class</span> <span class="tf">ProduitController</span> {
+    <span class="tk">private final</span> ProduitService service;
+
+    <span class="tk">public</span> ProduitController(ProduitService service) {  <span class="tc">// injecté par Spring</span>
+        <span class="tk">this</span>.service = service;
+    }
+
+    <span class="tn">@GetMapping</span>(<span class="ts">"/produits"</span>)
+    <span class="tk">public</span> List&lt;Produit&gt; <span class="tn">lister</span>() { <span class="tk">return</span> service.lister(); }
+}</pre>
+    <div class="hint"><strong>À retenir —</strong> le trio <b>Controller → Service → Repository</b> est l'architecture standard. Chaque couche a un rôle&nbsp;: exposer (contrôleur), décider (service), accéder aux données (repository). Spring assemble le tout par injection.</div>
+  </section>
+
+  <!-- CONFIG -->
+  <section class="step" id="config">
+    <span class="snum"><span class="dotnum">9</span> Notion</span>
+    <h2>La configuration</h2>
+    <p class="goal">Le fichier <code>application.properties</code> (ou <code>.yml</code>) centralise les réglages&nbsp;: port, connexion à la base, etc.</p>
+    <p class="term-cap">application.properties</p>
+<pre>server.port=8080
+spring.application.name=fioul-api
+spring.data.mongodb.uri=mongodb://localhost:27017/fioul</pre>
+    <div class="warn"><strong>Sécurité —</strong> une URI de base avec mot de passe ne doit <b>jamais</b> être écrite en clair ici dans un dépôt Git. On utilise une variable d'environnement&nbsp;: <code>spring.data.mongodb.uri=${MONGODB_URI}</code>.</div>
+  </section>
+
+  <!-- SWAGGER -->
+  <section class="step" id="swagger">
+    <span class="snum"><span class="dotnum">10</span> Notion</span>
+    <h2>Documenter avec Swagger</h2>
+    <p class="goal">Une seule dépendance (<b>springdoc-openapi</b>) génère une interface web qui documente <b>et</b> permet de tester l'API depuis le navigateur.</p>
+    <p class="term-cap">La dépendance (pom.xml)</p>
+<pre>&lt;dependency&gt;
+  &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+  &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+  &lt;version&gt;2.6.0&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+    <p class="term-cap">Résultat — sans aucune configuration</p>
+    <div class="res-out">Interface Swagger UI : http://localhost:8080/swagger-ui/index.html
+Description OpenAPI  : http://localhost:8080/v3/api-docs</div>
+    <div class="hint"><strong>Le lien avec le projet —</strong> ces bases suffisent à construire l'API du fioul. Pour l'enchaînement complet couche par couche (entité → repository → DTO → service → contrôleur → validation → Swagger) appliqué au projet, voir le <a href="parcours-api-spring.html">guide pas à pas</a>.</div>
+  </section>
+
+  <!-- RESSOURCES -->
+  <section class="step" id="ressources">
+    <span class="snum"><span class="dotnum">＋</span> Pour aller plus loin</span>
+    <h2>Ressources Spring Boot</h2>
+    <div class="reslist">
+      <a class="res" href="parcours-api-spring.html">
+        <div class="rtop"><span class="rname">Guide pas à pas — API fioul <span class="ext">→</span></span><span class="tags"><span class="rt">Pratique</span><span class="rt fr">FR</span></span></div>
+        <span class="rdesc">Construire l'API du projet couche par couche, sur cette plateforme.</span>
+        <span class="rurl">parcours-api-spring.html</span>
+      </a>
+      <a class="res" href="https://spring.io/guides" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Spring Guides (officiel) <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Tutoriels courts et officiels « Getting Started », dont « Building a RESTful Web Service ».</span>
+        <span class="rurl">spring.io/guides</span>
+      </a>
+      <a class="res" href="https://docs.spring.io/spring-boot/index.html" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Documentation Spring Boot <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">La référence complète&nbsp;: starters, auto-configuration, propriétés.</span>
+        <span class="rurl">docs.spring.io/spring-boot</span>
+      </a>
+      <a class="res" href="https://www.baeldung.com/spring-boot" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Baeldung — Spring Boot <span class="ext">↗</span></span><span class="tags"><span class="rt">Intermédiaire</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Des centaines d'articles pratiques et précis sur chaque aspect de Spring.</span>
+        <span class="rurl">baeldung.com/spring-boot</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="../mongodb/tuto-mongodb.html">← Cours MongoDB</a>
+    <a class="next" href="parcours-api-spring.html">Passer à la pratique&nbsp;: le guide pas à pas →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Cours Spring Boot de base, en français — rédigé pour la plateforme SIO WEB. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

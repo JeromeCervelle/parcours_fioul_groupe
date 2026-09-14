@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 19 — Projet : authentification avancée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>.done-box{background:linear-gradient(150deg,var(--accent-wash),var(--fioul-wash));border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-top:24px}.done-box h3{font-size:1.15rem;margin-bottom:8px}.done-box p{color:var(--ink-soft);font-size:.95rem}</style>
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 19</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 19</div>
+  <span class="lbadge">Chapitre 19 / 19 · dernier · 🛡️</span>
+  <h1>Projet — authentification avancée</h1>
+  <p class="intro">On pousse la sécurité plus loin&nbsp;: jetons de rafraîchissement, OAuth2, et délégation à un fournisseur d'identité comme Keycloak. Dernier chapitre du parcours Spring.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#refresh">1 · Refresh token</a><a href="#oauth">2 · OAuth2</a><a href="#keycloak">3 · Keycloak</a><a href="#bilan">4 · Bilan</a></div></nav>
+<main class="wrap">
+  <section class="step" id="refresh">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Access token &amp; refresh token</h2>
+    <p class="goal">Pour concilier sécurité et confort&nbsp;: un <b>access token</b> à durée très courte (quelques minutes) et un <b>refresh token</b> à durée plus longue, qui permet d'obtenir un nouvel access token sans se reconnecter.</p>
+<pre>POST /api/auth/refresh  { refreshToken }  → { accessToken, refreshToken }</pre>
+  </section>
+  <section class="step" id="oauth">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>OAuth2 &amp; OpenID Connect</h2>
+    <p class="goal"><b>OAuth2</b> standardise la délégation d'autorisation (« se connecter avec Google/France Connect »). <b>OpenID Connect</b> ajoute l'authentification. Spring Security fournit un client et un serveur de ressources OAuth2.</p>
+    <div class="hint"><strong>Idée —</strong> plutôt que de gérer soi-même les mots de passe, on peut déléguer l'authentification à un fournisseur d'identité de confiance.</div>
+  </section>
+  <section class="step" id="keycloak">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Déléguer à Keycloak</h2>
+    <p class="goal"><b>Keycloak</b> est un serveur d'identité open source&nbsp;: il gère utilisateurs, rôles, connexion, tokens. L'API devient un simple <b>serveur de ressources</b> qui vérifie les JWT émis par Keycloak.</p>
+<pre>spring.security.oauth2.resourceserver.jwt.issuer-uri=\
+  https://keycloak.exemple.fr/realms/fioul</pre>
+  </section>
+  <section class="step" id="bilan">
+    <span class="snum"><span class="dotnum">✓</span> Bilan</span>
+    <h2>Bilan du parcours Spring Boot</h2>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Ajoute au minimum le rafraîchissement de jeton (access court + refresh). L'OAuth2/Keycloak est une ouverture avancée, idéale pour un approfondissement ou un projet de groupe motivé — et un excellent pont avec le cours Cyber.</p></div>
+    <div class="done-box"><h3>🎉 Parcours Spring Boot terminé</h3>
+      <p>Des bases jusqu'au déploiement sécurisé et supervisé, tu as construit une API REST complète sur MongoDB. Étape suivante&nbsp;: consommer cette API depuis le mobile avec le <a href="../flutter/parcours-flutter.html">parcours Flutter</a>, ou revoir la pratique guidée dans le <a href="parcours-api-spring.html">guide pas à pas</a>.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Access token court + refresh token pour l'ergonomie et la sécurité.</li>
+      <li>OAuth2/OIDC pour déléguer l'authentification.</li>
+      <li>Keycloak&nbsp;: l'API devient serveur de ressources vérifiant les JWT.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch18.html">← Chapitre 18</a><a class="next" href="spring-chapitres.html">Retour au sommaire →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 19 — Authentification avancée. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

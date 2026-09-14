@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 08 — Modéliser une base</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 08</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 08</div>
+    <span class="lbadge">Chapitre 08 / 17</span>
+    <h1>Modéliser une base</h1>
+    <p class="intro">Le chapitre le plus important. En NoSQL, on ne modélise pas « comme en SQL ». La question centrale est&nbsp;: pour chaque relation, faut-il <b>embarquer</b> (imbriquer les données) ou <b>référencer</b> (pointer par un identifiant)&nbsp;? La réponse dépend de la façon dont on lit les données.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#question">1 · La question centrale</a>
+    <a href="#un-un">2 · Un-à-un</a>
+    <a href="#un-plusieurs">3 · Un-à-plusieurs</a>
+    <a href="#reference">4 · Référencer</a>
+    <a href="#plusieurs">5 · Plusieurs-à-plusieurs</a>
+    <a href="#limites">6 · Limites &amp; règles</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="question">
+    <span class="snum"><span class="dotnum">1</span> Principe</span>
+    <h2>Embarquer ou référencer&nbsp;?</h2>
+    <p class="goal">Deux façons de relier des données&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Embarquer</b> — imbriquer les données liées <em>dans</em> le document parent (un sous-document ou un tableau).</li>
+      <li><b>Référencer</b> — stocker seulement l'<code>_id</code> de l'autre document, comme une clé étrangère.</li>
+    </ul>
+    <p style="color:var(--ink-soft);margin-top:10px">La règle d'or&nbsp;:</p>
+    <div class="hint"><strong>« Ce qu'on lit ensemble, on le stocke ensemble. »</strong> On embarque les données quasiment toujours consultées avec leur parent et qui lui appartiennent&nbsp;; on référence ce qui est partagé, volumineux, ou qui vit sa propre vie.</div>
+  </section>
+
+  <section class="step" id="un-un">
+    <span class="snum"><span class="dotnum">2</span> Relation</span>
+    <h2>Un-à-un (1‑1)</h2>
+    <p class="goal">Une entité liée à exactement une autre&nbsp;: le plus souvent on <b>embarque</b>, sous forme de sous-document.</p>
+<pre>{
+  <span class="ts">"nom"</span>: <span class="ts">"Dupont"</span>,
+  <span class="ts">"adresse"</span>: {            <span class="tc">// sous-document embarqué (1-1)</span>
+    <span class="ts">"rue"</span>: <span class="ts">"3 rue des Tilleuls"</span>,
+    <span class="ts">"ville"</span>: <span class="ts">"Limoges"</span>,
+    <span class="ts">"cp"</span>: <span class="ts">"87000"</span>
+  }
+}</pre>
+  </section>
+
+  <section class="step" id="un-plusieurs">
+    <span class="snum"><span class="dotnum">3</span> Relation</span>
+    <h2>Un-à-plusieurs (1‑N) — embarqué</h2>
+    <p class="goal">Quand les « plusieurs » appartiennent au parent et ne sont pas trop nombreux, on les embarque dans un <b>tableau</b>.</p>
+<pre>{
+  <span class="ts">"zone"</span>: <span class="ts">"Ladignac-le-Long"</span>,
+  <span class="ts">"commandes"</span>: [                 <span class="tc">// tableau embarqué (1-N)</span>
+    { <span class="ts">"litres"</span>: <span class="tn">1500</span>, <span class="ts">"commune"</span>: <span class="ts">"Ladignac"</span> },
+    { <span class="ts">"litres"</span>: <span class="tn">800</span>,  <span class="ts">"commune"</span>: <span class="ts">"Nexon"</span> }
+  ]
+}</pre>
+    <div class="hint"><strong>Avantage —</strong> une seule lecture ramène la campagne <em>et</em> ses commandes. Pas de jointure.</div>
+  </section>
+
+  <section class="step" id="reference">
+    <span class="snum"><span class="dotnum">4</span> Relation</span>
+    <h2>Un-à-plusieurs (1‑N) — référencé</h2>
+    <p class="goal">Quand les « plusieurs » sont très nombreux, partagés, ou consultés séparément, on <b>référence</b>&nbsp;: le parent (ou l'enfant) stocke l'<code>_id</code> de l'autre.</p>
+<pre><span class="tc">// une campagne référence son fournisseur (partagé par plusieurs campagnes)</span>
+{ <span class="ts">"zone"</span>: <span class="ts">"Ladignac-le-Long"</span>, <span class="ts">"fournisseurId"</span>: <span class="ts">"total-energies"</span> }
+
+{ <span class="ts">"_id"</span>: <span class="ts">"total-energies"</span>, <span class="ts">"nom"</span>: <span class="ts">"TotalEnergies"</span>, <span class="ts">"paliers"</span>: [ ... ] }</pre>
+    <div class="hint"><strong>Reconstituer le lien —</strong> côté requête, on joint avec <code>$lookup</code> (chapitre 14) ou on fait deux lectures. Côté Spring, ce sera une relation par identifiant entre deux repositories.</div>
+  </section>
+
+  <section class="step" id="plusieurs">
+    <span class="snum"><span class="dotnum">5</span> Relation</span>
+    <h2>Plusieurs-à-plusieurs (N‑N)</h2>
+    <p class="goal">On modélise avec des <b>tableaux d'identifiants</b> d'un côté (ou des deux), sans table de jonction comme en SQL.</p>
+<pre><span class="tc">// un fournisseur dessert plusieurs zones ; une zone a plusieurs fournisseurs</span>
+{ <span class="ts">"_id"</span>: <span class="ts">"total-energies"</span>, <span class="ts">"zonesDesservies"</span>: [<span class="ts">"87"</span>, <span class="ts">"19"</span>, <span class="ts">"23"</span>] }</pre>
+    <div class="hint"><strong>À retenir —</strong> on choisit le côté où placer le tableau selon les requêtes les plus fréquentes (« quelles zones pour ce fournisseur&nbsp;? » vs « quels fournisseurs pour cette zone&nbsp;? »).</div>
+  </section>
+
+  <section class="step" id="limites">
+    <span class="snum"><span class="dotnum">6</span> Règles</span>
+    <h2>Limites &amp; bonnes pratiques</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>16 Mo</b> — un document ne peut pas dépasser 16 Mo. Un tableau qui grossit sans fin (des milliers d'éléments) doit être référencé, pas embarqué.</li>
+      <li><b>Dénormalisation maîtrisée</b> — on accepte parfois de <em>dupliquer</em> une donnée (ex. le nom du fournisseur dans la campagne) pour éviter une jointure à chaque lecture&nbsp;; en contrepartie, il faut la mettre à jour aux deux endroits.</li>
+      <li><b>Modéliser d'après les accès</b> — on part des écrans et des requêtes fréquentes, pas d'un schéma théorique.</li>
+    </ul>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Le modèle du projet découle directement de ce chapitre&nbsp;: <b>commandes embarquées</b> dans la campagne (on les lit toujours ensemble, volume raisonnable), <b>fournisseur référencé</b> (partagé, avec ses paliers), <b>utilisateurs</b> dans leur propre collection (ils se connectent, ont des rôles). Écris ce modèle et <b>justifie chaque choix</b> dans le README — c'est le jalon fil rouge du parcours MongoDB.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Question centrale&nbsp;: embarquer (lu ensemble, possédé) vs référencer (partagé, volumineux).</li>
+        <li>1‑1&nbsp;: sous-document. 1‑N&nbsp;: tableau embarqué ou référence selon le volume.</li>
+        <li>N‑N&nbsp;: tableaux d'<code>_id</code>.</li>
+        <li>Limite 16 Mo&nbsp;; dénormalisation maîtrisée&nbsp;; modéliser d'après les accès.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch07.html">← Chapitre 07</a>
+    <a class="next" href="mongo-ch09.html">Chapitre 09 · Curseur &amp; exercices →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 08 — Modéliser une base. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

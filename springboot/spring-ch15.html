@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 15 — Projet : packaging & déploiement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 15</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 15</div>
+  <span class="lbadge">Chapitre 15 / 19 · projet</span>
+  <h1>Projet — packaging &amp; déploiement</h1>
+  <p class="intro">On met réellement l'API Fioul Groupé en ligne, avec Docker, la base sur Atlas, et un déploiement déclenché par la forge (CI/CD).</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#build">1 · Build de prod</a><a href="#atlas">2 · Base Atlas</a><a href="#run">3 · Lancer en ligne</a><a href="#cicd">4 · CI/CD</a></div></nav>
+<main class="wrap">
+  <section class="step" id="build">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Le build de production</h2>
+    <p class="goal">On construit l'image Docker du projet à partir du <code>Dockerfile</code> du chapitre 14, taguée par version.</p>
+<pre>docker build -t fioul-api:1.0.0 .
+docker run -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e MONGODB_URI="$MONGODB_URI" fioul-api:1.0.0</pre>
+  </section>
+  <section class="step" id="atlas">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>La base sur Atlas</h2>
+    <p class="goal">On pointe l'API vers le cluster Atlas (parcours MongoDB, chapitre 17)&nbsp;: utilisateur applicatif, IP autorisée pour l'hébergeur, URI en secret.</p>
+  </section>
+  <section class="step" id="run">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Mettre en ligne</h2>
+    <p class="goal">On pousse l'image sur une plateforme (Railway, Render, un VPS…). L'API obtient une URL publique (HTTPS) que l'appli Flutter utilisera comme <code>apiBaseUrl</code>.</p>
+    <div class="warn"><strong>HTTPS —</strong> en production, l'API doit être servie en HTTPS (certificat), surtout parce qu'elle transporte des JWT.</div>
+  </section>
+  <section class="step" id="cicd">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Automatiser (CI/CD)</h2>
+    <p class="goal">On complète le workflow GitHub Actions&nbsp;: à chaque tag <code>v*</code>, construire l'image et la déployer. Le déploiement devient reproductible et tracé.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Déploie <code>fioul-api</code> connectée à Atlas, récupère son URL HTTPS et note-la dans le README. Ajoute une release <code>v1.0.0</code> (parcours Forge, séance 7). L'API est en ligne&nbsp;: le parcours Flutter peut la consommer.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Image Docker taguée par version&nbsp;; config par variables d'env.</li>
+      <li>Base sur Atlas&nbsp;; URL API publique en HTTPS.</li>
+      <li>Déploiement automatisé via la CI/CD de la forge.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch14.html">← Chapitre 14</a><a class="next" href="spring-ch16.html">Chapitre 16 · Partie Monitoring →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 15 — Packaging &amp; déploiement. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

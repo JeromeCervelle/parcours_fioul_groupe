@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 03 — Écrire un Dockerfile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 03</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 03</div>
+  <span class="lbadge">Chapitre 03 / 08</span>
+  <h1>Écrire un Dockerfile</h1>
+  <p class="intro">Un <b>Dockerfile</b> décrit comment construire l'image de <em>ton</em> application. On voit les instructions clés, puis on empaquette l'API Spring en une image légère avec un build multi-étapes.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#instructions">1 · Les instructions</a><a href="#exemple">2 · Un exemple</a><a href="#build">3 · Construire</a><a href="#multistage">4 · Multi-stage (API)</a></div></nav>
+<main class="wrap">
+  <section class="step" id="instructions">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les instructions principales</h2>
+    <table class="maptab">
+      <thead><tr><th>Instruction</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td><code>FROM</code></td><td>image de base (ex. <code>eclipse-temurin:21-jre</code>)</td></tr>
+        <tr><td><code>WORKDIR</code></td><td>répertoire de travail dans l'image</td></tr>
+        <tr><td><code>COPY</code></td><td>copier des fichiers du projet dans l'image</td></tr>
+        <tr><td><code>RUN</code></td><td>exécuter une commande à la construction</td></tr>
+        <tr><td><code>EXPOSE</code></td><td>documenter le port utilisé</td></tr>
+        <tr><td><code>ENTRYPOINT</code> / <code>CMD</code></td><td>commande lancée au démarrage du conteneur</td></tr>
+      </tbody>
+    </table>
+  </section>
+  <section class="step" id="exemple">
+    <span class="snum"><span class="dotnum">2</span> Exemple</span>
+    <h2>Un Dockerfile simple</h2>
+<pre>FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY target/fioul-api.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]</pre>
+  </section>
+  <section class="step" id="build">
+    <span class="snum"><span class="dotnum">3</span> Commande</span>
+    <h2>Construire l'image</h2>
+<pre>docker build -t fioul-api:1.0 .
+docker run -d -p 8080:8080 fioul-api:1.0</pre>
+    <div class="hint"><strong>Le contexte &amp; le cache —</strong> le <code>.</code> est le « contexte » envoyé à Docker. Chaque instruction crée une couche mise en cache&nbsp;: placer ce qui change le moins en haut accélère les reconstructions.</div>
+  </section>
+  <section class="step" id="multistage">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Build multi-étapes pour l'API</h2>
+    <p class="goal">On compile <em>dans</em> l'image (étape build) puis on ne garde que le jar dans une image finale légère (sans Maven ni JDK complet).</p>
+<pre><span class="tc"># étape 1 : compilation</span>
+FROM maven:3-eclipse-temurin-21 AS build
+WORKDIR /src
+COPY . .
+RUN mvn -B clean package -DskipTests
+<span class="tc"># étape 2 : image finale légère</span>
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /src/target/fioul-api-*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris ce <code>Dockerfile</code> multi-stage pour l'API Spring du projet, ajoute un <code>.dockerignore</code> (chapitre 8), et construis <code>fioul-api:1.0</code>. Tu obtiens une image portable qui embarque l'API — prête à être orchestrée avec la base au chapitre 7.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Le Dockerfile décrit la construction de ton image (FROM, COPY, RUN, ENTRYPOINT).</li>
+      <li><code>docker build -t nom:tag .</code>&nbsp;; couches mises en cache.</li>
+      <li>Le multi-stage produit une image finale légère (compile puis ne garde que l'artefact).</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-ch02.html">← Chapitre 02</a><a class="next" href="docker-ch04.html">Chapitre 04 · Volumes &amp; persistance →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 03 — Écrire un Dockerfile. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

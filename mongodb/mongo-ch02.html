@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 02 — Shell mongo, Compass & VS Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 02</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 02</div>
+    <span class="lbadge">Chapitre 02 / 17</span>
+    <h1>Le shell mongo, Compass &amp; VS Code</h1>
+    <p class="intro">Les trois façons de dialoguer avec MongoDB&nbsp;: le shell <code>mongosh</code> (ligne de commande), Compass (interface graphique) et l'extension VS Code. On installe les réflexes de base pour se connecter, explorer et importer des données.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#mongosh">1 · mongosh</a>
+    <a href="#connexion">2 · Se connecter</a>
+    <a href="#admin">3 · Commandes d'exploration</a>
+    <a href="#test">4 · Premier test</a>
+    <a href="#compass">5 · Compass &amp; VS Code</a>
+    <a href="#import">6 · Import / export</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="mongosh">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>mongosh, le shell MongoDB</h2>
+    <p class="goal"><code>mongosh</code> est une console interactive dans laquelle on tape des commandes JavaScript pour piloter MongoDB. C'est l'outil le plus direct pour apprendre&nbsp;: on voit immédiatement l'effet de chaque commande.</p>
+    <div class="hint"><strong>À savoir —</strong> <code>mongosh</code> comprend le JavaScript&nbsp;: on peut y déclarer des variables, faire des boucles, etc. Les méthodes s'écrivent toujours sous la forme <code>db.<i>collection</i>.<i>methode</i>()</code>.</div>
+  </section>
+
+  <section class="step" id="connexion">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Se connecter</h2>
+    <p class="goal">Sans argument, <code>mongosh</code> se connecte au serveur local sur le port par défaut <code>27017</code>. On peut aussi fournir une URI de connexion (utile pour Atlas).</p>
+    <p class="term-cap">Connexion locale</p>
+<pre>mongosh</pre>
+    <p class="term-cap">Connexion via une URI (ex. Atlas)</p>
+<pre>mongosh <span class="ts">"mongodb+srv://user:motdepasse@cluster.mongodb.net/fioul"</span></pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">Current Mongosh Log ID: ...
+Connecting to: mongodb://127.0.0.1:27017/
+test&gt;</div>
+    <div class="hint"><strong>L'invite —</strong> <code>test&gt;</code> indique la base courante (ici <code>test</code>). On en change avec <code>use</code> (section suivante).</div>
+  </section>
+
+  <section class="step" id="admin">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les commandes d'exploration</h2>
+    <p class="goal">Quelques commandes pour se repérer dans le serveur, les bases et les collections.</p>
+<pre>show dbs             <span class="tc">// lister les bases</span>
+use fioul            <span class="tc">// se placer sur (ou créer) la base "fioul"</span>
+db                   <span class="tc">// afficher la base courante</span>
+show collections     <span class="tc">// lister les collections de la base courante</span>
+db.campagnes.countDocuments()   <span class="tc">// compter les documents</span>
+db.dropDatabase()    <span class="tc">// supprimer la base courante (prudence !)</span></pre>
+    <div class="warn"><strong>Prudence —</strong> <code>db.dropDatabase()</code> et <code>db.<i>col</i>.drop()</code> suppriment définitivement. À réserver à un environnement de test.</div>
+  </section>
+
+  <section class="step" id="test">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Un premier test</h2>
+    <p class="goal">Pour vérifier que tout fonctionne, on insère un document et on le relit. La base et la collection sont créées automatiquement.</p>
+<pre>use fioul
+db.test.insertOne({ message: <span class="ts">"ça marche !"</span>, date: new Date() })
+db.test.find()</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: ObjectId("..."), message: "ça marche !", date: ISODate("2026-09-13T...") }</div>
+    <p style="color:var(--ink-soft)">On peut ensuite nettoyer&nbsp;: <code>db.test.drop()</code>.</p>
+  </section>
+
+  <section class="step" id="compass">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Compass &amp; l'extension VS Code</h2>
+    <p class="goal">Tout ne se fait pas forcément au clavier. Deux outils graphiques complètent le shell&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>MongoDB Compass</b> — une application de bureau pour se connecter, parcourir les collections, filtrer visuellement, éditer un document au clic et même construire des pipelines d'agrégation avec un aperçu en direct.</li>
+      <li><b>Extension MongoDB pour VS Code</b> — se connecter depuis l'éditeur et lancer des « playgrounds » (fichiers <code>.mongodb.js</code>) où l'on écrit et exécute des requêtes sans quitter VS Code.</li>
+    </ul>
+    <div class="hint"><strong>Quand utiliser quoi —</strong> le shell pour apprendre et scripter&nbsp;; Compass pour explorer visuellement et débuter une agrégation&nbsp;; VS Code pour garder ses requêtes dans le projet, versionnées avec le code.</div>
+  </section>
+
+  <section class="step" id="import">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Importer / exporter des données</h2>
+    <p class="goal">Pour charger un jeu de données de départ (ou sauvegarder), on utilise les outils <code>mongoimport</code> / <code>mongoexport</code> (fichiers JSON ou CSV), ou l'import intégré de Compass.</p>
+    <p class="term-cap">Importer un fichier JSON dans une collection</p>
+<pre>mongoimport --db fioul --collection fournisseurs \
+            --file fournisseurs.json --jsonArray</pre>
+    <p class="term-cap">Exporter une collection vers un fichier JSON</p>
+<pre>mongoexport --db fioul --collection campagnes \
+            --out campagnes.json --jsonArray</pre>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Prépare un fichier <code>fournisseurs.json</code> contenant 2 ou 3 distributeurs (avec leurs paliers de prix) et importe-le avec <code>mongoimport</code>. Tu disposeras ainsi d'un jeu de données réaliste pour tester tes requêtes dès le chapitre 3. Explore ensuite ta base dans Compass pour visualiser les documents.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li><code>mongosh</code> se connecte en local (port 27017) ou via une URI (Atlas).</li>
+        <li><code>use</code>, <code>show dbs</code>, <code>show collections</code> pour se repérer.</li>
+        <li>Compass (GUI) et l'extension VS Code complètent le shell.</li>
+        <li><code>mongoimport</code> / <code>mongoexport</code> pour charger et sauvegarder des données.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch01.html">← Chapitre 01</a>
+    <a class="next" href="mongo-ch03.html">Chapitre 03 · Les méthodes CRUD →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 02 — Shell, Compass &amp; VS Code. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

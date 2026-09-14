@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 12 — Partie Sécurité</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 12</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 12</div>
+  <span class="lbadge">Chapitre 12 / 19 · 🛡️ Cyber</span>
+  <h1>Spring Boot — la partie Sécurité</h1>
+  <p class="intro">Protéger l'API avec <b>Spring Security</b>&nbsp;: authentification, jetons <b>JWT</b>, autorisation par rôles. Chapitre charnière avec le cours de cybersécurité.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#authn">1 · AuthN vs AuthZ</a><a href="#jwt">2 · Le JWT</a><a href="#chaine">3 · La chaîne de filtres</a><a href="#roles">4 · Rôles</a></div></nav>
+<main class="wrap">
+  <section class="step" id="authn">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Authentification vs autorisation</h2>
+    <p class="goal">Deux questions distinctes&nbsp;: <b>authentification</b> = « qui es-tu&nbsp;? » (login/mot de passe)&nbsp;; <b>autorisation</b> = « as-tu le droit&nbsp;? » (rôles/permissions). Spring Security gère les deux.</p>
+  </section>
+  <section class="step" id="jwt">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Le jeton JWT</h2>
+    <p class="goal">Après connexion, le serveur émet un <b>JWT</b> (JSON Web Token) signé. Le client le renvoie dans l'en-tête <code>Authorization: Bearer &lt;token&gt;</code> à chaque requête. Le serveur vérifie la signature — pas besoin de session côté serveur (API <b>stateless</b>).</p>
+<pre>POST /api/auth/login  → { "token": "eyJhbGciOiJIUzI1Ni.." }
+GET  /api/campagnes    Header: Authorization: Bearer eyJhbGci..</pre>
+    <div class="warn"><strong>Sécurité (Cyber) —</strong> un JWT est signé, pas chiffré&nbsp;: ne jamais y mettre de secret. Prévoir une expiration courte et un mécanisme de rafraîchissement.</div>
+  </section>
+  <section class="step" id="chaine">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>La chaîne de filtres de sécurité</h2>
+    <p class="goal">On configure un <code>SecurityFilterChain</code>&nbsp;: quelles routes sont publiques, lesquelles exigent une authentification, et on ajoute un filtre qui valide le JWT.</p>
+<pre><span class="tn">@Bean</span>
+SecurityFilterChain chaine(HttpSecurity http) <span class="tk">throws</span> Exception {
+  http.csrf(c -&gt; c.disable())
+      .authorizeHttpRequests(a -&gt; a
+        .requestMatchers(<span class="ts">"/api/auth/**"</span>).permitAll()
+        .requestMatchers(HttpMethod.GET, <span class="ts">"/api/campagnes/**"</span>).permitAll()
+        .anyRequest().authenticated());
+  <span class="tk">return</span> http.build();
+}</pre>
+  </section>
+  <section class="step" id="roles">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Autorisation par rôles</h2>
+    <p class="goal"><code>@PreAuthorize</code> restreint une méthode à un rôle.</p>
+<pre><span class="tn">@PreAuthorize</span>(<span class="ts">"hasRole('COORDINATEUR')"</span>)
+<span class="tn">@PostMapping</span> <span class="tk">public</span> CampagneDTO ouvrir(...) { ... }</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Rends publics la lecture des campagnes et l'authentification&nbsp;; protège l'ouverture/clôture (<code>COORDINATEUR</code>) et l'inscription (<code>PARTICULIER</code> connecté). C'est le jalon sécurité, détaillé au chapitre 13.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>AuthN (qui&nbsp;?) vs AuthZ (droit&nbsp;?).</li>
+      <li>JWT signé dans <code>Authorization: Bearer</code>&nbsp;; API stateless.</li>
+      <li><code>SecurityFilterChain</code> + <code>@PreAuthorize</code> par rôle.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch11.html">← Chapitre 11</a><a class="next" href="spring-ch13.html">Chapitre 13 · Projet — sécurisation →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 12 — Partie Sécurité. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 11 — Projet : tests automatisés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 11</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 11</div>
+  <span class="lbadge">Chapitre 11 / 19 · projet</span>
+  <h1>Projet — les tests automatisés</h1>
+  <p class="intro">Des tests qui garantissent que l'API fonctionne et continue de fonctionner&nbsp;: tests unitaires du service, tests d'intégration des contrôleurs (MockMvc), et exécution en continu (CI).</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#pyramide">1 · La pyramide</a><a href="#unit">2 · Test unitaire</a><a href="#mockmvc">3 · MockMvc</a><a href="#ci">4 · En CI</a></div></nav>
+<main class="wrap">
+  <section class="step" id="pyramide">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>La pyramide des tests</h2>
+    <p class="goal">Beaucoup de tests <b>unitaires</b> (rapides, isolent une classe), quelques tests d'<b>intégration</b> (plusieurs couches ensemble), peu de tests <b>end-to-end</b>. Le starter <code>spring-boot-starter-test</code> fournit JUnit 5, Mockito et AssertJ.</p>
+  </section>
+  <section class="step" id="unit">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Tester le service (unitaire)</h2>
+    <p class="goal">On isole <code>CampagneService</code> en <b>simulant</b> le repository avec Mockito.</p>
+<pre><span class="tn">@Test</span>
+<span class="tk">void</span> rejoindre_refuse_si_cloturee() {
+    Campagne c = <span class="tk">new</span> Campagne(); c.setStatut(Statut.CLOTUREE);
+    when(repo.findById(<span class="ts">"1"</span>)).thenReturn(Optional.of(c));
+    assertThrows(CampagneFermee.<span class="tk">class</span>,
+        () -&gt; service.rejoindre(<span class="ts">"1"</span>, <span class="tk">new</span> CreerCommandeDTO(<span class="tn">1000</span>, <span class="ts">"Nexon"</span>, <span class="ts">"..."</span>)));
+}</pre>
+  </section>
+  <section class="step" id="mockmvc">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Tester l'API avec MockMvc</h2>
+    <p class="goal"><code>MockMvc</code> envoie de vraies requêtes HTTP à l'application (sans serveur réseau) et vérifie la réponse.</p>
+<pre><span class="tn">@SpringBootTest</span> <span class="tn">@AutoConfigureMockMvc</span>
+<span class="tk">class</span> <span class="tf">CampagneApiTest</span> {
+  <span class="tn">@Autowired</span> MockMvc mvc;
+  <span class="tn">@Test</span> <span class="tk">void</span> liste_repond_200() <span class="tk">throws</span> Exception {
+    mvc.perform(get(<span class="ts">"/api/campagnes"</span>))
+       .andExpect(status().isOk());
+  }
+}</pre>
+  </section>
+  <section class="step" id="ci">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Exécuter les tests en continu</h2>
+    <p class="goal"><code>mvn verify</code> lance tous les tests. En intégration continue (parcours Forge, séance 6), ce même <code>mvn verify</code> tourne à chaque Pull Request&nbsp;: on ne fusionne que du vert.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris au moins&nbsp;: un test unitaire de <code>calculerPrix</code> (chaque palier), un test « rejoindre refusé si clôturée », et un test MockMvc de <code>GET /api/campagnes</code>. Branche-les dans le workflow GitHub Actions.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Pyramide&nbsp;: beaucoup d'unitaires, quelques intégrations.</li>
+      <li>Mockito pour isoler&nbsp;; MockMvc pour tester l'API.</li>
+      <li><code>mvn verify</code> en local et en CI.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch10.html">← Chapitre 10</a><a class="next" href="spring-ch12.html">Chapitre 12 · Partie Sécurité →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 11 — Tests automatisés. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

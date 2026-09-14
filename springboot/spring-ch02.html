@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 02 — Mise en place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 02</small></span></a>
+  <nav class="nav" id="nav">
+    <a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a>
+  </nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button>
+  <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 02</div>
+  <span class="lbadge">Chapitre 02 / 19</span>
+  <h1>Mise en place d'une application Spring Boot</h1>
+  <p class="intro">Générer le projet, comprendre la classe de démarrage, écrire un premier contrôleur et vérifier que l'API répond. On pose le squelette Controller / Service / Repository.</p>
+</div></section>
+
+<nav class="stepnav" id="stepnav"><div class="wrap">
+  <a href="#generer">1 · Générer</a>
+  <a href="#demarrer">2 · Démarrer</a>
+  <a href="#controleur">3 · Contrôleur</a>
+  <a href="#couches">4 · Les 3 couches</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="step" id="generer">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Générer le projet</h2>
+    <p class="goal">Sur <b>Spring Initializr</b>&nbsp;: Maven, Java 21, packaging Jar, et la dépendance <b>Spring Web</b>. On téléchargera d'autres starters plus tard (Data MongoDB, Validation, Security…).</p>
+<pre>src/main/java/com/fioul/api/
+    FioulApiApplication.java   <span class="tc">// classe de démarrage</span>
+src/main/resources/
+    application.properties
+pom.xml                        <span class="tc">// dépendances Maven</span></pre>
+  </section>
+  <section class="step" id="demarrer">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>La classe de démarrage</h2>
+    <p class="goal"><code>@SpringBootApplication</code> marque le point d'entrée et déclenche l'auto-configuration + le scan des composants.</p>
+<pre><span class="tn">@SpringBootApplication</span>
+<span class="tk">public class</span> <span class="tf">FioulApiApplication</span> {
+    <span class="tk">public static void</span> main(String[] args) {
+        SpringApplication.run(FioulApiApplication.<span class="tk">class</span>, args);
+    }
+}</pre>
+    <p class="term-cap">Lancer</p>
+<pre>mvn spring-boot:run   <span class="tc"># → Tomcat started on port 8080</span></pre>
+  </section>
+  <section class="step" id="controleur">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Un premier contrôleur (healthcheck)</h2>
+    <p class="goal">Un endpoint minimal pour vérifier que l'API tourne.</p>
+<pre><span class="tn">@RestController</span>
+<span class="tk">public class</span> <span class="tf">HealthController</span> {
+    <span class="tn">@GetMapping</span>(<span class="ts">"/api/health"</span>)
+    <span class="tk">public</span> Map&lt;String,String&gt; health() {
+        <span class="tk">return</span> Map.of(<span class="ts">"statut"</span>, <span class="ts">"OK"</span>);
+    }
+}</pre>
+    <p class="term-cap">Résultat — GET /api/health</p>
+    <div class="res-out">{ "statut": "OK" }</div>
+  </section>
+  <section class="step" id="couches">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Poser les trois couches</h2>
+    <p class="goal">On organise le code en paquets par couche&nbsp;: <code>controller</code>, <code>service</code>, <code>repository</code> (+ <code>model</code>, <code>dto</code>). Chaque type d'objet a sa place.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Crée <code>fioul-api</code> avec un endpoint <code>/api/health</code>, mets-le dans le dépôt <code>fioul-groupe</code> (dossier <code>api/</code>), et vérifie qu'il démarre. Tu as le socle&nbsp;; les prochaines couches viendront s'y greffer.</p></div>
+    <div class="recap"><strong>À retenir</strong>
+      <ul><li>Initializr → projet Maven + Spring Web.</li>
+      <li><code>@SpringBootApplication</code> + <code>main</code> démarrent l'appli.</li>
+      <li>Organiser le code par couches dès le départ.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch01.html">← Chapitre 01</a><a class="next" href="spring-ch03.html">Chapitre 03 · Structure &amp; configuration →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 02 — Mise en place. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

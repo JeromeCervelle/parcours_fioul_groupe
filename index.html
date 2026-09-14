@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours Fioul Groupé — BTS SIO SLAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="#top">
+      <span class="mk">🛢️</span>
+      <span>Parcours Fioul Groupé<small>BTS SIO · SLAM — un projet, quatre technos</small></span>
+    </a>
+    <nav class="nav" id="nav">
+      <a href="#fil-rouge">Le projet</a>
+      <a href="#pipeline">Le fil de données</a>
+      <a href="#parcours">Les 4 parcours</a>
+      <a href="#roadmap">Progression</a>
+      <a href="#forge">Forge &amp; Git</a>
+      <a href="#eval">Évaluation</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<a id="top"></a>
+<section class="hero">
+  <div class="wrap">
+    <span class="kick"><span class="dot"></span> Atelier SLAM de 2<sup>e</sup> année</span>
+    <h1>Trois cours, <em>un seul projet</em> qui les relie de bout en bout.</h1>
+    <p class="lede">On fond MongoDB, Spring Boot et Flutter en un parcours unique, cousu par un fil rouge concret&nbsp;: une application de <strong>commande groupée de fioul</strong>. Chaque techno construit une couche du même produit — versionné sur GitHub du premier commit au déploiement.</p>
+    <div class="cta">
+      <a class="btn primary" href="#parcours">Commencer un parcours →</a>
+      <a class="btn ghost" href="#fil-rouge">Découvrir le fil rouge</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>5</b><span>parcours reliés</span></div>
+      <div class="stat"><b>71</b><span>chapitres</span></div>
+      <div class="stat"><b>1</b><span>dépôt de code</span></div>
+      <div class="stat"><b>1</b><span>produit livré</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIL ROUGE -->
+<section class="fil" id="fil-rouge">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Le fil rouge</span>
+      <h2>« Fioul Groupé » — se chauffer moins cher, à plusieurs</h2>
+      <p>En zone rurale sans gaz de ville, on se chauffe au fioul. Commander <strong>ensemble</strong>, en gros volume, fait baisser le prix au litre. L'appli coordonne ces commandes groupées&nbsp;: un voisin ouvre une <em>campagne</em> pour sa commune, chacun s'inscrit avec sa quantité, et le volume total débloque un meilleur tarif chez le distributeur.</p>
+    </div>
+    <div class="card">
+      <div class="grid2">
+        <div>
+          <h3>Le domaine en une phrase</h3>
+          <p>Un <b>coordinateur</b> ouvre une campagne pour une zone et une date limite. Des <b>particuliers</b> rejoignent avec une quantité de litres et une adresse de livraison. Quand le volume cumulé franchit un palier, le <b>prix au litre</b> baisse pour tout le monde. À la clôture, les commandes sont consolidées et livrées.</p>
+          <ul class="roles">
+            <li><span class="tag">Coordinateur</span> ouvre et pilote une campagne, suit le volume, clôture et déclenche la commande auprès du fournisseur.</li>
+            <li><span class="tag">Particulier</span> parcourt les campagnes ouvertes de sa zone, s'inscrit, suit en direct le palier de prix atteint.</li>
+            <li><span class="tag">Fournisseur</span> définit ses paliers dégressifs (volume → prix/L) et les zones qu'il dessert.</li>
+          </ul>
+        </div>
+        <div class="why">
+          <h4>Pourquoi ce sujet</h4>
+          <ul>
+            <li><b>Concret et local</b> — les étudiants connaissent la réalité (Limousin, campagne).</li>
+            <li><b>Riche techniquement</b> — agrégations, géo, rôles, mobile.</li>
+            <li><b>Un seul domaine</b> — pas de nouveau contexte à chaque techno.</li>
+            <li><b>Motivant</b> — une vraie appli utilisable au bout.</li>
+            <li><b>Évaluable</b> — critères clairs à chaque jalon.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PIPELINE -->
+<section id="pipeline">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">La colonne vertébrale</span>
+      <h2>La même entité, portée d'une techno à l'autre</h2>
+      <p>Le concept clé du parcours&nbsp;: une <code>Campagne</code> définie une fois se retrouve dans le document MongoDB, dans l'API Spring, puis à l'écran dans Flutter. Les étudiants voient la donnée circuler à travers toute la pile.</p>
+    </div>
+    <div class="pipe">
+      <div class="pcol mongo">
+        <div class="ph"><span class="badge">MongoDB</span> Document stocké</div>
+<pre>{
+  <span class="ts">"_id"</span>: ObjectId(<span class="ts">"..."</span>),
+  <span class="ts">"zone"</span>: <span class="ts">"Ladignac-le-Long"</span>,
+  <span class="ts">"statut"</span>: <span class="ts">"OUVERTE"</span>,
+  <span class="ts">"dateLimite"</span>: ISODate(...),
+  <span class="ts">"fournisseurId"</span>: ObjectId(...),
+  <span class="ts">"commandes"</span>: [
+    { <span class="ts">"litres"</span>: <span class="tn">1500</span>,
+      <span class="ts">"commune"</span>: <span class="ts">"Ladignac"</span> }
+  ]
+}</pre>
+        <div class="cap">Modélisation NoSQL &middot; agrégation du volume &middot; palier de prix.</div>
+      </div>
+      <div class="pcol spring">
+        <div class="ph"><span class="badge">Spring Boot</span> Exposée en API</div>
+<pre><span class="tc">// GET /api/campagnes/{id}</span>
+<span class="tk">record</span> <span class="tk">CampagneDTO</span>(
+  String id,
+  String zone,
+  Statut statut,
+  Instant dateLimite,
+  <span class="tk">int</span> volumeTotal,
+  BigDecimal prixLitre
+) {}</pre>
+        <div class="cap">Couches controller / service / repository &middot; validation &middot; JWT.</div>
+      </div>
+      <div class="pcol flutter">
+        <div class="ph"><span class="badge">Flutter</span> Affichée à l'écran</div>
+<pre><span class="tk">class</span> <span class="tf">Campagne</span> {
+  <span class="tk">final</span> String zone;
+  <span class="tk">final</span> <span class="tk">int</span> volumeTotal;
+  <span class="tk">final</span> <span class="tk">double</span> prixLitre;
+
+  <span class="tk">factory</span> Campagne.fromJson(
+    Map&lt;String,dynamic&gt; j) =&gt; ...
+}</pre>
+        <div class="cap">Écran liste + détail &middot; jauge de volume &middot; s'inscrire.</div>
+      </div>
+    </div>
+    <p class="pipe-note">Une donnée → trois représentations. C'est ce fil qui transforme trois cours séparés en un seul apprentissage.</p>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PARCOURS -->
+<section id="parcours">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Le contenu</span>
+      <h2>Quatre parcours, dans l'ordre du projet</h2>
+      <p>Tes trois cours existants sont conservés intégralement. On ajoute le parcours «&nbsp;Forge &amp; Git&nbsp;» en amont, et chaque parcours reçoit un <strong>jalon fil rouge</strong> sur le projet. Les parcours MongoDB, Spring et Flutter disposent d'un <strong>guide pas à pas</strong> (exemple à adapter au fioul).</p>
+    </div>
+    <div class="tracks">
+
+      <details class="track forge" open>
+        <summary>
+          <span class="tnum">0</span>
+          <span class="tbody"><span class="k">Nouveau · prérequis</span><h3>Forge &amp; Git avec GitHub</h3><span class="sub">8 chapitres · mettre en place le projet</span></span>
+          <span class="chev">▸</span>
+        </summary>
+        <div class="chapters">
+          <ol>
+            <li><b>Pourquoi une forge&nbsp;?</b> <span>— Git vs GitHub, compte, clé SSH / token</span></li>
+            <li><b>Premier dépôt</b> <span>— init, add, commit, <code>.gitignore</code>, README</span></li>
+            <li><b>Travailler à plusieurs</b> <span>— branches, merge, conflits</span></li>
+            <li><b>Le flux GitHub</b> <span>— issues, Pull Requests, revue, protection de branche</span></li>
+            <li><b>Organiser le travail</b> <span>— GitHub Projects, milestones, labels</span></li>
+            <li><b>Intégration continue</b> <span>— GitHub Actions&nbsp;: build Maven + tests, build Flutter</span></li>
+            <li><b>Déploiement</b> <span>— GitHub Pages, secrets, releases</span></li>
+            <li><b>Bonnes pratiques &amp; sécurité</b> <span>— commits conventionnels, zéro secret, Dependabot</span></li>
+          </ol>
+          <div class="milestone">🛢️ <span><b>Jalon fil rouge —</b> créer le dépôt <code>fioul-groupe</code>, le board du projet, les premières issues, et publier CE site sur GitHub Pages.</span></div>
+          <a class="go" href="parcours-forge.html">Ouvrir les 8 séances pas à pas →</a>
+        </div>
+      </details>
+
+      <details class="track mongo">
+        <summary>
+          <span class="tnum">1</span>
+          <span class="tbody"><span class="k">Existant · 17 ch. · guide pas à pas</span><h3>MongoDB — NoSQL orienté documents</h3><span class="sub">Modéliser progressivement les données du domaine</span></span>
+          <span class="chev">▸</span>
+        </summary>
+        <div class="chapters">
+          <ol>
+            <li><b>Introduction à MongoDB</b> <span>— SQL/NoSQL, documents, BSON</span></li>
+            <li><b>Shell mongo, Compass &amp; VSCode</b> <span>— mongosh, import/export</span></li>
+            <li><b>Méthodes CRUD</b> <span>— insert, find, update, delete</span></li>
+            <li><b>Opérateurs de recherche</b> <span>— comparaison, logiques</span></li>
+            <li><b>Opérateurs de tableaux</b> <span>— $all, $elemMatch, $push, $pull</span></li>
+            <li><b>Opérateurs de mise à jour</b> <span>— $currentDate, $min/$max</span></li>
+            <li><b>Les projections</b> <span>— inclusion/exclusion, $slice</span></li>
+            <li><b>Modéliser une base</b> <span>— One-to-One, One-to-Many, Many-to-Many</span></li>
+            <li><b>Curseur &amp; exercices</b> <span>— sort, limit, skip, count</span></li>
+            <li><b>Validation des schémas</b> <span>— $jsonSchema</span></li>
+            <li><b>Les index</b> <span>— explain, composés, TTL, unique</span></li>
+            <li><b>Recherches textuelles</b> <span>— $text, score</span></li>
+            <li><b>Recherches géospatiales</b> <span>— 2dsphere, $near, $geoWithin</span></li>
+            <li><b>Les agrégations</b> <span>— $group, $lookup, $unwind, $bucket</span></li>
+            <li><b>Exemples d'agrégations</b> <span>— cas concrets</span></li>
+            <li><b>Types de nombre</b> <span>— int32, int64, decimal128</span></li>
+            <li><b>Présentation d'Atlas</b> <span>— DBaaS, cluster</span></li>
+          </ol>
+          <div class="milestone">🛢️ <span><b>Jalon fil rouge —</b> modéliser <code>campagnes</code>, <code>commandes</code>, <code>fournisseurs</code>&nbsp;; agréger le volume&nbsp;; requête géo.</span></div>
+          <a class="go" href="mongodb/tuto-mongodb.html">Cours de base (FR) →</a>
+          <a class="go" href="mongodb/mongodb-chapitres.html">Les 17 chapitres →</a>
+          <a class="go" href="mongodb/parcours-mongodb.html">Guide pas à pas →</a>
+        </div>
+      </details>
+
+      <details class="track spring">
+        <summary>
+          <span class="tnum">2</span>
+          <span class="tbody"><span class="k">Existant · 19 ch. · guide pas à pas</span><h3>Spring Boot — l'API du projet</h3><span class="sub">Entity → repository → service → DTO → controller → Swagger</span></span>
+          <span class="chev">▸</span>
+        </summary>
+        <div class="chapters">
+          <ol>
+            <li><b>Introduction</b> <span>— écosystème, architecture</span></li>
+            <li><b>Mise en place d'une appli Spring Boot</b> <span>— contrôleur, service, repository</span></li>
+            <li><b>Structure &amp; configuration</b> <span>— starters, properties</span></li>
+            <li><b>Projet fil rouge — mise en place</b> <span>— API, tests, Swagger</span></li>
+            <li><b>Partie Web</b> <span>— MVC, contrôleurs, validation</span></li>
+            <li><b>Projet — couche Web</b> <span>— design API</span></li>
+            <li><b>Partie Services</b> <span>— clean code, SOLID, IoC</span></li>
+            <li><b>Projet — couche Services</b> <span>— logique métier</span></li>
+            <li><b>Partie Data</b> <span>— Spring Data, entités, repositories</span></li>
+            <li><b>Projet — couche Data</b> <span>— persistance</span></li>
+            <li><b>Projet — tests automatisés</b> <span>— MockMvc, E2E</span></li>
+            <li><b>Partie Sécurité</b> <span>— Spring Security, JWT</span></li>
+            <li><b>Projet — sécurisation</b> <span>— rôles, durcissement</span></li>
+            <li><b>Partie Déploiement</b> <span>— Maven, Docker</span></li>
+            <li><b>Projet — packaging &amp; déploiement</b> <span>— profils, cloud</span></li>
+            <li><b>Partie Monitoring</b> <span>— logs, Actuator</span></li>
+            <li><b>Projet — surveillance</b> <span>— Graylog</span></li>
+            <li><b>Projet — nouvelles fonctionnalités</b> <span>— extensions</span></li>
+            <li><b>Projet — authentification avancée</b> <span>— OAuth2, Keycloak</span></li>
+          </ol>
+          <div class="milestone">🛢️ <span><b>Jalon fil rouge —</b> API REST <code>/api/campagnes</code>, <code>/commandes</code>, <code>/auth</code> avec rôles, tests et Swagger.</span></div>
+          <a class="go" href="springboot/tuto-spring.html">Cours de base (FR) →</a>
+          <a class="go" href="springboot/spring-chapitres.html">Les 19 chapitres →</a>
+          <a class="go" href="springboot/parcours-api-spring.html">Guide pas à pas →</a>
+        </div>
+      </details>
+
+      <details class="track flutter">
+        <summary>
+          <span class="tnum">3</span>
+          <span class="tbody"><span class="k">Existant · 19 ch. · guide pas à pas</span><h3>Flutter — l'appli mobile</h3><span class="sub">Modèle → service → liste → détail → état → formulaire → auth</span></span>
+          <span class="chev">▸</span>
+        </summary>
+        <div class="chapters">
+          <ol>
+            <li><b>Introduction à Flutter</b> <span>— Dart, hot reload</span></li>
+            <li><b>Les bases de Dart</b> <span>— variables, classes, async</span></li>
+            <li><b>Introduction aux widgets</b> <span>— Text, Image</span></li>
+            <li><b>Widgets de layout</b> <span>— Container, Column, Row, Stack</span></li>
+            <li><b>Introduction à Material</b> <span>— Scaffold, AppBar</span></li>
+            <li><b>Stateless / Stateful, Card, InkWell</b> <span>— état, callback</span></li>
+            <li><b>Widgets de listes</b> <span>— ListView, ListTile, GridView</span></li>
+            <li><b>Date, BottomNav &amp; cycle de vie</b> <span>— DateTime, Intl</span></li>
+            <li><b>Fonctionnement approfondi</b> <span>— keys, thème, MediaQuery</span></li>
+            <li><b>La navigation</b> <span>— Navigator, routes nommées</span></li>
+            <li><b>Dialog, SnackBar, Drawer &amp; Tabs</b> <span>— retours utilisateur</span></li>
+            <li><b>Provider &amp; gestion d'état</b> <span>— ChangeNotifier, Consumer</span></li>
+            <li><b>Protocole HTTP</b> <span>— http, JSON, FutureBuilder</span></li>
+            <li><b>Les formulaires</b> <span>— Form, TextFormField, validation</span></li>
+            <li><b>Animations</b> <span>— AnimationController, Hero</span></li>
+            <li><b>Interaction avec le hardware</b> <span>— image_picker, GPS</span></li>
+            <li><b>Google Maps</b> <span>— GoogleMap, marqueurs</span></li>
+            <li><b>Publication sur le Store</b> <span>— build Android</span></li>
+            <li><b>Authentification JWT</b> <span>— token, refresh</span></li>
+          </ol>
+          <div class="milestone">🛢️ <span><b>Jalon fil rouge —</b> appli mobile&nbsp;: liste, détail avec jauge, inscription, connexion JWT, carte.</span></div>
+          <a class="go" href="flutter/tuto-flutter.html">Cours de base (FR) →</a>
+          <a class="go" href="flutter/flutter-chapitres.html">Les 19 chapitres →</a>
+          <a class="go" href="flutter/parcours-flutter.html">Guide pas à pas →</a>
+        </div>
+      </details>
+
+      <details class="track docker">
+        <summary>
+          <span class="tnum">🐳</span>
+          <span class="tbody"><span class="k">Infrastructure · 8 chapitres</span><h3>Docker &amp; conteneurs</h3><span class="sub">Orchestrer les 3 couches avec docker-compose</span></span>
+          <span class="chev">▸</span>
+        </summary>
+        <div class="chapters">
+          <ol>
+            <li><b>Introduction à Docker</b> <span>— conteneur vs VM, image, registre</span></li>
+            <li><b>Images &amp; conteneurs</b> <span>— run, ps, logs, exec, ports</span></li>
+            <li><b>Écrire un Dockerfile</b> <span>— build multi-stage de l'API</span></li>
+            <li><b>Volumes &amp; persistance</b> <span>— données MongoDB</span></li>
+            <li><b>Les réseaux</b> <span>— communication par nom de service</span></li>
+            <li><b>Docker Compose</b> <span>— tout décrire en un fichier</span></li>
+            <li><b>Le projet en Compose</b> <span>— database + api + web</span></li>
+            <li><b>Bonnes pratiques &amp; déploiement</b> <span>— secrets, images légères, registre</span></li>
+          </ol>
+          <div class="milestone">🛢️ <span><b>Jalon fil rouge —</b> un <code>compose.yaml</code> qui monte les 3 couches (base, API, front) d'une seule commande, reproductible partout.</span></div>
+          <a class="go" href="docker/docker-chapitres.html">Les 8 chapitres →</a>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">La progression</span>
+      <h2>De l'idée au produit livré, jalon par jalon</h2>
+      <p>La séquence est volontairement ordonnée&nbsp;: on ne construit l'API qu'après avoir modélisé les données, ni l'appli mobile qu'après avoir une API. Chaque jalon ajoute une couche vérifiable au même dépôt GitHub.</p>
+    </div>
+    <div class="road">
+      <div class="step-r">
+        <span class="rd">0</span>
+        <div class="when">Semaines 1–2 · avant les technos</div>
+        <h4>Cadrage &amp; forge</h4>
+        <p>On pose le problème (le fioul, les rôles, les user stories), on crée le dépôt, le board de projet et les premières issues. Le site du cours lui-même est déployé sur GitHub Pages.</p>
+        <div class="pills"><span class="pill forge">Forge &amp; Git</span></div>
+      </div>
+      <div class="step-r">
+        <span class="rd">1</span>
+        <div class="when">Bloc données</div>
+        <h4>Modéliser le domaine</h4>
+        <p>Campagnes, commandes, fournisseurs en documents. Volume total par campagne (agrégation), regroupement par commune (géospatial). Base hébergée sur Atlas.</p>
+        <div class="pills"><span class="pill mongo">MongoDB</span><span class="pill forge">issues / PR</span></div>
+      </div>
+      <div class="step-r">
+        <span class="rd">2</span>
+        <div class="when">Bloc back-end</div>
+        <h4>Exposer &amp; sécuriser l'API</h4>
+        <p>API REST en couches au-dessus de MongoDB, validation, rôles coordinateur / particulier en JWT, tests, Swagger, CI verte sur chaque PR.</p>
+        <div class="pills"><span class="pill spring">Spring Boot</span><span class="pill forge">GitHub Actions</span></div>
+      </div>
+      <div class="step-r">
+        <span class="rd">3</span>
+        <div class="when">Bloc mobile</div>
+        <h4>L'appli des particuliers</h4>
+        <p>Écrans liste et détail, jauge de volume, formulaire d'inscription, authentification JWT contre l'API Spring, carte des zones. L'appli consomme la vraie API.</p>
+        <div class="pills"><span class="pill flutter">Flutter</span><span class="pill spring">API</span></div>
+      </div>
+      <div class="step-r">
+        <span class="rd">✓</span>
+        <div class="when">Livraison</div>
+        <h4>Le produit &amp; sa soutenance</h4>
+        <p>Dépôt à l'historique propre, board bouclé, CI verte, API déployée + Swagger, APK Flutter, README complet. Soutenance et démonstration de bout en bout.</p>
+        <div class="pills"><span class="pill">Tout le parcours</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FORGE -->
+<section id="forge">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Le nouveau parcours</span>
+      <h2>Mise en place du projet via une forge (GitHub)</h2>
+      <p>Un TD progressif, transversal&nbsp;: les étudiants n'apprennent pas Git «&nbsp;en théorie&nbsp;» puis l'oublient — ils l'utilisent réellement pour livrer le projet, séance après séance.</p>
+    </div>
+    <div class="forge-wrap">
+      <div class="tdlist">
+        <div class="ti"><span class="n">1</span><div><h4>Le dépôt &amp; le premier commit</h4><p>Compte GitHub, <code>git init</code>, <code>.gitignore</code>, README, premier <code>push</code>.</p></div></div>
+        <div class="ti"><span class="n">2</span><div><h4>Branches &amp; Pull Requests</h4><p>Une branche par fonctionnalité, PR, revue croisée, protection de <code>main</code>.</p></div></div>
+        <div class="ti"><span class="n">3</span><div><h4>Piloter avec GitHub Projects</h4><p>Board kanban, issues reliées aux user stories, labels, milestones.</p></div></div>
+        <div class="ti"><span class="n">4</span><div><h4>Intégration continue</h4><p><code>.github/workflows</code>&nbsp;: build Maven + tests, lint et build Flutter.</p></div></div>
+        <div class="ti"><span class="n">5</span><div><h4>Déploiement &amp; secrets</h4><p>GitHub Pages, secrets pour Atlas, releases versionnées.</p></div></div>
+      </div>
+      <div class="callout">
+        <span class="badge-self">Idée d'accroche</span>
+        <h3>La première mise en ligne, c'est ce site lui-même</h3>
+        <p>La toute première victoire du parcours&nbsp;: publier le portail du cours sur GitHub Pages. Les étudiants voient leur travail en ligne dès la séance 1 — un déclic motivant avant d'écrire une seule ligne de MongoDB.</p>
+<pre># dans le dépôt fioul-groupe
+git add site/
+git commit -m "docs: portail du parcours"
+git push
+# → Settings ▸ Pages ▸ branche main /site
+# → https://&lt;classe&gt;.github.io/fioul-groupe/</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- EVAL -->
+<section id="eval">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Cadre pédagogique</span>
+      <h2>Livrables &amp; évaluation</h2>
+      <p>Des critères concrets, alignés sur le référentiel du BTS SIO SLAM et sur des pratiques professionnelles réelles.</p>
+    </div>
+    <div class="cards3">
+      <div class="mini">
+        <div class="ic">📦</div>
+        <h4>Livrables attendus</h4>
+        <ul>
+          <li>Dépôt GitHub à l'historique propre</li>
+          <li>Board de projet bouclé</li>
+          <li>Base MongoDB (Atlas) + jeux de données</li>
+          <li>API Spring déployée + Swagger</li>
+          <li>APK Flutter fonctionnel</li>
+          <li>README + dossier de synthèse</li>
+        </ul>
+      </div>
+      <div class="mini">
+        <div class="ic">📊</div>
+        <h4>Critères d'évaluation</h4>
+        <ul>
+          <li>Modélisation &amp; pertinence des agrégations</li>
+          <li>Qualité de l'API (couches, validation, tests)</li>
+          <li>UX &amp; robustesse de l'appli mobile</li>
+          <li>Hygiène Git (commits, PR, revues)</li>
+          <li>CI verte &amp; déploiement effectif</li>
+          <li>Soutenance &amp; démonstration</li>
+        </ul>
+      </div>
+      <div class="mini cyber">
+        <div class="ic">🛡️</div>
+        <h4>Passerelle Cybersécurité</h4>
+        <ul>
+          <li>Modèle de menaces du projet</li>
+          <li>Authentification JWT &amp; rôles</li>
+          <li>Validation des entrées côté API</li>
+          <li>Zéro secret dans le dépôt (Dependabot)</li>
+          <li>HTTPS &amp; durcissement au déploiement</li>
+          <li>Revue de code orientée sécurité</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note-box">
+      <b>À propos de ce portail —</b> site statique autonome (HTML/CSS/JS pur), dans l'esprit visuel de tes trois sites existants. Les parcours MongoDB, Spring et Flutter pointent vers des <b>guides pas à pas</b> ; chaque parcours pourra aussi pointer vers tes pages <code>chapitre-XX.html</code> une fois les trois sites rassemblés dans le même dépôt.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="#top"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Atelier SLAM — BTS SIO, lycée Suzanne Valadon. Un fil rouge unique reliant MongoDB, Spring Boot et Flutter, versionné sur GitHub.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('theme');
+  try{var saved=localStorage.getItem('fg-theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  if(btn) btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    var next = cur==='dark' ? 'light' : (cur==='light' ? 'dark' :
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'));
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('fg-theme',next);}catch(e){}
+  });
+  var burger=document.getElementById('burger'), nav=document.getElementById('nav');
+  if(burger) burger.addEventListener('click',function(){
+    var open=nav.classList.toggle('open'); burger.setAttribute('aria-expanded',open);
+  });
+  if(nav) nav.addEventListener('click',function(e){ if(e.target.tagName==='A') nav.classList.remove('open'); });
+  var links=[].slice.call(document.querySelectorAll('.nav a')), map={};
+  links.forEach(function(a){var id=a.getAttribute('href').slice(1),el=document.getElementById(id); if(el) map[id]=a;});
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(es){es.forEach(function(en){
+      if(en.isIntersecting){links.forEach(function(a){a.classList.remove('on')});var a=map[en.target.id]; if(a) a.classList.add('on');}
+    });},{rootMargin:'-45% 0px -50% 0px'});
+    Object.keys(map).forEach(function(id){obs.observe(document.getElementById(id))});
+  }
+})();
+</script>
+</body>
+</html>

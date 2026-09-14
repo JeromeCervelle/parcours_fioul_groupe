@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 10 — Projet : couche Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 10</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 10</div>
+  <span class="lbadge">Chapitre 10 / 19 · projet</span>
+  <h1>Projet — la couche Data</h1>
+  <p class="intro">On branche l'API sur la vraie base MongoDB&nbsp;: entités, repositories, connexion, et données de départ. L'API n'utilise plus de données factices.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#entites">1 · Les entités</a><a href="#connexion">2 · La connexion</a><a href="#brancher">3 · Brancher le service</a><a href="#seed">4 · Données de départ</a></div></nav>
+<main class="wrap">
+  <section class="step" id="entites">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Entités &amp; sous-documents</h2>
+    <p class="goal">On finalise <code>Campagne</code> (avec <code>List&lt;Commande&gt;</code> embarquée), <code>Commande</code>, et <code>Fournisseur</code> (avec ses <code>Palier</code>). Les types monétaires en <code>BigDecimal</code> (cf. Mongo ch. 16).</p>
+<pre><span class="tk">public class</span> <span class="tf">Commande</span> {
+    <span class="tk">private int</span> litres;
+    <span class="tk">private</span> String commune;
+    <span class="tk">private</span> String adresse;
+}</pre>
+  </section>
+  <section class="step" id="connexion">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>La connexion à MongoDB</h2>
+    <p class="goal">On configure l'URI (locale en dev, Atlas en prod via secret).</p>
+<pre>spring.data.mongodb.uri=mongodb://localhost:27017/fioul   <span class="tc"># dev</span>
+<span class="tc"># prod : spring.data.mongodb.uri=${MONGODB_URI}</span></pre>
+  </section>
+  <section class="step" id="brancher">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Brancher le service sur le repository</h2>
+    <p class="goal">Le service utilise désormais <code>repo.findAll()</code>, <code>repo.save()</code>… Les données factices disparaissent&nbsp;; l'API lit et écrit dans MongoDB.</p>
+    <div class="hint"><strong>Vérifier —</strong> insère une campagne via <code>POST /api/campagnes</code>, relis-la dans Compass&nbsp;: elle doit apparaître dans la collection <code>campagnes</code>.</div>
+  </section>
+  <section class="step" id="seed">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Un jeu de données de départ</h2>
+    <p class="goal">On peut initialiser des fournisseurs et quelques campagnes au démarrage (un <code>CommandLineRunner</code>), pour tester tout de suite.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Connecte l'API à ta base <code>fioul</code>, insère 2-3 fournisseurs (avec paliers) et vérifie de bout en bout&nbsp;: <code>POST</code> une campagne, ajoute des commandes, consulte le détail — le <code>volumeTotal</code> et le <code>prixLitre</code> doivent se calculer.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Entités finalisées, monétaire en <code>BigDecimal</code>.</li>
+      <li>Connexion via <code>spring.data.mongodb.uri</code> (secret en prod).</li>
+      <li>Service branché sur le vrai repository&nbsp;; jeu de données de départ.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch09.html">← Chapitre 09</a><a class="next" href="spring-ch11.html">Chapitre 11 · Tests automatisés →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 10 — Projet : couche Data. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

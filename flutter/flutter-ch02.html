@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 02 — Les bases de Dart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 02</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 02</div>
+  <span class="lbadge">Chapitre 02 / 19</span>
+  <h1>Les bases de Dart</h1>
+  <p class="intro">Le minimum de Dart pour être à l'aise en Flutter&nbsp;: variables et types, null-safety, fonctions, classes, collections, et l'asynchrone.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#vars">1 · Variables</a><a href="#null">2 · Null-safety</a><a href="#fonctions">3 · Fonctions</a><a href="#classes">4 · Classes</a><a href="#async">5 · Async</a></div></nav>
+<main class="wrap">
+  <section class="step" id="vars">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Variables &amp; types</h2>
+    <p class="goal">Dart est typé mais sait inférer. <code>var</code> déduit le type, <code>final</code> interdit la réassignation, <code>const</code> est constant à la compilation.</p>
+<pre><span class="tk">var</span> zone = <span class="ts">'Ladignac'</span>;      <span class="tc">// String inféré</span>
+<span class="tk">final int</span> litres = <span class="tn">1500</span>;
+<span class="tk">const double</span> tva = <span class="tn">0.20</span>;
+String? commentaire;         <span class="tc">// peut être null (voir section 2)</span></pre>
+  </section>
+  <section class="step" id="null">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>La null-safety</h2>
+    <p class="goal">Par défaut une variable <b>ne peut pas être null</b>. Le <code>?</code> autorise null&nbsp;; le <code>!</code> affirme non-null&nbsp;; <code>??</code> fournit une valeur par défaut.</p>
+<pre>String? nom;                 <span class="tc">// nullable</span>
+print(nom ?? <span class="ts">'Anonyme'</span>);      <span class="tc">// valeur si null</span></pre>
+    <div class="hint"><strong>Pourquoi —</strong> la null-safety élimine à la compilation une grande classe de bugs (le fameux <code>NullPointerException</code>).</div>
+  </section>
+  <section class="step" id="fonctions">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Fonctions &amp; paramètres nommés</h2>
+    <p class="goal">Dart aime les <b>paramètres nommés</b> (entre accolades), très présents dans les widgets Flutter.</p>
+<pre><span class="tk">int</span> prixTotal(<span class="tk">int</span> litres, {<span class="tk">double</span> prix = <span class="tn">1.0</span>}) =&gt; (litres * prix).round();
+prixTotal(<span class="tn">1500</span>, prix: <span class="tn">1.02</span>);</pre>
+  </section>
+  <section class="step" id="classes">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Classes &amp; collections</h2>
+    <p class="goal">Classes classiques&nbsp;; listes (<code>List</code>), ensembles (<code>Set</code>), dictionnaires (<code>Map</code>). Les méthodes fonctionnelles (<code>map</code>, <code>where</code>) sont partout.</p>
+<pre><span class="tk">class</span> <span class="tf">Campagne</span> {
+  <span class="tk">final</span> String zone;
+  <span class="tk">final int</span> volume;
+  Campagne(<span class="tk">this</span>.zone, <span class="tk">this</span>.volume);
+}
+<span class="tk">var</span> zones = campagnes.map((c) =&gt; c.zone).toList();</pre>
+  </section>
+  <section class="step" id="async">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>L'asynchrone : Future, async/await</h2>
+    <p class="goal">Un appel réseau renvoie un <b>Future</b> (une valeur « plus tard »). <code>async</code>/<code>await</code> rend le code lisible.</p>
+<pre>Future&lt;List&lt;Campagne&gt;&gt; charger() <span class="tk">async</span> {
+  <span class="tk">final</span> reponse = <span class="tk">await</span> http.get(url);
+  <span class="tk">return</span> parse(reponse.body);
+}</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Tu utiliseras tout ça&nbsp;: une classe <code>Campagne</code> avec <code>final</code>, des <code>List&lt;Campagne&gt;</code>, la null-safety pour les champs optionnels, et <code>async/await</code> pour appeler l'API. Ce chapitre est la boîte à outils du reste du parcours.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>var</code>/<code>final</code>/<code>const</code>&nbsp;; null-safety (<code>?</code>, <code>!</code>, <code>??</code>).</li>
+      <li>Paramètres nommés (omniprésents dans les widgets).</li>
+      <li>Classes, collections, et <code>Future</code> + <code>async/await</code>.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch01.html">← Chapitre 01</a><a class="next" href="flutter-ch03.html">Chapitre 03 · Introduction aux widgets →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 02 — Les bases de Dart. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

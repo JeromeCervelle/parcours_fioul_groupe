@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 15 — Exemples d'agrégations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 15</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 15</div>
+    <span class="lbadge">Chapitre 15 / 17</span>
+    <h1>Exemples d'agrégations</h1>
+    <p class="intro">On met en pratique le pipeline du chapitre 14 sur des cas concrets du projet Fioul Groupé, construits étape par étape. Objectif&nbsp;: savoir <b>composer</b> les étapes pour répondre à une vraie question.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#volume">1 · Volume par campagne</a>
+    <a href="#palier">2 · Palier de prix</a>
+    <a href="#top">3 · Top des zones</a>
+    <a href="#stats">4 · Stats par statut</a>
+    <a href="#tranches">5 · Tranches ($bucket)</a>
+    <a href="#construire">6 · Méthode</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="volume">
+    <span class="snum"><span class="dotnum">1</span> Cas</span>
+    <h2>Le volume total par campagne</h2>
+    <p class="goal">On déplie les commandes puis on somme les litres, campagne par campagne.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$unwind</span>: <span class="ts">"$commandes"</span> },
+  { <span class="ts">$group</span>: {
+      _id: <span class="ts">"$zone"</span>,
+      volumeTotal: { <span class="ts">$sum</span>: <span class="ts">"$commandes.litres"</span> },
+      participants: { <span class="ts">$sum</span>: <span class="tn">1</span> }
+  }},
+  { <span class="ts">$sort</span>: { volumeTotal: <span class="tn">-1</span> } }
+])</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: "Ladignac-le-Long", volumeTotal: 4200, participants: 3 }
+{ _id: "Saint-Yrieix",     volumeTotal: 2600, participants: 2 }</div>
+  </section>
+
+  <section class="step" id="palier">
+    <span class="snum"><span class="dotnum">2</span> Cas</span>
+    <h2>En déduire le palier de prix</h2>
+    <p class="goal">Une fois le volume connu, on choisit le bon palier du fournisseur. On joint le fournisseur (<code>$lookup</code>), puis on calcule (ici, une logique simplifiée avec <code>$switch</code>).</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$unwind</span>: <span class="ts">"$commandes"</span> },
+  { <span class="ts">$group</span>: { _id: <span class="ts">"$_id"</span>, zone: { <span class="ts">$first</span>: <span class="ts">"$zone"</span> },
+             volume: { <span class="ts">$sum</span>: <span class="ts">"$commandes.litres"</span> } } },
+  { <span class="ts">$addFields</span>: {
+      prixLitre: { <span class="ts">$switch</span>: { branches: [
+        { case: { <span class="ts">$gte</span>: [<span class="ts">"$volume"</span>, <span class="tn">8000</span>] }, then: <span class="tn">0.98</span> },
+        { case: { <span class="ts">$gte</span>: [<span class="ts">"$volume"</span>, <span class="tn">3000</span>] }, then: <span class="tn">1.02</span> }
+      ], default: <span class="tn">1.08</span> } }
+  }}
+])</pre>
+    <div class="hint"><strong>À retenir —</strong> <code>$addFields</code> ajoute un champ calculé sans supprimer les autres. <code>$switch</code> est un « si/sinon » dans le pipeline.</div>
+  </section>
+
+  <section class="step" id="top">
+    <span class="snum"><span class="dotnum">3</span> Cas</span>
+    <h2>Le top 3 des zones les plus mobilisées</h2>
+    <p class="goal">On réutilise le volume par zone, on trie, on limite.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$unwind</span>: <span class="ts">"$commandes"</span> },
+  { <span class="ts">$group</span>: { _id: <span class="ts">"$zone"</span>, volume: { <span class="ts">$sum</span>: <span class="ts">"$commandes.litres"</span> } } },
+  { <span class="ts">$sort</span>: { volume: <span class="tn">-1</span> } },
+  { <span class="ts">$limit</span>: <span class="tn">3</span> }
+])</pre>
+  </section>
+
+  <section class="step" id="stats">
+    <span class="snum"><span class="dotnum">4</span> Cas</span>
+    <h2>Statistiques par statut</h2>
+    <p class="goal">Combien de campagnes par statut&nbsp;? Un simple <code>$group</code> sur <code>statut</code>.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$group</span>: { _id: <span class="ts">"$statut"</span>, nb: { <span class="ts">$sum</span>: <span class="tn">1</span> } } }
+])</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: "OUVERTE", nb: 5 }
+{ _id: "CLOTUREE", nb: 2 }
+{ _id: "LIVREE", nb: 1 }</div>
+  </section>
+
+  <section class="step" id="tranches">
+    <span class="snum"><span class="dotnum">5</span> Cas</span>
+    <h2>Répartir en tranches de volume ($bucket)</h2>
+    <p class="goal"><code>$bucket</code> classe les campagnes par intervalle de volume — utile pour un graphique.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$unwind</span>: <span class="ts">"$commandes"</span> },
+  { <span class="ts">$group</span>: { _id: <span class="ts">"$_id"</span>, volume: { <span class="ts">$sum</span>: <span class="ts">"$commandes.litres"</span> } } },
+  { <span class="ts">$bucket</span>: {
+      groupBy: <span class="ts">"$volume"</span>,
+      boundaries: [<span class="tn">0</span>, <span class="tn">3000</span>, <span class="tn">8000</span>, <span class="tn">100000</span>],
+      default: <span class="ts">"autre"</span>,
+      output: { nb: { <span class="ts">$sum</span>: <span class="tn">1</span> } }
+  }}
+])</pre>
+  </section>
+
+  <section class="step" id="construire">
+    <span class="snum"><span class="dotnum">6</span> Méthode</span>
+    <h2>Comment construire un pipeline</h2>
+    <p class="goal">La bonne méthode&nbsp;: on ajoute les étapes <b>une par une</b> et on vérifie le résultat intermédiaire à chaque fois. Compass propose même un aperçu en direct étape par étape.</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li>Filtrer d'abord (<code>$match</code>) pour ne travailler que sur l'utile.</li>
+      <li>Déplier si besoin (<code>$unwind</code>), puis regrouper (<code>$group</code>).</li>
+      <li>Mettre en forme la sortie (<code>$project</code>/<code>$addFields</code>), trier, limiter.</li>
+    </ul>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Garde ces pipelines&nbsp;: le « volume + palier » deviendra le calcul renvoyé par l'API dans le <code>CampagneDTO</code> (champs <code>volumeTotal</code> et <code>prixLitre</code>). Les stats par statut et les tranches alimenteront un futur tableau de bord coordinateur.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>On compose les étapes du ch. 14 pour répondre à des questions concrètes.</li>
+        <li><code>$addFields</code> + <code>$switch</code> pour des champs calculés conditionnels.</li>
+        <li>Construire un pipeline pas à pas, en vérifiant chaque étape (Compass aide).</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch14.html">← Chapitre 14</a>
+    <a class="next" href="mongo-ch16.html">Chapitre 16 · Les types de nombre →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 15 — Exemples d'agrégations. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

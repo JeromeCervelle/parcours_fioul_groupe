@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 04 — Widgets de layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 04</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 04</div>
+  <span class="lbadge">Chapitre 04 / 19</span>
+  <h1>Widgets de layout</h1>
+  <p class="intro">Positionner les éléments à l'écran&nbsp;: Row, Column, Stack, l'alignement, l'espace flexible, et les marges. C'est ce qui structure chaque écran.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#rowcol">1 · Row &amp; Column</a><a href="#align">2 · Alignement</a><a href="#flex">3 · Expanded</a><a href="#stack">4 · Stack</a><a href="#espace">5 · Marges</a></div></nav>
+<main class="wrap">
+  <section class="step" id="rowcol">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Row &amp; Column</h2>
+    <p class="goal"><code>Row</code> aligne ses enfants horizontalement, <code>Column</code> verticalement. Tous deux prennent une liste <code>children</code>.</p>
+<pre>Column(children: [
+  Text(<span class="ts">'Ladignac-le-Long'</span>),
+  Row(children: [ Icon(Icons.local_gas_station), Text(<span class="ts">'4200 L'</span>) ]),
+])</pre>
+  </section>
+  <section class="step" id="align">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>L'alignement</h2>
+    <p class="goal"><code>mainAxisAlignment</code> (axe principal) et <code>crossAxisAlignment</code> (axe transverse) règlent la répartition. Pour une <code>Column</code>, l'axe principal est vertical.</p>
+<pre>Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [ Text(<span class="ts">'Volume'</span>), Text(<span class="ts">'4200 L'</span>) ],
+)</pre>
+  </section>
+  <section class="step" id="flex">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Espace flexible : Expanded</h2>
+    <p class="goal"><code>Expanded</code> fait qu'un enfant occupe l'espace restant&nbsp;; utile pour une jauge ou pour pousser un élément à droite.</p>
+<pre>Row(children: [
+  Expanded(child: LinearProgressIndicator(value: <span class="tn">0.6</span>)),
+  Text(<span class="ts">' 60%'</span>),
+])</pre>
+  </section>
+  <section class="step" id="stack">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Superposer : Stack</h2>
+    <p class="goal"><code>Stack</code> empile les widgets les uns sur les autres (comme des calques)&nbsp;; <code>Positioned</code> place précisément un enfant. Idéal pour un badge sur une image.</p>
+  </section>
+  <section class="step" id="espace">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Marges &amp; espacements</h2>
+    <p class="goal"><code>Padding</code> (marge intérieure), <code>SizedBox</code> (espace fixe entre deux widgets), <code>EdgeInsets</code> pour définir les valeurs.</p>
+<pre>SizedBox(height: <span class="tn">12</span>)   <span class="tc">// un espace vertical de 12 px</span></pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Construis la carte d'une campagne&nbsp;: la zone en titre, une <code>Row</code> volume/prix avec <code>spaceBetween</code>, et une jauge de progression avec <code>Expanded</code>. C'est la brique de l'écran liste (chapitre 7).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>Row</code>/<code>Column</code> + <code>children</code>&nbsp;; alignements main/cross.</li>
+      <li><code>Expanded</code> pour l'espace flexible&nbsp;; <code>Stack</code> pour superposer.</li>
+      <li><code>Padding</code>, <code>SizedBox</code>, <code>EdgeInsets</code> pour l'espacement.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch03.html">← Chapitre 03</a><a class="next" href="flutter-ch05.html">Chapitre 05 · Introduction à Material →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 04 — Widgets de layout. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

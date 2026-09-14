@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 03 — Structure & configuration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 03</small></span></a>
+  <nav class="nav" id="nav">
+    <a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a>
+  </nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button>
+  <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 03</div>
+  <span class="lbadge">Chapitre 03 / 19</span>
+  <h1>Structure &amp; configuration</h1>
+  <p class="intro">Comment Spring Boot se configure « tout seul », comment on ajuste ce comportement via les properties, et comment gérer plusieurs environnements (dev, prod).</p>
+</div></section>
+
+<nav class="stepnav" id="stepnav"><div class="wrap">
+  <a href="#starters">1 · Starters</a>
+  <a href="#auto">2 · Auto-configuration</a>
+  <a href="#properties">3 · Properties</a>
+  <a href="#profils">4 · Profils</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="step" id="starters">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les starters</h2>
+    <p class="goal">Un <b>starter</b> regroupe des dépendances cohérentes. Ajouter <code>spring-boot-starter-web</code> apporte Spring MVC, Jackson (JSON) et Tomcat, avec des versions déjà accordées entre elles par le <code>parent</code>.</p>
+<pre>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+  </section>
+  <section class="step" id="auto">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>L'auto-configuration</h2>
+    <p class="goal">Spring Boot examine les dépendances présentes et <b>configure automatiquement</b> ce qu'il faut&nbsp;: voir <code>starter-web</code> ⇒ il démarre un serveur web&nbsp;; voir <code>starter-data-mongodb</code> ⇒ il prépare la connexion Mongo. On ne configure à la main que les exceptions.</p>
+  </section>
+  <section class="step" id="properties">
+    <span class="snum"><span class="dotnum">3</span> Pratique</span>
+    <h2>application.properties</h2>
+    <p class="goal">Le fichier central des réglages. Quelques exemples&nbsp;:</p>
+<pre>server.port=8080
+spring.application.name=fioul-api
+spring.data.mongodb.uri=mongodb://localhost:27017/fioul
+logging.level.org.springframework=INFO</pre>
+    <div class="hint"><strong>YAML —</strong> on peut préférer <code>application.yml</code>, plus lisible pour des réglages imbriqués. Même contenu, autre syntaxe.</div>
+  </section>
+  <section class="step" id="profils">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Plusieurs environnements (profils)</h2>
+    <p class="goal">Des fichiers <code>application-dev.properties</code> et <code>application-prod.properties</code> permettent des réglages par environnement, activés par <code>spring.profiles.active</code>.</p>
+<pre>spring.profiles.active=dev</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Configure <code>fioul-api</code>&nbsp;: base locale en profil <code>dev</code>, base Atlas en <code>prod</code> via <code>${MONGODB_URI}</code> (secret, jamais en clair). Tu prépares ainsi le déploiement du chapitre 14.</p></div>
+    <div class="recap"><strong>À retenir</strong>
+      <ul><li>Starters = dépendances groupées et compatibles.</li>
+      <li>Auto-configuration selon les dépendances présentes.</li>
+      <li><code>application.properties</code>/<code>.yml</code>&nbsp;; profils par environnement.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch02.html">← Chapitre 02</a><a class="next" href="spring-ch04.html">Chapitre 04 · Projet fil rouge →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 03 — Structure &amp; configuration. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

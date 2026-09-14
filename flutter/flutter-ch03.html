@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 03 — Introduction aux widgets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 03</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 03</div>
+  <span class="lbadge">Chapitre 03 / 19</span>
+  <h1>Introduction aux widgets</h1>
+  <p class="intro">Le concept fondateur en détail&nbsp;: ce qu'est un widget, ses propriétés, l'arbre de widgets, et les widgets « feuilles » de base (Text, Image, Icon).</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#def">1 · Un widget</a><a href="#arbre">2 · L'arbre</a><a href="#base">3 · Widgets de base</a><a href="#const">4 · const</a></div></nav>
+<main class="wrap">
+  <section class="step" id="def">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce qu'un widget&nbsp;?</h2>
+    <p class="goal">Un widget est une <b>description immuable</b> d'une partie de l'interface. On le configure par ses <b>propriétés</b> (des paramètres nommés). Flutter les assemble et les dessine.</p>
+<pre>Text(
+  <span class="ts">'Campagne Ladignac'</span>,
+  style: TextStyle(fontSize: <span class="tn">18</span>, fontWeight: FontWeight.bold),
+)</pre>
+  </section>
+  <section class="step" id="arbre">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>L'arbre de widgets</h2>
+    <p class="goal">Un widget « contenant » reçoit d'autres widgets via <code>child</code> (un) ou <code>children</code> (plusieurs). On construit ainsi une <b>hiérarchie</b>.</p>
+<pre>Padding(
+  padding: EdgeInsets.all(<span class="tn">16</span>),
+  child: Column(children: [ Text(<span class="ts">'A'</span>), Text(<span class="ts">'B'</span>) ]),
+)</pre>
+  </section>
+  <section class="step" id="base">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les widgets de base</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><code>Text</code> — afficher du texte (avec un <code>style</code>).</li>
+      <li><code>Image.asset</code> / <code>Image.network</code> — une image locale ou distante.</li>
+      <li><code>Icon</code> — une icône Material (<code>Icons.local_gas_station</code>).</li>
+      <li><code>Container</code> — une boîte stylable (marge, fond, bordure).</li>
+    </ul>
+  </section>
+  <section class="step" id="const">
+    <span class="snum"><span class="dotnum">4</span> Bonne pratique</span>
+    <h2>Le mot-clé const</h2>
+    <p class="goal">Préfixer un widget qui ne changera jamais par <code>const</code> permet à Flutter de le réutiliser sans le reconstruire&nbsp;: petit gain de performance, bon réflexe.</p>
+<pre><span class="tk">const</span> Text(<span class="ts">'Fioul Groupé'</span>)</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Compose une petite carte de campagne&nbsp;: un <code>Container</code> avec une <code>Column</code> contenant un <code>Text</code> (la zone), une ligne <code>Icon</code> + <code>Text</code> (le volume). Tu manipules déjà l'arbre de widgets.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Un widget = description immuable configurée par ses propriétés.</li>
+      <li><code>child</code>/<code>children</code> construisent l'arbre.</li>
+      <li>Widgets de base&nbsp;: Text, Image, Icon, Container&nbsp;; <code>const</code> quand c'est figé.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch02.html">← Chapitre 02</a><a class="next" href="flutter-ch04.html">Chapitre 04 · Widgets de layout →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 03 — Introduction aux widgets. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

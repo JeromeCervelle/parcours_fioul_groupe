@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker · Chapitre 04 — Volumes & persistance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="docker">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Docker · Chapitre 04</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="docker-chapitres.html">Chapitres</a><a href="../springboot/spring-chapitres.html">Spring</a><a href="../mongodb/mongodb-chapitres.html">MongoDB</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="docker-chapitres.html">Docker</a> › Chapitre 04</div>
+  <span class="lbadge">Chapitre 04 / 08</span>
+  <h1>Volumes &amp; persistance</h1>
+  <p class="intro">Par défaut, tout ce qu'écrit un conteneur disparaît quand on le supprime. Pour conserver les données — comme celles de MongoDB — on utilise des <b>volumes</b>.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#probleme">1 · Le problème</a><a href="#volume">2 · Volume nommé</a><a href="#bind">3 · Bind mount</a><a href="#mongo">4 · Persister MongoDB</a></div></nav>
+<main class="wrap">
+  <section class="step" id="probleme">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les conteneurs sont éphémères</h2>
+    <p class="goal">Le système de fichiers d'un conteneur est <b>jetable</b>&nbsp;: si on supprime le conteneur MongoDB, la base est perdue. Il faut donc stocker les données <b>en dehors</b> du conteneur.</p>
+    <div class="warn"><strong>Piège classique —</strong> lancer une base sans volume, puis <code>docker rm</code>&nbsp;: toutes les campagnes disparaissent. Les données doivent survivre au conteneur.</div>
+  </section>
+  <section class="step" id="volume">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Les volumes nommés</h2>
+    <p class="goal">Un <b>volume nommé</b> est un espace de stockage géré par Docker, indépendant du cycle de vie du conteneur. On le monte à l'endroit où le service écrit ses données.</p>
+<pre>docker volume create fioul-data
+docker run -d --name fioul-mongo \
+  -v fioul-data:/data/db -p 27017:27017 mongo:7</pre>
+    <p style="color:var(--ink-soft)">Ici <code>/data/db</code> est le dossier où MongoDB stocke ses données&nbsp;; il est désormais persisté dans le volume <code>fioul-data</code>.</p>
+  </section>
+  <section class="step" id="bind">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les bind mounts</h2>
+    <p class="goal">Un <b>bind mount</b> monte un dossier de <em>ta machine</em> dans le conteneur — utile en développement (voir tout de suite un fichier modifié) ou pour injecter un jeu de données initial.</p>
+<pre>docker run -v ./init:/docker-entrypoint-initdb.d mongo:7</pre>
+    <div class="hint"><strong>Volume nommé vs bind mount —</strong> volume nommé pour les <em>données</em> (géré par Docker, portable)&nbsp;; bind mount pour partager un <em>dossier précis</em> de l'hôte.</div>
+  </section>
+  <section class="step" id="mongo">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>Persister la base du projet</h2>
+    <p class="goal">On vérifie la persistance&nbsp;: insérer une campagne, supprimer le conteneur, le relancer sur le même volume → les données sont toujours là.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Monte <code>fioul-data:/data/db</code> pour la base du projet. Teste&nbsp;: crée une campagne, <code>docker rm -f fioul-mongo</code>, relance avec le même <code>-v fioul-data:/data/db</code> → la campagne est intacte. On réutilisera ce volume dans le <code>docker-compose</code> (chapitre 7).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Le FS d'un conteneur est jetable&nbsp;: sans volume, les données sont perdues.</li>
+      <li>Volume nommé (<code>-v nom:/chemin</code>) pour persister les données.</li>
+      <li>Bind mount (<code>-v ./hôte:/conteneur</code>) pour partager un dossier de l'hôte.</li></ul></div>
+  </section>
+  <div class="pager"><a href="docker-ch03.html">← Chapitre 03</a><a class="next" href="docker-ch05.html">Chapitre 05 · Les réseaux →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Docker · Chapitre 04 — Volumes &amp; persistance. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

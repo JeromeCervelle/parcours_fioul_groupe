@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 13 — Projet : sécurisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 13</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 13</div>
+  <span class="lbadge">Chapitre 13 / 19 · projet · 🛡️</span>
+  <h1>Projet — la sécurisation</h1>
+  <p class="intro">On sécurise concrètement l'API Fioul Groupé&nbsp;: inscription/connexion, émission de JWT, rôles coordinateur/particulier, et durcissement.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#users">1 · Utilisateurs</a><a href="#auth">2 · Login → JWT</a><a href="#proteger">3 · Protéger</a><a href="#durcir">4 · Durcir</a></div></nav>
+<main class="wrap">
+  <section class="step" id="users">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>La collection utilisateurs</h2>
+    <p class="goal">Un <code>Utilisateur</code> a un email, un mot de passe <b>haché</b> (jamais en clair&nbsp;!) et des rôles.</p>
+<pre><span class="tn">@Document</span>(<span class="ts">"utilisateurs"</span>)
+<span class="tk">public class</span> <span class="tf">Utilisateur</span> {
+  <span class="tn">@Id</span> String id;
+  <span class="tn">@Indexed</span>(unique=<span class="tk">true</span>) String email;
+  String motDePasseHash;
+  List&lt;String&gt; roles;   <span class="tc">// [PARTICULIER] ou [COORDINATEUR]</span>
+}</pre>
+    <div class="hint"><strong>Hachage —</strong> on stocke <code>passwordEncoder.encode(motDePasse)</code> (BCrypt). On ne peut jamais retrouver le mot de passe d'origine.</div>
+  </section>
+  <section class="step" id="auth">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Inscription &amp; connexion</h2>
+    <p class="goal">Deux endpoints publics&nbsp;: <code>register</code> crée l'utilisateur (mot de passe haché)&nbsp;; <code>login</code> vérifie les identifiants et renvoie un JWT.</p>
+<pre>POST /api/auth/register  { email, motDePasse, role }
+POST /api/auth/login     { email, motDePasse }  → { token }</pre>
+  </section>
+  <section class="step" id="proteger">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Protéger les endpoints</h2>
+    <p class="goal">On applique les règles du chapitre 12 au projet&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><code>GET /api/campagnes/**</code> → public.</li>
+      <li><code>POST /api/campagnes</code>, <code>PUT .../cloturer</code> → <code>COORDINATEUR</code>.</li>
+      <li><code>POST .../commandes</code> → tout utilisateur authentifié.</li>
+    </ul>
+  </section>
+  <section class="step" id="durcir">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Durcir (lien Cyber)</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li>Mots de passe hachés (BCrypt), jamais journalisés.</li>
+      <li>JWT à expiration courte&nbsp;; secret de signature en variable d'environnement.</li>
+      <li>Validation des entrées (chapitre 5) contre les injections.</li>
+      <li>HTTPS en production (chapitre 14).</li>
+    </ul>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Implémente <code>register</code>/<code>login</code>, protège les endpoints par rôle, teste avec Swagger (bouton « Authorize » pour coller le JWT). Rédige une courte <b>analyse de risques</b> à joindre au dossier — passerelle directe avec ton cours de cybersécurité.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Mots de passe hachés (BCrypt)&nbsp;; email unique.</li>
+      <li><code>login</code> émet un JWT&nbsp;; endpoints protégés par rôle.</li>
+      <li>Durcissement&nbsp;: expiration, secret en env, validation, HTTPS.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch12.html">← Chapitre 12</a><a class="next" href="spring-ch14.html">Chapitre 14 · Partie Déploiement →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 13 — Projet : sécurisation. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MongoDB — Les 17 chapitres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+.chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:8px}
+.ch{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:16px 18px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);transition:.16s}
+.ch:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow-lift);text-decoration:none}
+.ch .n{flex:0 0 auto;width:40px;height:40px;border-radius:11px;background:var(--accent-wash);color:var(--accent-ink);
+  display:grid;place-items:center;font-family:"Fraunces";font-weight:600;font-size:1.05rem}
+.ch h3{font-family:"Instrument Sans";font-weight:700;font-size:1rem;margin:0 0 3px}
+.ch p{font-size:.85rem;color:var(--muted);margin:0}
+.ch.soon{opacity:.6;pointer-events:none}
+.ch.soon .n{background:var(--surface-2);color:var(--muted)}
+.ch .badge-soon{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 7px;margin-top:5px;display:inline-block}
+.legend{font-size:.85rem;color:var(--muted);margin-top:20px}
+</style>
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB — les 17 chapitres</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html" class="on">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › MongoDB › Chapitres</div>
+    <span class="lbadge">🍃 Cours complet — 17 chapitres</span>
+    <h1>MongoDB — le cours par chapitres</h1>
+    <p class="intro">Le cours détaillé, chapitre par chapitre&nbsp;: de la découverte du modèle documents jusqu'aux agrégations, aux index et à l'hébergement sur Atlas. Chaque chapitre se termine par un encart <strong>« sur le projet Fioul Groupé »</strong> qui applique la notion au fil rouge.</p>
+  </div>
+</section>
+
+<main class="wrap" style="padding-block:44px">
+  <div class="chgrid">
+
+    <a class="ch" href="mongo-ch01.html"><span class="n">01</span><div><h3>Introduction à MongoDB</h3><p>SQL vs NoSQL, documents, collections, BSON, écosystème.</p></div></a>
+    <a class="ch" href="mongo-ch02.html"><span class="n">02</span><div><h3>Shell mongo, Compass &amp; VS Code</h3><p>mongosh, connexion, Compass, import/export.</p></div></a>
+    <a class="ch" href="mongo-ch03.html"><span class="n">03</span><div><h3>Les méthodes CRUD</h3><p>insert, find, update, delete, ObjectId.</p></div></a>
+    <a class="ch" href="mongo-ch04.html"><span class="n">04</span><div><h3>Les opérateurs de recherche</h3><p>comparaison, logiques, éléments, évaluation.</p></div></a>
+    <a class="ch" href="mongo-ch05.html"><span class="n">05</span><div><h3>Les opérateurs de tableaux</h3><p>$all, $elemMatch, $size, $push, $pull, $addToSet.</p></div></a>
+
+    <a class="ch" href="mongo-ch06.html"><span class="n">06</span><div><h3>Les opérateurs de mise à jour</h3><p>$set, $unset, $inc, $mul, $min/$max, $rename, $currentDate.</p></div></a>
+    <a class="ch" href="mongo-ch07.html"><span class="n">07</span><div><h3>Les projections</h3><p>inclusion/exclusion, _id, $slice, $elemMatch.</p></div></a>
+    <a class="ch" href="mongo-ch08.html"><span class="n">08</span><div><h3>Modéliser une base</h3><p>1‑1, 1‑N, N‑N, embarquer vs référencer.</p></div></a>
+    <a class="ch" href="mongo-ch09.html"><span class="n">09</span><div><h3>Curseur &amp; exercices</h3><p>sort, limit, skip, count, distinct.</p></div></a>
+    <a class="ch" href="mongo-ch10.html"><span class="n">10</span><div><h3>Validation des schémas</h3><p>$jsonSchema, required, enum, validationLevel.</p></div></a>
+    <a class="ch" href="mongo-ch11.html"><span class="n">11</span><div><h3>Les index</h3><p>explain, composés (ESR), unique, TTL, partiels.</p></div></a>
+    <a class="ch" href="mongo-ch12.html"><span class="n">12</span><div><h3>Recherches textuelles</h3><p>index texte, $text, $search, score.</p></div></a>
+    <a class="ch" href="mongo-ch13.html"><span class="n">13</span><div><h3>Recherches géospatiales</h3><p>GeoJSON, 2dsphere, $near, $geoWithin.</p></div></a>
+    <a class="ch" href="mongo-ch14.html"><span class="n">14</span><div><h3>Les agrégations</h3><p>pipeline, $match, $group, $unwind, $lookup, $project.</p></div></a>
+    <a class="ch" href="mongo-ch15.html"><span class="n">15</span><div><h3>Exemples d'agrégations</h3><p>volume, palier de prix, top zones, $bucket.</p></div></a>
+    <a class="ch" href="mongo-ch16.html"><span class="n">16</span><div><h3>Les types de nombre</h3><p>double, int, long, decimal128 (l'argent).</p></div></a>
+    <a class="ch" href="mongo-ch17.html"><span class="n">17</span><div><h3>Présentation d'Atlas</h3><p>DBaaS, cluster M0, accès, connexion, secrets.</p></div></a>
+
+  </div>
+  <p class="legend">✅ Les 17 chapitres du parcours MongoDB sont rédigés et disponibles.</p>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Cours MongoDB par chapitres — plateforme SIO WEB. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

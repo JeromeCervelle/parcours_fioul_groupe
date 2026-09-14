@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 11 — Dialog, SnackBar, Drawer & Tabs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 11</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 11</div>
+  <span class="lbadge">Chapitre 11 / 19</span>
+  <h1>Dialog, SnackBar, Drawer &amp; Tabs</h1>
+  <p class="intro">Les retours à l'utilisateur et la navigation secondaire&nbsp;: boîtes de dialogue, messages éphémères, menu latéral et onglets.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#dialog">1 · Dialog</a><a href="#snackbar">2 · SnackBar</a><a href="#drawer">3 · Drawer</a><a href="#tabs">4 · Tabs</a></div></nav>
+<main class="wrap">
+  <section class="step" id="dialog">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les boîtes de dialogue</h2>
+    <p class="goal"><code>showDialog</code> ouvre une fenêtre modale (ex. <code>AlertDialog</code>) — pour confirmer une action.</p>
+<pre>showDialog(context: context, builder: (_) =&gt; AlertDialog(
+  title: <span class="tk">const</span> Text(<span class="ts">'Confirmer'</span>),
+  content: <span class="tk">const</span> Text(<span class="ts">'Rejoindre cette campagne ?'</span>),
+  actions: [ TextButton(onPressed: () =&gt; Navigator.pop(context, <span class="tk">true</span>),
+                        child: <span class="tk">const</span> Text(<span class="ts">'Oui'</span>)) ],
+));</pre>
+  </section>
+  <section class="step" id="snackbar">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>SnackBar : messages éphémères</h2>
+    <p class="goal">Un message court en bas de l'écran — parfait pour confirmer un succès ou signaler une erreur.</p>
+<pre>ScaffoldMessenger.of(context).showSnackBar(
+  <span class="tk">const</span> SnackBar(content: Text(<span class="ts">'Inscription enregistrée !'</span>)),
+);</pre>
+  </section>
+  <section class="step" id="drawer">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Le Drawer (menu latéral)</h2>
+    <p class="goal">Le <code>drawer</code> du <code>Scaffold</code> ouvre un panneau latéral (menu) via l'icône hamburger.</p>
+  </section>
+  <section class="step" id="tabs">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Les onglets (Tabs)</h2>
+    <p class="goal"><code>TabBar</code> + <code>TabBarView</code> (avec un <code>DefaultTabController</code>) organisent le contenu en onglets — par ex. « Ouvertes » / « Clôturées ».</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Demande confirmation avant de rejoindre une campagne (<code>showDialog</code>), affiche un <code>SnackBar</code> de succès ou l'erreur renvoyée par l'API, et sépare les campagnes « ouvertes » / « clôturées » en onglets.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>showDialog</code> (modale de confirmation), <code>SnackBar</code> (message éphémère).</li>
+      <li><code>drawer</code> du Scaffold pour le menu latéral.</li>
+      <li><code>TabBar</code>/<code>TabBarView</code> pour les onglets.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch10.html">← Chapitre 10</a><a class="next" href="flutter-ch12.html">Chapitre 12 · Provider &amp; état →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 11 — Dialog, SnackBar, Drawer &amp; Tabs. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

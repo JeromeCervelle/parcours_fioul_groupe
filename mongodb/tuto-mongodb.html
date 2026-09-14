@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MongoDB — Les bases (cours FR)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+/* petits ajouts propres au cours (blocs Syntaxe / Exemple / Résultat) */
+.res-out{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--t-mongo);
+  border-radius:10px;padding:12px 15px;margin:12px 0;font-family:"JetBrains Mono";font-size:.8rem;color:var(--ink-soft);overflow-x:auto;line-height:1.5;white-space:pre-wrap}
+.try{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:600;color:var(--t-mongo);
+  background:var(--t-mongo-wash);border-radius:8px;padding:5px 11px;margin-top:6px}
+.mini-toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-top:26px}
+.mini-toc strong{display:block;font-family:"Instrument Sans";font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mini-toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+@media(max-width:600px){.mini-toc ol{columns:1}}
+.mini-toc li{margin:5px 0;font-size:.92rem}
+</style>
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Cours — MongoDB, les bases (FR)</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="tuto-mongodb.html" class="on">Cours MongoDB</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+      <a href="../springboot/parcours-api-spring.html">API Spring</a>
+      <a href="../flutter/parcours-flutter.html">Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Cours MongoDB — les bases</div>
+    <span class="lbadge">🍃 Cours de base — en français</span>
+    <h1>MongoDB, les bases</h1>
+    <p class="intro">Un cours court et progressif pour démarrer avec MongoDB, dans l'esprit des tutoriels simples&nbsp;: une notion par section, la <strong>syntaxe</strong>, un <strong>exemple</strong> et son <strong>résultat</strong>. Tous les exemples s'exécutent dans <code>mongosh</code> (le shell MongoDB) et utilisent une petite base <code>boutique</code>.</p>
+    <div class="mini-toc">
+      <strong>Sommaire</strong>
+      <ol>
+        <li><a href="#intro">Qu'est-ce que MongoDB&nbsp;?</a></li>
+        <li><a href="#demarrer">Démarrer avec mongosh</a></li>
+        <li><a href="#base">Créer / utiliser une base</a></li>
+        <li><a href="#inserer">Insérer des documents</a></li>
+        <li><a href="#find">Rechercher (find)</a></li>
+        <li><a href="#filtrer">Filtrer avec des opérateurs</a></li>
+        <li><a href="#projection">Choisir les champs</a></li>
+        <li><a href="#trier">Trier</a></li>
+        <li><a href="#limiter">Limiter les résultats</a></li>
+        <li><a href="#update">Mettre à jour</a></li>
+        <li><a href="#supprimer">Supprimer</a></li>
+        <li><a href="#agreger">Agréger</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#intro">Intro</a>
+    <a href="#demarrer">mongosh</a>
+    <a href="#base">Base</a>
+    <a href="#inserer">Insérer</a>
+    <a href="#find">Rechercher</a>
+    <a href="#filtrer">Filtrer</a>
+    <a href="#projection">Champs</a>
+    <a href="#trier">Trier</a>
+    <a href="#limiter">Limiter</a>
+    <a href="#update">Mettre à jour</a>
+    <a href="#supprimer">Supprimer</a>
+    <a href="#agreger">Agréger</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="step" id="intro">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce que MongoDB&nbsp;?</h2>
+    <p class="goal">MongoDB est une base de données <b>NoSQL orientée documents</b>. Au lieu de tables et de lignes (comme en SQL), on stocke des <b>documents</b> au format proche du JSON, regroupés dans des <b>collections</b>.</p>
+    <p style="color:var(--ink-soft);margin-top:12px">Le vocabulaire, comparé au monde SQL&nbsp;:</p>
+    <table class="maptab">
+      <thead><tr><th>SQL (relationnel)</th><th>MongoDB</th></tr></thead>
+      <tbody>
+        <tr><td>Base de données</td><td>Base de données</td></tr>
+        <tr><td>Table</td><td>Collection</td></tr>
+        <tr><td>Ligne (enregistrement)</td><td>Document</td></tr>
+        <tr><td>Colonne</td><td>Champ</td></tr>
+      </tbody>
+    </table>
+    <p class="term-cap">Un document ressemble à ceci</p>
+<pre>{
+  <span class="ts">"_id"</span>: ObjectId(<span class="ts">"652f..."</span>),   <span class="tc">// clé unique, générée automatiquement</span>
+  <span class="ts">"nom"</span>: <span class="ts">"Dupont"</span>,
+  <span class="ts">"ville"</span>: <span class="ts">"Limoges"</span>,
+  <span class="ts">"points"</span>: <span class="tn">120</span>
+}</pre>
+    <div class="hint"><strong>À retenir —</strong> chaque document possède un champ <code>_id</code> unique. Si tu ne le fournis pas, MongoDB en crée un automatiquement (un <code>ObjectId</code>). Les documents d'une même collection n'ont pas besoin d'avoir exactement les mêmes champs&nbsp;: c'est la souplesse du NoSQL.</div>
+  </section>
+
+  <!-- DEMARRER -->
+  <section class="step" id="demarrer">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Démarrer avec mongosh</h2>
+    <p class="goal"><code>mongosh</code> est le <b>shell</b> de MongoDB&nbsp;: une console qui permet de taper des commandes directement. On peut aussi utiliser <b>MongoDB Compass</b> (interface graphique) ou l'extension VS Code, mais le shell est le plus direct pour apprendre.</p>
+    <p class="term-cap">Se connecter au serveur local</p>
+<pre>mongosh</pre>
+    <p class="term-cap">Quelques commandes utiles</p>
+<pre>show dbs           <span class="tc">// lister les bases existantes</span>
+db                 <span class="tc">// afficher la base courante</span>
+show collections   <span class="tc">// lister les collections de la base courante</span></pre>
+    <div class="tip"><strong>Astuce —</strong> tu peux tout faire depuis Compass en cliquant, mais taper les commandes dans <code>mongosh</code> aide à comprendre ce qui se passe réellement.</div>
+  </section>
+
+  <!-- BASE -->
+  <section class="step" id="base">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Créer / utiliser une base</h2>
+    <p class="goal">La commande <code>use</code> sélectionne une base — et la <b>crée</b> si elle n'existe pas encore. En réalité, la base n'apparaît vraiment qu'au premier document inséré.</p>
+    <p class="term-cap">Syntaxe</p>
+<pre>use nomDeLaBase</pre>
+    <p class="term-cap">Exemple</p>
+<pre>use boutique</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">switched to db boutique</div>
+    <div class="hint"><strong>Note —</strong> tant qu'aucun document n'y est inséré, <code>show dbs</code> n'affichera pas encore <code>boutique</code>. C'est normal.</div>
+  </section>
+
+  <!-- INSERER -->
+  <section class="step" id="inserer">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Insérer des documents</h2>
+    <p class="goal">On ajoute des documents dans une collection avec <code>insertOne()</code> (un document) ou <code>insertMany()</code> (plusieurs). La collection est créée automatiquement au premier insert.</p>
+    <p class="term-cap">Syntaxe</p>
+<pre>db.collection.insertOne({ champ: valeur, ... })
+db.collection.insertMany([ { ... }, { ... } ])</pre>
+    <p class="term-cap">Exemple — un client</p>
+<pre>db.clients.insertOne({
+  nom: <span class="ts">"Dupont"</span>,
+  ville: <span class="ts">"Limoges"</span>,
+  points: <span class="tn">120</span>
+})</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{
+  acknowledged: true,
+  insertedId: ObjectId("652f1a...")
+}</div>
+    <p class="term-cap">Exemple — plusieurs clients d'un coup</p>
+<pre>db.clients.insertMany([
+  { nom: <span class="ts">"Martin"</span>, ville: <span class="ts">"Limoges"</span>, points: <span class="tn">80</span> },
+  { nom: <span class="ts">"Nguyen"</span>, ville: <span class="ts">"Brive"</span>,   points: <span class="tn">200</span> },
+  { nom: <span class="ts">"Petit"</span>,  ville: <span class="ts">"Limoges"</span>, points: <span class="tn">50</span> }
+])</pre>
+    <div class="hint"><strong>À retenir —</strong> pas besoin de définir un schéma au préalable, contrairement au SQL. On insère directement le document.</div>
+  </section>
+
+  <!-- FIND -->
+  <section class="step" id="find">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Rechercher des documents (find)</h2>
+    <p class="goal"><code>find()</code> renvoie tous les documents qui correspondent à un filtre. Sans filtre, elle renvoie <b>tout</b>. <code>findOne()</code> renvoie seulement le premier résultat.</p>
+    <p class="term-cap">Syntaxe</p>
+<pre>db.collection.find(filtre)
+db.collection.findOne(filtre)</pre>
+    <p class="term-cap">Exemple — tous les clients</p>
+<pre>db.clients.find()</pre>
+    <p class="term-cap">Exemple — les clients de Limoges</p>
+<pre>db.clients.find({ ville: <span class="ts">"Limoges"</span> })</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: ObjectId("..."), nom: "Dupont", ville: "Limoges", points: 120 }
+{ _id: ObjectId("..."), nom: "Martin", ville: "Limoges", points: 80 }
+{ _id: ObjectId("..."), nom: "Petit",  ville: "Limoges", points: 50 }</div>
+    <div class="tip"><strong>Astuce lisibilité —</strong> ajoute <code>.pretty()</code> pour un affichage indenté&nbsp;: <code>db.clients.find().pretty()</code>.</div>
+  </section>
+
+  <!-- FILTRER -->
+  <section class="step" id="filtrer">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Filtrer avec des opérateurs</h2>
+    <p class="goal">Un filtre peut aller plus loin que l'égalité, grâce aux <b>opérateurs de comparaison</b> (préfixés par <code>$</code>) et aux opérateurs logiques.</p>
+    <p class="term-cap">Principaux opérateurs</p>
+<pre><span class="ts">$gt</span>  <span class="tc">// supérieur à        $gte // supérieur ou égal</span>
+<span class="ts">$lt</span>  <span class="tc">// inférieur à        $lte // inférieur ou égal</span>
+<span class="ts">$ne</span>  <span class="tc">// différent de       $in  // dans une liste</span></pre>
+    <p class="term-cap">Exemple — clients avec plus de 100 points</p>
+<pre>db.clients.find({ points: { <span class="ts">$gt</span>: <span class="tn">100</span> } })</pre>
+    <p class="term-cap">Exemple — clients de Limoges OU de Brive</p>
+<pre>db.clients.find({ ville: { <span class="ts">$in</span>: [<span class="ts">"Limoges"</span>, <span class="ts">"Brive"</span>] } })</pre>
+    <p class="term-cap">Exemple — combiner deux conditions (ET implicite)</p>
+<pre>db.clients.find({ ville: <span class="ts">"Limoges"</span>, points: { <span class="ts">$gte</span>: <span class="tn">80</span> } })</pre>
+    <p class="term-cap">Exemple — un OU explicite</p>
+<pre>db.clients.find({ <span class="ts">$or</span>: [
+  { ville: <span class="ts">"Brive"</span> },
+  { points: { <span class="ts">$gt</span>: <span class="tn">150</span> } }
+] })</pre>
+    <div class="hint"><strong>À retenir —</strong> plusieurs champs dans le même objet = un <b>ET</b>. Pour un <b>OU</b>, on utilise <code>$or</code> avec un tableau de conditions.</div>
+  </section>
+
+  <!-- PROJECTION -->
+  <section class="step" id="projection">
+    <span class="snum"><span class="dotnum">7</span> Notion</span>
+    <h2>Choisir les champs (projection)</h2>
+    <p class="goal">Le second argument de <code>find()</code> indique quels champs afficher&nbsp;: <code>1</code> pour inclure, <code>0</code> pour exclure. C'est la <b>projection</b>.</p>
+    <p class="term-cap">Exemple — n'afficher que le nom et les points</p>
+<pre>db.clients.find(
+  { },                              <span class="tc">// pas de filtre : tous</span>
+  { nom: <span class="tn">1</span>, points: <span class="tn">1</span>, _id: <span class="tn">0</span> }   <span class="tc">// projection</span>
+)</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ nom: "Dupont", points: 120 }
+{ nom: "Martin", points: 80 }
+{ nom: "Nguyen", points: 200 }
+{ nom: "Petit",  points: 50 }</div>
+    <div class="hint"><strong>Note —</strong> le champ <code>_id</code> est affiché par défaut&nbsp;; on l'exclut explicitement avec <code>_id: 0</code>. On ne mélange pas inclusion et exclusion (sauf pour <code>_id</code>).</div>
+  </section>
+
+  <!-- TRIER -->
+  <section class="step" id="trier">
+    <span class="snum"><span class="dotnum">8</span> Notion</span>
+    <h2>Trier les résultats (sort)</h2>
+    <p class="goal"><code>sort()</code> ordonne les résultats&nbsp;: <code>1</code> pour croissant, <code>-1</code> pour décroissant.</p>
+    <p class="term-cap">Exemple — clients du plus au moins de points</p>
+<pre>db.clients.find().sort({ points: <span class="tn">-1</span> })</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ nom: "Nguyen", points: 200, ... }
+{ nom: "Dupont", points: 120, ... }
+{ nom: "Martin", points: 80, ... }
+{ nom: "Petit",  points: 50, ... }</div>
+  </section>
+
+  <!-- LIMITER -->
+  <section class="step" id="limiter">
+    <span class="snum"><span class="dotnum">9</span> Notion</span>
+    <h2>Limiter les résultats (limit / skip)</h2>
+    <p class="goal"><code>limit()</code> restreint le nombre de documents renvoyés&nbsp;; <code>skip()</code> en saute un certain nombre. On les combine souvent avec <code>sort()</code> — par exemple pour un « top&nbsp;3 » ou de la pagination.</p>
+    <p class="term-cap">Exemple — les 2 meilleurs clients</p>
+<pre>db.clients.find().sort({ points: <span class="tn">-1</span> }).limit(<span class="tn">2</span>)</pre>
+    <p class="term-cap">Exemple — pagination (page 2, 2 par page)</p>
+<pre>db.clients.find().skip(<span class="tn">2</span>).limit(<span class="tn">2</span>)</pre>
+    <div class="tip"><strong>Ordre d'écriture —</strong> peu importe l'ordre de <code>sort</code>, <code>skip</code>, <code>limit</code> dans la ligne&nbsp;: MongoDB applique toujours tri → skip → limit.</div>
+  </section>
+
+  <!-- UPDATE -->
+  <section class="step" id="update">
+    <span class="snum"><span class="dotnum">10</span> Notion</span>
+    <h2>Mettre à jour (update)</h2>
+    <p class="goal"><code>updateOne()</code> modifie le premier document correspondant, <code>updateMany()</code> tous. L'opérateur <code>$set</code> modifie ou ajoute un champ, <code>$inc</code> incrémente une valeur.</p>
+    <p class="term-cap">Syntaxe</p>
+<pre>db.collection.updateOne(filtre, { <span class="ts">$set</span>: { champ: valeur } })</pre>
+    <p class="term-cap">Exemple — changer la ville de Dupont</p>
+<pre>db.clients.updateOne(
+  { nom: <span class="ts">"Dupont"</span> },
+  { <span class="ts">$set</span>: { ville: <span class="ts">"Tulle"</span> } }
+)</pre>
+    <p class="term-cap">Exemple — ajouter 10 points à tous les clients de Limoges</p>
+<pre>db.clients.updateMany(
+  { ville: <span class="ts">"Limoges"</span> },
+  { <span class="ts">$inc</span>: { points: <span class="tn">10</span> } }
+)</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ acknowledged: true, matchedCount: 2, modifiedCount: 2 }</div>
+    <div class="warn"><strong>Attention —</strong> sans opérateur <code>$set</code>, tu <em>remplaces</em> tout le document par ce que tu passes&nbsp;! Utilise toujours <code>$set</code> pour ne modifier que certains champs.</div>
+  </section>
+
+  <!-- SUPPRIMER -->
+  <section class="step" id="supprimer">
+    <span class="snum"><span class="dotnum">11</span> Notion</span>
+    <h2>Supprimer (delete / drop)</h2>
+    <p class="goal"><code>deleteOne()</code> supprime le premier document correspondant, <code>deleteMany()</code> tous. <code>drop()</code> supprime la collection entière.</p>
+    <p class="term-cap">Exemple — supprimer un client</p>
+<pre>db.clients.deleteOne({ nom: <span class="ts">"Petit"</span> })</pre>
+    <p class="term-cap">Exemple — supprimer tous les clients de Brive</p>
+<pre>db.clients.deleteMany({ ville: <span class="ts">"Brive"</span> })</pre>
+    <p class="term-cap">Exemple — supprimer toute la collection</p>
+<pre>db.clients.drop()</pre>
+    <div class="warn"><strong>Irréversible —</strong> <code>deleteMany({})</code> avec un filtre vide supprime <b>tous</b> les documents. À manipuler avec prudence.</div>
+  </section>
+
+  <!-- AGREGER -->
+  <section class="step" id="agreger">
+    <span class="snum"><span class="dotnum">12</span> Notion</span>
+    <h2>Agréger (aggregate)</h2>
+    <p class="goal">L'agrégation calcule des résultats à partir de plusieurs documents, via un <b>pipeline</b> d'étapes&nbsp;: <code>$match</code> (filtrer), <code>$group</code> (regrouper), <code>$sort</code> (trier)… C'est l'équivalent puissant du <code>GROUP BY</code> du SQL.</p>
+    <p class="term-cap">Exemple — total de points par ville</p>
+<pre>db.clients.aggregate([
+  { <span class="ts">$group</span>: {
+      _id: <span class="ts">"$ville"</span>,               <span class="tc">// on regroupe par ville</span>
+      totalPoints: { <span class="ts">$sum</span>: <span class="ts">"$points"</span> },
+      nbClients:   { <span class="ts">$sum</span>: <span class="tn">1</span> }
+  }},
+  { <span class="ts">$sort</span>: { totalPoints: <span class="tn">-1</span> } }
+])</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: "Limoges", totalPoints: 260, nbClients: 3 }
+{ _id: "Brive",   totalPoints: 200, nbClients: 1 }</div>
+    <div class="hint"><strong>Le lien avec le projet —</strong> c'est exactement ce mécanisme qui, dans Fioul Groupé, calcule le <b>volume total par campagne</b> (avec <code>$sum</code>) pour déterminer le palier de prix. Voir le <a href="parcours-mongodb.html#e6">guide pas à pas, étape 6</a>.</div>
+  </section>
+
+  <div class="pager">
+    <a href="../index.html">← Retour au portail</a>
+    <a class="next" href="parcours-mongodb.html">Passer à la pratique&nbsp;: le guide pas à pas →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Cours MongoDB de base, en français — rédigé pour la plateforme SIO WEB. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

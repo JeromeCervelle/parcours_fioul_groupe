@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 05 — Partie Web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 05</small></span></a>
+  <nav class="nav" id="nav">
+    <a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a>
+  </nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button>
+  <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 05</div>
+  <span class="lbadge">Chapitre 05 / 19</span>
+  <h1>Spring Boot — la partie Web</h1>
+  <p class="intro">La couche qui expose l'API&nbsp;: contrôleurs REST, verbes HTTP, paramètres, codes de statut, et gestion propre des erreurs.</p>
+</div></section>
+
+<nav class="stepnav" id="stepnav"><div class="wrap">
+  <a href="#rest">1 · REST &amp; verbes</a>
+  <a href="#params">2 · Paramètres</a>
+  <a href="#statuts">3 · Codes de statut</a>
+  <a href="#erreurs">4 · Gestion des erreurs</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="step" id="rest">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Contrôleurs REST &amp; verbes HTTP</h2>
+    <p class="goal"><code>@RestController</code> + <code>@RequestMapping</code> définissent un contrôleur et son URL de base. Chaque verbe a son annotation.</p>
+<pre><span class="tn">@RestController</span>
+<span class="tn">@RequestMapping</span>(<span class="ts">"/api/campagnes"</span>)
+<span class="tk">public class</span> <span class="tf">CampagneController</span> {
+    <span class="tn">@GetMapping</span>            <span class="tc">// lire</span>
+    <span class="tn">@PostMapping</span>           <span class="tc">// créer</span>
+    <span class="tn">@PutMapping</span>(<span class="ts">"/{id}"</span>)   <span class="tc">// modifier</span>
+    <span class="tn">@DeleteMapping</span>(<span class="ts">"/{id}"</span>)<span class="tc">// supprimer</span>
+}</pre>
+  </section>
+  <section class="step" id="params">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Recevoir des paramètres</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><code>@PathVariable</code> — dans le chemin (<code>/campagnes/{id}</code>).</li>
+      <li><code>@RequestParam</code> — après le <code>?</code> (<code>?zone=Ladignac</code>).</li>
+      <li><code>@RequestBody</code> — le corps JSON d'un POST/PUT.</li>
+    </ul>
+<pre><span class="tn">@GetMapping</span>
+<span class="tk">public</span> List&lt;CampagneDTO&gt; lister(<span class="tn">@RequestParam</span>(required=<span class="tk">false</span>) String zone) { ... }</pre>
+  </section>
+  <section class="step" id="statuts">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Les codes de statut HTTP</h2>
+    <p class="goal">Une bonne API renvoie le bon code&nbsp;: <b>200</b> OK, <b>201</b> Created, <b>204</b> No Content, <b>400</b> requête invalide, <b>404</b> non trouvé, <b>409</b> conflit. On utilise <code>ResponseEntity</code> pour les maîtriser.</p>
+<pre><span class="tk">return</span> ResponseEntity.status(HttpStatus.CREATED).body(dto);</pre>
+  </section>
+  <section class="step" id="erreurs">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Gérer les erreurs proprement</h2>
+    <p class="goal">Un <code>@RestControllerAdvice</code> centralise la transformation des exceptions en réponses HTTP lisibles.</p>
+<pre><span class="tn">@RestControllerAdvice</span>
+<span class="tk">public class</span> <span class="tf">GestionErreurs</span> {
+    <span class="tn">@ExceptionHandler</span>(CampagneIntrouvable.<span class="tk">class</span>)
+    <span class="tn">@ResponseStatus</span>(HttpStatus.NOT_FOUND)
+    <span class="tk">public</span> Map&lt;String,String&gt; introuvable(CampagneIntrouvable e) {
+        <span class="tk">return</span> Map.of(<span class="ts">"erreur"</span>, e.getMessage());
+    }
+}</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Conçois le contrat de l'API&nbsp;: URLs, verbes, codes attendus (201 à la création d'une commande, 409 si la campagne est clôturée, 404 si l'id n'existe pas). C'est le jalon « couche Web » du chapitre 6.</p></div>
+    <div class="recap"><strong>À retenir</strong>
+      <ul><li>Un verbe HTTP = une annotation (<code>@GetMapping</code>…).</li>
+      <li>Paramètres&nbsp;: <code>@PathVariable</code>, <code>@RequestParam</code>, <code>@RequestBody</code>.</li>
+      <li>Bons codes de statut&nbsp;; erreurs centralisées avec <code>@RestControllerAdvice</code>.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch04.html">← Chapitre 04</a><a class="next" href="spring-ch06.html">Chapitre 06 · Projet — couche Web →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 05 — Partie Web. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

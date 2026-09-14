@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 04 — Projet fil rouge : mise en place</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 04</small></span></a>
+  <nav class="nav" id="nav">
+    <a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a>
+  </nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button>
+  <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 04</div>
+  <span class="lbadge">Chapitre 04 / 19 · projet</span>
+  <h1>Projet fil rouge — mise en place</h1>
+  <p class="intro">Premier chapitre « pratique » du fil rouge. On cadre l'API Fioul Groupé, on ajoute les dépendances utiles, un premier test d'intégration, et Swagger pour explorer l'API.</p>
+</div></section>
+
+<nav class="stepnav" id="stepnav"><div class="wrap">
+  <a href="#cible">1 · L'API cible</a>
+  <a href="#deps">2 · Dépendances</a>
+  <a href="#test">3 · Premier test</a>
+  <a href="#swagger">4 · Swagger</a>
+</div></nav>
+
+<main class="wrap">
+  <section class="step" id="cible">
+    <span class="snum"><span class="dotnum">1</span> Cadrage</span>
+    <h2>L'API Fioul Groupé</h2>
+    <p class="goal">On vise une API REST au-dessus de la base MongoDB, avec le CRUD des campagnes et l'inscription des particuliers.</p>
+<pre>GET    /api/campagnes            <span class="tc">// lister (filtre ?zone=)</span>
+GET    /api/campagnes/{id}       <span class="tc">// détail (volume + prix calculés)</span>
+POST   /api/campagnes            <span class="tc">// ouvrir            [COORDINATEUR]</span>
+POST   /api/campagnes/{id}/commandes  <span class="tc">// rejoindre    [PARTICULIER]</span>
+PUT    /api/campagnes/{id}/cloturer   <span class="tc">// clôturer    [COORDINATEUR]</span></pre>
+  </section>
+  <section class="step" id="deps">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Les dépendances du projet</h2>
+    <p class="goal">On ajoute au <code>pom.xml</code>&nbsp;: <b>Spring Web</b>, <b>Spring Data MongoDB</b>, <b>Validation</b>, et <b>springdoc-openapi</b> (Swagger). Plus tard&nbsp;: Spring Security (chapitre 12).</p>
+    <div class="hint"><strong>Mises à jour —</strong> on part sur des versions à jour du <code>spring-boot-starter-parent</code> pour écarter d'éventuelles dépendances vulnérables (bon réflexe, à relier au cours Cyber).</div>
+  </section>
+  <section class="step" id="test">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Le test de contexte</h2>
+    <p class="goal">Spring Boot génère un premier test qui vérifie que le contexte démarre. C'est le socle des tests d'intégration.</p>
+<pre><span class="tn">@SpringBootTest</span>
+<span class="tk">class</span> <span class="tf">FioulApiApplicationTests</span> {
+    <span class="tn">@Test</span> <span class="tk">void</span> contextLoads() { }
+}</pre>
+  </section>
+  <section class="step" id="swagger">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Swagger UI pour explorer</h2>
+    <p class="goal">La dépendance <code>springdoc-openapi</code> déploie sans configuration une interface de test.</p>
+    <div class="res-out">Swagger UI : http://localhost:8080/swagger-ui/index.html
+OpenAPI    : http://localhost:8080/v3/api-docs</div>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Cadre l'API dans une issue GitHub, ajoute les dépendances, vérifie le test de contexte au vert et Swagger accessible. Le projet est prêt à recevoir ses couches (Web, Services, Data) dans les chapitres suivants.</p></div>
+    <div class="recap"><strong>À retenir</strong>
+      <ul><li>On définit d'abord les endpoints cibles.</li>
+      <li>Dépendances&nbsp;: Web, Data MongoDB, Validation, springdoc.</li>
+      <li><code>@SpringBootTest</code> = test d'intégration&nbsp;; Swagger pour explorer.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch03.html">← Chapitre 03</a><a class="next" href="spring-ch05.html">Chapitre 05 · Partie Web →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 04 — Projet : mise en place. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

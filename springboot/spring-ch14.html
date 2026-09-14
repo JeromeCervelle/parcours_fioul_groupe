@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 14 — Partie Déploiement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 14</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 14</div>
+  <span class="lbadge">Chapitre 14 / 19</span>
+  <h1>Spring Boot — le déploiement</h1>
+  <p class="intro">Passer du « ça tourne sur ma machine » à une application livrable&nbsp;: construire un jar exécutable, gérer les environnements, et conteneuriser avec Docker.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#jar">1 · Le jar</a><a href="#env">2 · Environnements</a><a href="#docker">3 · Docker</a><a href="#ou">4 · Où déployer</a></div></nav>
+<main class="wrap">
+  <section class="step" id="jar">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Construire un jar exécutable</h2>
+    <p class="goal">Maven produit un <b>fat jar</b> contenant l'appli + le serveur Tomcat. On le lance avec <code>java -jar</code>.</p>
+<pre>mvn clean package        <span class="tc"># → target/fioul-api-1.0.0.jar</span>
+java -jar target/fioul-api-1.0.0.jar</pre>
+  </section>
+  <section class="step" id="env">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Configurer par l'environnement</h2>
+    <p class="goal">On ne recompile pas entre dev et prod&nbsp;: on injecte la configuration par <b>variables d'environnement</b> (12-factor). Le secret MongoDB Atlas passe ainsi, jamais dans le jar.</p>
+<pre>export MONGODB_URI="mongodb+srv://user:***@cluster.mongodb.net/fioul"
+export SPRING_PROFILES_ACTIVE=prod
+java -jar fioul-api.jar</pre>
+  </section>
+  <section class="step" id="docker">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Conteneuriser avec Docker</h2>
+    <p class="goal">Un <code>Dockerfile</code> multi-stage compile puis n'emporte que le jar dans une image légère.</p>
+<pre><span class="tc"># build</span>
+FROM maven:3-eclipse-temurin-21 AS build
+COPY . .
+RUN mvn -B clean package -DskipTests
+<span class="tc"># run</span>
+FROM eclipse-temurin:21-jre
+COPY --from=build /target/fioul-api-*.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]</pre>
+  </section>
+  <section class="step" id="ou">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Où déployer&nbsp;?</h2>
+    <p class="goal">Le conteneur peut tourner sur une VM, une plateforme cloud (Railway, Render, Azure, AWS…), ou un serveur de l'établissement. La base, elle, est sur Atlas.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris le <code>Dockerfile</code>, construis l'image, lance le conteneur en lui passant <code>MONGODB_URI</code> vers Atlas. L'API est alors joignable depuis Internet — prête pour l'appli Flutter. Détails dans le chapitre 15.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>mvn package</code> → fat jar exécutable (<code>java -jar</code>).</li>
+      <li>Config par variables d'environnement (secrets hors du build).</li>
+      <li>Docker multi-stage pour une image légère&nbsp;; base sur Atlas.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch13.html">← Chapitre 13</a><a class="next" href="spring-ch15.html">Chapitre 15 · Packaging &amp; déploiement →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 14 — Déploiement. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

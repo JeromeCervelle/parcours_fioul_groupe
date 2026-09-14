@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 12 — Provider & gestion d'état</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 12</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 12</div>
+  <span class="lbadge">Chapitre 12 / 19</span>
+  <h1>Provider &amp; gestion d'état</h1>
+  <p class="intro">Au-delà de setState, comment partager un état entre plusieurs écrans et rafraîchir automatiquement l'UI, avec le paquet Provider.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#pourquoi">1 · Pourquoi</a><a href="#notifier">2 · ChangeNotifier</a><a href="#fournir">3 · Fournir</a><a href="#consommer">4 · Consommer</a></div></nav>
+<main class="wrap">
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Pourquoi une gestion d'état&nbsp;?</h2>
+    <p class="goal"><code>setState</code> ne partage l'état que dans <em>un</em> widget. Dès que plusieurs écrans doivent voir la même donnée (les campagnes, l'utilisateur connecté), on a besoin d'un état <b>partagé</b>. <b>Provider</b> est la solution recommandée pour débuter.</p>
+  </section>
+  <section class="step" id="notifier">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Un ChangeNotifier</h2>
+    <p class="goal">Une classe qui étend <code>ChangeNotifier</code> détient l'état et prévient l'UI via <code>notifyListeners()</code>.</p>
+<pre><span class="tk">class</span> <span class="tf">CampagneProvider</span> <span class="tk">extends</span> ChangeNotifier {
+  List&lt;Campagne&gt; _liste = [];
+  List&lt;Campagne&gt; <span class="tk">get</span> liste =&gt; _liste;
+  Future&lt;<span class="tk">void</span>&gt; charger(String? zone) <span class="tk">async</span> {
+    _liste = <span class="tk">await</span> CampagneService().getOuvertes(zone: zone);
+    notifyListeners();
+  }
+}</pre>
+  </section>
+  <section class="step" id="fournir">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Fournir le provider</h2>
+    <p class="goal">On place le provider au-dessus des écrans concernés (souvent à la racine).</p>
+<pre>ChangeNotifierProvider(
+  create: (_) =&gt; CampagneProvider()..charger(<span class="tk">null</span>),
+  child: <span class="tk">const</span> MonAppli(),
+)</pre>
+  </section>
+  <section class="step" id="consommer">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Consommer l'état</h2>
+    <p class="goal">Dans un écran&nbsp;: <code>context.watch()</code> pour lire et se reconstruire aux changements, <code>context.read()</code> pour appeler une méthode sans écouter.</p>
+<pre><span class="tk">final</span> campagnes = context.watch&lt;CampagneProvider&gt;().liste;
+<span class="tc">// action :</span> context.read&lt;CampagneProvider&gt;().charger(<span class="ts">'Ladignac'</span>);</pre>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Crée <code>CampagneProvider</code> (liste + <code>charger</code> + <code>rejoindre</code>) et un <code>AuthProvider</code> (utilisateur/JWT). Après une inscription, <code>notifyListeners()</code> met à jour la jauge partout — sans recharger tout l'écran.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Provider partage l'état entre écrans.</li>
+      <li><code>ChangeNotifier</code> + <code>notifyListeners()</code> pour publier les changements.</li>
+      <li><code>context.watch</code> (lire+écouter) / <code>context.read</code> (agir).</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch11.html">← Chapitre 11</a><a class="next" href="flutter-ch13.html">Chapitre 13 · Protocole HTTP →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 12 — Provider &amp; gestion d'état. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

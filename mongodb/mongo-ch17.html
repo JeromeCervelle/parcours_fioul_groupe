@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 17 — Présentation d'Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+.done-box{background:linear-gradient(150deg,var(--accent-wash),var(--fioul-wash));border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-top:24px}
+.done-box h3{font-size:1.15rem;margin-bottom:8px}
+.done-box p{color:var(--ink-soft);font-size:.95rem}
+</style>
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 17</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 17</div>
+    <span class="lbadge">Chapitre 17 / 17 · dernier</span>
+    <h1>Présentation d'Atlas</h1>
+    <p class="intro">Jusqu'ici, MongoDB tournait en local. <b>Atlas</b> est le service géré (cloud) de MongoDB&nbsp;: on y héberge sa base, accessible depuis Internet — ce qui permettra à l'API Spring et à l'appli Flutter de s'y connecter, où qu'elles s'exécutent.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#dbaas">1 · Qu'est-ce qu'Atlas</a>
+    <a href="#cluster">2 · Créer un cluster</a>
+    <a href="#securite">3 · Accès &amp; sécurité</a>
+    <a href="#connexion">4 · Se connecter</a>
+    <a href="#outils">5 · Outils intégrés</a>
+    <a href="#bilan">6 · Bilan du parcours</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="dbaas">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Un DBaaS : la base en tant que service</h2>
+    <p class="goal">Atlas est un <b>DBaaS</b> (<i>Database as a Service</i>)&nbsp;: MongoDB installe, sauvegarde, met à jour et surveille la base pour toi, sur le cloud de ton choix (AWS, Azure, GCP). Il existe un palier <b>gratuit</b> (M0), parfait pour un projet pédagogique.</p>
+  </section>
+
+  <section class="step" id="cluster">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Créer un cluster gratuit</h2>
+    <p class="goal">Les grandes étapes, depuis <code>cloud.mongodb.com</code>&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li>Créer un compte, puis un <b>projet</b>.</li>
+      <li>Déployer un cluster <b>M0 (Free)</b>, choisir une région proche (ex. Paris).</li>
+      <li>Attendre quelques minutes le provisionnement.</li>
+    </ul>
+    <div class="hint"><strong>Vocabulaire —</strong> un <b>cluster</b> est le groupe de serveurs qui héberge la base (répliquée pour la disponibilité). En M0, tout cela est transparent.</div>
+  </section>
+
+  <section class="step" id="securite">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Accès &amp; sécurité</h2>
+    <p class="goal">Deux réglages indispensables avant de se connecter&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Database Access</b> — créer un utilisateur (login + mot de passe) avec ses droits.</li>
+      <li><b>Network Access</b> — autoriser les adresses IP qui peuvent se connecter (liste blanche d'IP).</li>
+    </ul>
+    <div class="warn"><strong>Bonne pratique (lien Cyber) —</strong> n'autorise que les IP nécessaires (pas <code>0.0.0.0/0</code> en production), utilise un mot de passe fort, et ne mets <b>jamais</b> l'URI de connexion (qui contient le mot de passe) dans le dépôt Git&nbsp;: passe par un secret / variable d'environnement.</div>
+  </section>
+
+  <section class="step" id="connexion">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>Se connecter à Atlas</h2>
+    <p class="goal">Atlas fournit une <b>URI de connexion</b> (format <code>mongodb+srv://</code>) à utiliser avec mongosh, Compass ou un driver.</p>
+<pre><span class="tc"># avec mongosh</span>
+mongosh <span class="ts">"mongodb+srv://user:motdepasse@cluster0.xxxx.mongodb.net/fioul"</span></pre>
+<pre><span class="tc"># côté Spring (application.properties), via une variable d'environnement</span>
+spring.data.mongodb.uri=${MONGODB_URI}</pre>
+  </section>
+
+  <section class="step" id="outils">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Les outils intégrés</h2>
+    <p class="goal">Atlas ne fait pas qu'héberger&nbsp;; il offre&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Data Explorer</b> — parcourir et éditer les documents dans le navigateur.</li>
+      <li><b>Sauvegardes</b> automatiques et restauration.</li>
+      <li><b>Metrics</b> — surveiller performances et requêtes lentes.</li>
+      <li><b>Atlas Search</b> (recherche avancée, cf. chapitre 12) et bien d'autres.</li>
+    </ul>
+  </section>
+
+  <section class="step" id="bilan">
+    <span class="snum"><span class="dotnum">✓</span> Bilan</span>
+    <h2>Bilan du parcours MongoDB</h2>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Héberge ta base <code>fioul</code> sur un cluster M0, crée un utilisateur applicatif et autorise l'IP de développement. Récupère l'URI et garde-la dans un <b>secret</b> (pas dans Git). À partir de là, l'API Spring (parcours 2) se connectera à cette base, et l'appli Flutter (parcours 3) l'atteindra via l'API — le fil rouge est prêt à devenir une vraie application en ligne.</p>
+    </div>
+    <div class="done-box">
+      <h3>🎉 Parcours MongoDB terminé</h3>
+      <p>Tu as parcouru les 17 chapitres&nbsp;: du modèle documents jusqu'aux agrégations, aux index, à la géolocalisation et à l'hébergement. Tu as toutes les briques pour modéliser et alimenter la base du projet. Étape suivante&nbsp;: exposer ces données via une API avec le <a href="../springboot/parcours-api-spring.html">parcours Spring Boot</a>, ou t'entraîner sur le <a href="parcours-mongodb.html">guide pas à pas</a>.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Atlas = MongoDB hébergé et géré (DBaaS), avec un palier gratuit M0.</li>
+        <li>Avant de se connecter&nbsp;: créer un utilisateur (Database Access) + autoriser les IP (Network Access).</li>
+        <li>URI <code>mongodb+srv://…</code>&nbsp;; jamais de mot de passe dans Git (secret / variable d'env).</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch16.html">← Chapitre 16</a>
+    <a class="next" href="mongodb-chapitres.html">Retour au sommaire →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 17 — Présentation d'Atlas. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

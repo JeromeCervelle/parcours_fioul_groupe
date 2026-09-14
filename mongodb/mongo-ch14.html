@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 14 — Les agrégations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 14</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 14</div>
+    <span class="lbadge">Chapitre 14 / 17</span>
+    <h1>Les agrégations</h1>
+    <p class="intro">L'agrégation est l'outil le plus puissant de MongoDB&nbsp;: un <b>pipeline</b> d'étapes qui transforment les documents (filtrer, regrouper, calculer, joindre). C'est l'équivalent — en plus expressif — du <code>GROUP BY</code> et des jointures du SQL.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#pipeline">1 · Le pipeline</a>
+    <a href="#match">2 · $match</a>
+    <a href="#group">3 · $group</a>
+    <a href="#unwind">4 · $unwind</a>
+    <a href="#lookup">5 · $lookup</a>
+    <a href="#project">6 · $project &amp; autres</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="pipeline">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Le principe du pipeline</h2>
+    <p class="goal"><code>aggregate()</code> reçoit un <b>tableau d'étapes</b>. Chaque étape reçoit les documents de la précédente, les transforme, et passe le résultat à la suivante — comme un tapis roulant.</p>
+<pre>db.collection.aggregate([
+  { <span class="ts">$etape1</span>: { ... } },
+  { <span class="ts">$etape2</span>: { ... } },
+  ...
+])</pre>
+    <div class="hint"><strong>À retenir —</strong> l'ordre des étapes compte. On filtre tôt (<code>$match</code>) pour réduire le volume, avant les étapes coûteuses.</div>
+  </section>
+
+  <section class="step" id="match">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>$match — filtrer</h2>
+    <p class="goal"><code>$match</code> sélectionne les documents (même syntaxe que le filtre de <code>find</code>). Placé en premier, il allège tout le pipeline.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$match</span>: { statut: <span class="ts">"OUVERTE"</span> } }
+])</pre>
+  </section>
+
+  <section class="step" id="group">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>$group — regrouper &amp; calculer</h2>
+    <p class="goal"><code>$group</code> regroupe les documents par une clé (<code>_id</code>) et calcule des accumulateurs&nbsp;: <code>$sum</code>, <code>$avg</code>, <code>$min</code>, <code>$max</code>, <code>$count</code>, <code>$push</code>…</p>
+<pre>db.clients.aggregate([
+  { <span class="ts">$group</span>: {
+      _id: <span class="ts">"$ville"</span>,                <span class="tc">// clé de regroupement</span>
+      totalPoints: { <span class="ts">$sum</span>: <span class="ts">"$points"</span> },
+      moyenne:     { <span class="ts">$avg</span>: <span class="ts">"$points"</span> },
+      nb:          { <span class="ts">$sum</span>: <span class="tn">1</span> }
+  }}
+])</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: "Limoges", totalPoints: 260, moyenne: 86.6, nb: 3 }
+{ _id: "Brive",   totalPoints: 200, moyenne: 200,  nb: 1 }</div>
+    <div class="hint"><strong>Le champ précédé de $ —</strong> <code>"$points"</code> désigne <em>la valeur</em> du champ <code>points</code> de chaque document. <code>_id: null</code> regroupe <em>tous</em> les documents en un seul total.</div>
+  </section>
+
+  <section class="step" id="unwind">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>$unwind — déplier un tableau</h2>
+    <p class="goal"><code>$unwind</code> « éclate » un tableau&nbsp;: il produit <b>un document par élément</b>. Indispensable pour agréger sur les éléments d'un tableau embarqué (comme nos <code>commandes</code>).</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$unwind</span>: <span class="ts">"$commandes"</span> },      <span class="tc">// 1 ligne par commande</span>
+  { <span class="ts">$group</span>: {
+      _id: <span class="ts">"$zone"</span>,
+      volumeTotal: { <span class="ts">$sum</span>: <span class="ts">"$commandes.litres"</span> }
+  }}
+])</pre>
+  </section>
+
+  <section class="step" id="lookup">
+    <span class="snum"><span class="dotnum">5</span> Étape</span>
+    <h2>$lookup — la jointure</h2>
+    <p class="goal"><code>$lookup</code> joint une autre collection (l'équivalent d'un <code>JOIN</code> SQL) — par exemple pour rattacher à chaque campagne les infos de son fournisseur référencé.</p>
+<pre>db.campagnes.aggregate([
+  { <span class="ts">$lookup</span>: {
+      from: <span class="ts">"fournisseurs"</span>,
+      localField: <span class="ts">"fournisseurId"</span>,
+      foreignField: <span class="ts">"_id"</span>,
+      as: <span class="ts">"fournisseur"</span>          <span class="tc">// tableau de résultats</span>
+  }}
+])</pre>
+    <div class="hint"><strong>À retenir —</strong> <code>$lookup</code> ajoute un <b>tableau</b> <code>as</code>&nbsp;; on le déplie souvent avec <code>$unwind</code> juste après, puisqu'on n'attend qu'un fournisseur.</div>
+  </section>
+
+  <section class="step" id="project">
+    <span class="snum"><span class="dotnum">6</span> Étape</span>
+    <h2>$project, $sort, $limit, $bucket</h2>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>$project</b> — choisir/renommer/calculer des champs de sortie.</li>
+      <li><b>$sort</b>, <b>$limit</b>, <b>$skip</b> — comme sur le curseur, mais dans le pipeline.</li>
+      <li><b>$bucket</b> / <b>$bucketAuto</b> — répartir en tranches (histogramme).</li>
+    </ul>
+<pre>{ <span class="ts">$project</span>: { _id: <span class="tn">0</span>, zone: <span class="ts">"$_id"</span>, volumeTotal: <span class="tn">1</span> } }
+{ <span class="ts">$sort</span>: { volumeTotal: <span class="tn">-1</span> } }
+{ <span class="ts">$limit</span>: <span class="tn">5</span> }</pre>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>C'est le chapitre qui fait vivre le projet&nbsp;: <code>$unwind</code> sur <code>commandes</code> + <code>$group</code> avec <code>$sum</code> = le <b>volume total par campagne</b>&nbsp;; <code>$lookup</code> sur <code>fournisseurs</code> = récupérer les <b>paliers</b> pour en déduire le prix. Le chapitre 15 déroule ces pipelines pas à pas.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Agrégation = pipeline d'étapes qui se passent les documents.</li>
+        <li><code>$match</code> (filtrer tôt), <code>$group</code> (+ <code>$sum</code>/<code>$avg</code>), <code>$unwind</code> (déplier un tableau).</li>
+        <li><code>$lookup</code> = jointure&nbsp;; <code>$project</code>, <code>$sort</code>, <code>$limit</code>, <code>$bucket</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch13.html">← Chapitre 13</a>
+    <a class="next" href="mongo-ch15.html">Chapitre 15 · Exemples d'agrégations →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 14 — Les agrégations. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

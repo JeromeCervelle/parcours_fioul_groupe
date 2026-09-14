@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 04 — Les opérateurs de recherche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 04</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 04</div>
+    <span class="lbadge">Chapitre 04 / 17</span>
+    <h1>Les opérateurs de recherche</h1>
+    <p class="intro">Au-delà de l'égalité simple, les <b>opérateurs</b> (préfixés par <code>$</code>) rendent les filtres de <code>find()</code> vraiment expressifs&nbsp;: comparaisons, listes, combinaisons logiques, présence d'un champ, motifs de texte.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#egalite">1 · Égalité</a>
+    <a href="#comparaison">2 · Comparaison</a>
+    <a href="#listes">3 · Listes ($in)</a>
+    <a href="#logiques">4 · Logiques</a>
+    <a href="#element">5 · Existence &amp; type</a>
+    <a href="#regex">6 · Motifs ($regex)</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="egalite">
+    <span class="snum"><span class="dotnum">1</span> Rappel</span>
+    <h2>L'égalité simple</h2>
+    <p class="goal">La forme la plus simple d'un filtre&nbsp;: <code>{ champ: valeur }</code>. Elle sélectionne les documents dont le champ vaut exactement cette valeur.</p>
+<pre>db.clients.find({ ville: <span class="ts">"Limoges"</span> })</pre>
+    <div class="hint"><strong>À savoir —</strong> si le champ est un tableau, l'égalité renvoie aussi les documents dont le tableau <em>contient</em> la valeur.</div>
+  </section>
+
+  <section class="step" id="comparaison">
+    <span class="snum"><span class="dotnum">2</span> Opérateurs</span>
+    <h2>Les opérateurs de comparaison</h2>
+    <p class="goal">Ils comparent la valeur d'un champ à une référence.</p>
+    <table class="maptab">
+      <thead><tr><th>Opérateur</th><th>Signifie</th></tr></thead>
+      <tbody>
+        <tr><td><code>$eq</code> / <code>$ne</code></td><td>égal / différent</td></tr>
+        <tr><td><code>$gt</code> / <code>$gte</code></td><td>supérieur / supérieur ou égal</td></tr>
+        <tr><td><code>$lt</code> / <code>$lte</code></td><td>inférieur / inférieur ou égal</td></tr>
+      </tbody>
+    </table>
+    <p class="term-cap">Exemple — clients avec plus de 100 points</p>
+<pre>db.clients.find({ points: { <span class="ts">$gt</span>: <span class="tn">100</span> } })</pre>
+    <p class="term-cap">Exemple — points entre 50 et 150 (inclus)</p>
+<pre>db.clients.find({ points: { <span class="ts">$gte</span>: <span class="tn">50</span>, <span class="ts">$lte</span>: <span class="tn">150</span> } })</pre>
+  </section>
+
+  <section class="step" id="listes">
+    <span class="snum"><span class="dotnum">3</span> Opérateurs</span>
+    <h2>Chercher dans une liste de valeurs</h2>
+    <p class="goal"><code>$in</code> teste si la valeur figure dans une liste&nbsp;; <code>$nin</code> teste l'inverse.</p>
+<pre>db.clients.find({ ville: { <span class="ts">$in</span>: [<span class="ts">"Limoges"</span>, <span class="ts">"Brive"</span>] } })
+db.clients.find({ ville: { <span class="ts">$nin</span>: [<span class="ts">"Paris"</span>] } })</pre>
+    <div class="hint"><strong>Astuce —</strong> <code>$in</code> évite d'empiler plusieurs <code>$or</code> quand on teste le même champ contre plusieurs valeurs.</div>
+  </section>
+
+  <section class="step" id="logiques">
+    <span class="snum"><span class="dotnum">4</span> Opérateurs</span>
+    <h2>Les opérateurs logiques</h2>
+    <p class="goal">Plusieurs champs dans le même objet forment déjà un <b>ET</b> implicite. Pour un <b>OU</b>, ou des combinaisons, on utilise <code>$and</code>, <code>$or</code>, <code>$nor</code>, <code>$not</code>.</p>
+    <p class="term-cap">ET implicite</p>
+<pre>db.clients.find({ ville: <span class="ts">"Limoges"</span>, points: { <span class="ts">$gte</span>: <span class="tn">80</span> } })</pre>
+    <p class="term-cap">OU explicite</p>
+<pre>db.clients.find({ <span class="ts">$or</span>: [
+  { ville: <span class="ts">"Brive"</span> },
+  { points: { <span class="ts">$gt</span>: <span class="tn">150</span> } }
+] })</pre>
+    <div class="hint"><strong>À retenir —</strong> <code>$or</code> et <code>$and</code> prennent un <b>tableau</b> de conditions. On combine sans limite&nbsp;: un <code>$or</code> peut contenir des conditions elles-mêmes composées.</div>
+  </section>
+
+  <section class="step" id="element">
+    <span class="snum"><span class="dotnum">5</span> Opérateurs</span>
+    <h2>Présence d'un champ &amp; type</h2>
+    <p class="goal"><code>$exists</code> teste si un champ est présent&nbsp;; <code>$type</code> teste son type BSON. Très utile quand la collection n'a pas de schéma strict.</p>
+<pre><span class="tc">// clients qui ont un champ "email"</span>
+db.clients.find({ email: { <span class="ts">$exists</span>: <span class="tk">true</span> } })
+
+<span class="tc">// documents où "points" est bien un nombre</span>
+db.clients.find({ points: { <span class="ts">$type</span>: <span class="ts">"number"</span> } })</pre>
+    <div class="hint"><strong>Cas concret —</strong> repérer les documents « incomplets » (champ manquant) est fréquent en NoSQL, justement parce que le schéma n'est pas imposé.</div>
+  </section>
+
+  <section class="step" id="regex">
+    <span class="snum"><span class="dotnum">6</span> Opérateurs</span>
+    <h2>Rechercher un motif de texte ($regex)</h2>
+    <p class="goal"><code>$regex</code> filtre sur une <b>expression régulière</b> — pratique pour « commence par », « contient », etc. (Pour de la vraie recherche plein-texte, on verra l'index texte au chapitre 12.)</p>
+<pre><span class="tc">// villes commençant par "Lim"</span>
+db.clients.find({ ville: { <span class="ts">$regex</span>: <span class="ts">"^Lim"</span> } })
+
+<span class="tc">// insensible à la casse</span>
+db.clients.find({ ville: { <span class="ts">$regex</span>: <span class="ts">"brive"</span>, <span class="ts">$options</span>: <span class="ts">"i"</span> } })</pre>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Écris les filtres qui serviront à l'écran de recherche de l'appli&nbsp;: les campagnes <code>statut: "OUVERTE"</code> <b>ET</b> <code>zone: "Ladignac-le-Long"</code>&nbsp;; celles dont la <code>dateLimite</code> est <code>$gte</code> à aujourd'hui (<code>new Date()</code>)&nbsp;; celles de plusieurs communes avec <code>$in</code>. Ces filtres deviendront les méthodes du repository Spring (ex. <code>findByZoneAndStatut</code>).</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Comparaison&nbsp;: <code>$gt</code>, <code>$gte</code>, <code>$lt</code>, <code>$lte</code>, <code>$ne</code>.</li>
+        <li>Listes&nbsp;: <code>$in</code>, <code>$nin</code>.</li>
+        <li>Logique&nbsp;: ET implicite&nbsp;; <code>$or</code>, <code>$and</code>, <code>$nor</code>, <code>$not</code>.</li>
+        <li>Structure&nbsp;: <code>$exists</code>, <code>$type</code>&nbsp;; texte&nbsp;: <code>$regex</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch03.html">← Chapitre 03</a>
+    <a class="next" href="mongo-ch05.html">Chapitre 05 · Les opérateurs de tableaux →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 04 — Les opérateurs de recherche. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

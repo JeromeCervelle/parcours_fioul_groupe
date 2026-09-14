@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 10 — La validation des schémas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 10</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 10</div>
+    <span class="lbadge">Chapitre 10 / 17</span>
+    <h1>La validation des schémas</h1>
+    <p class="intro">L'absence de schéma imposé est une force, mais on veut souvent garantir un minimum de structure&nbsp;: champs obligatoires, types corrects, valeurs autorisées. MongoDB permet cela avec un <b>validateur</b> basé sur <code>$jsonSchema</code>, sans perdre la souplesse.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#pourquoi">1 · Pourquoi valider</a>
+    <a href="#jsonschema">2 · $jsonSchema</a>
+    <a href="#types">3 · Types &amp; contraintes</a>
+    <a href="#enum">4 · Valeurs autorisées</a>
+    <a href="#existante">5 · Sur une collection existante</a>
+    <a href="#niveau">6 · Niveau &amp; action</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="pourquoi">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Pourquoi valider&nbsp;?</h2>
+    <p class="goal">Sans garde-fou, rien n'empêche d'insérer une campagne sans <code>zone</code>, ou avec un <code>statut</code> écrit « ouvert » au lieu de « OUVERTE ». La validation pose des <b>règles minimales</b> vérifiées à chaque insertion/mise à jour, tout en laissant les champs non listés libres.</p>
+    <div class="hint"><strong>Équilibre —</strong> on valide ce qui est <em>critique</em> (présence, type, énumération) sans figer tout le document&nbsp;: on garde la souplesse d'ajouter de nouveaux champs.</div>
+  </section>
+
+  <section class="step" id="jsonschema">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Déclarer un validateur avec $jsonSchema</h2>
+    <p class="goal">À la création d'une collection, on fournit un <code>validator</code> décrit par <code>$jsonSchema</code>&nbsp;: champs requis et propriétés attendues.</p>
+<pre>db.createCollection(<span class="ts">"campagnes"</span>, {
+  validator: {
+    <span class="ts">$jsonSchema</span>: {
+      bsonType: <span class="ts">"object"</span>,
+      required: [<span class="ts">"zone"</span>, <span class="ts">"statut"</span>, <span class="ts">"dateLimite"</span>],
+      properties: {
+        zone:   { bsonType: <span class="ts">"string"</span> },
+        statut: { bsonType: <span class="ts">"string"</span> }
+      }
+    }
+  }
+})</pre>
+  </section>
+
+  <section class="step" id="types">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Types &amp; contraintes</h2>
+    <p class="goal">On précise le <code>bsonType</code> de chaque champ et des contraintes simples (min, max, longueur…).</p>
+<pre>properties: {
+  litres:     { bsonType: <span class="ts">"int"</span>, minimum: <span class="tn">500</span> },
+  prixLitre:  { bsonType: <span class="ts">"double"</span> },
+  commandes:  { bsonType: <span class="ts">"array"</span> }
+}</pre>
+    <div class="hint"><strong>Attention aux types —</strong> <code>"int"</code> et <code>"double"</code> sont distincts en BSON (chapitre 16). Dans <code>mongosh</code>, un nombre écrit <code>1500</code> peut être un <code>double</code>&nbsp;; utilise <code>NumberInt(1500)</code> si tu veux un entier.</div>
+  </section>
+
+  <section class="step" id="enum">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Restreindre à des valeurs autorisées (enum)</h2>
+    <p class="goal"><code>enum</code> limite un champ à une liste de valeurs — parfait pour un statut.</p>
+<pre>statut: {
+  bsonType: <span class="ts">"string"</span>,
+  <span class="ts">enum</span>: [<span class="ts">"OUVERTE"</span>, <span class="ts">"CLOTUREE"</span>, <span class="ts">"LIVREE"</span>]
+}</pre>
+    <p class="term-cap">Une insertion invalide est refusée</p>
+    <div class="res-out">MongoServerError: Document failed validation</div>
+  </section>
+
+  <section class="step" id="existante">
+    <span class="snum"><span class="dotnum">5</span> Pratique</span>
+    <h2>Ajouter un validateur à une collection existante</h2>
+    <p class="goal">Sur une collection déjà créée, on utilise <code>collMod</code>.</p>
+<pre>db.runCommand({
+  collMod: <span class="ts">"campagnes"</span>,
+  validator: { <span class="ts">$jsonSchema</span>: { <span class="tc">/* ... */</span> } }
+})</pre>
+  </section>
+
+  <section class="step" id="niveau">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Niveau &amp; action de validation</h2>
+    <p class="goal">Deux réglages ajustent la sévérité&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>validationLevel</b>&nbsp;: <code>strict</code> (toutes les écritures) ou <code>moderate</code> (n'applique qu'aux documents déjà valides).</li>
+      <li><b>validationAction</b>&nbsp;: <code>error</code> (rejette) ou <code>warn</code> (accepte mais journalise).</li>
+    </ul>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Pose un validateur sur <code>campagnes</code>&nbsp;: <code>zone</code> et <code>statut</code> requis, <code>statut</code> dans l'<code>enum</code> <code>["OUVERTE","CLOTUREE","LIVREE"]</code>, <code>litres</code> ≥ 500 sur les commandes. Tu obtiens le même filet de sécurité que la validation <code>@Valid</code> côté Spring — les deux se complètent (défense en profondeur, à relier au cours Cyber).</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>La validation pose des règles minimales sans figer le document.</li>
+        <li><code>$jsonSchema</code>&nbsp;: <code>required</code>, <code>bsonType</code>, <code>enum</code>, min/max.</li>
+        <li><code>collMod</code> pour une collection existante.</li>
+        <li><code>validationLevel</code> / <code>validationAction</code> règlent la sévérité.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch09.html">← Chapitre 09</a>
+    <a class="next" href="mongo-ch11.html">Chapitre 11 · Les index →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 10 — La validation des schémas. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

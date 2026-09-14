@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 16 — Les types de nombre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 16</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 16</div>
+    <span class="lbadge">Chapitre 16 / 17</span>
+    <h1>Les types de nombre</h1>
+    <p class="intro">Le BSON distingue plusieurs types numériques&nbsp;: entiers 32 et 64 bits, décimaux flottants, et un décimal exact. Choisir le bon type évite des surprises — surtout quand on manipule de l'<b>argent</b>, comme le prix du fioul.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#types">1 · Les 4 types</a>
+    <a href="#defaut">2 · Le piège du double</a>
+    <a href="#entiers">3 · Entiers</a>
+    <a href="#decimal">4 · decimal128 &amp; l'argent</a>
+    <a href="#java">5 · Côté Java</a>
+    <a href="#recap">6 · En résumé</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="types">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Les quatre types numériques</h2>
+    <p class="goal">Le BSON propose&nbsp;:</p>
+    <table class="maptab">
+      <thead><tr><th>Type BSON</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td><code>double</code></td><td>flottant 64 bits (par défaut dans mongosh)</td></tr>
+        <tr><td><code>int</code> (int32)</td><td>entier 32 bits (jusqu'à ~2,1 milliards)</td></tr>
+        <tr><td><code>long</code> (int64)</td><td>entier 64 bits (très grands entiers)</td></tr>
+        <tr><td><code>decimal</code> (decimal128)</td><td>décimal <b>exact</b> — pour l'argent</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="step" id="defaut">
+    <span class="snum"><span class="dotnum">2</span> Piège</span>
+    <h2>Le piège du double par défaut</h2>
+    <p class="goal">Dans <code>mongosh</code>, tout nombre écrit simplement est un <b>double</b>. Or les <code>double</code> ne représentent pas exactement certaines décimales&nbsp;: <code>0.1 + 0.2</code> ne fait pas exactement <code>0.3</code>. Gênant pour des prix.</p>
+<pre>db.test.insertOne({ prix: <span class="tn">1.02</span> })   <span class="tc">// prix est un double</span></pre>
+    <div class="warn"><strong>Conséquence —</strong> des calculs de prix en <code>double</code> peuvent accumuler des erreurs d'arrondi (des fractions de centime). À éviter pour de la facturation.</div>
+  </section>
+
+  <section class="step" id="entiers">
+    <span class="snum"><span class="dotnum">3</span> Pratique</span>
+    <h2>Forcer un entier</h2>
+    <p class="goal">Pour stocker un vrai entier (des litres, un compteur), on utilise <code>NumberInt()</code> (int32) ou <code>NumberLong()</code> (int64).</p>
+<pre>db.campagnes.insertOne({
+  zone: <span class="ts">"Ladignac-le-Long"</span>,
+  litresCibles: <span class="tf">NumberInt</span>(<span class="tn">8000</span>)
+})</pre>
+    <div class="hint"><strong>Pourquoi —</strong> c'est plus compact, plus clair sémantiquement, et cela permet à la validation de schéma d'exiger <code>bsonType: "int"</code>.</div>
+  </section>
+
+  <section class="step" id="decimal">
+    <span class="snum"><span class="dotnum">4</span> Pratique</span>
+    <h2>decimal128 pour l'argent</h2>
+    <p class="goal"><code>NumberDecimal()</code> stocke un décimal <b>exact</b> (128 bits). C'est LE type à utiliser pour un prix, un montant, une somme d'argent.</p>
+<pre>db.fournisseurs.insertOne({
+  nom: <span class="ts">"TotalEnergies"</span>,
+  paliers: [ { volumeMin: <span class="tf">NumberInt</span>(<span class="tn">3000</span>),
+               prixLitre: <span class="tf">NumberDecimal</span>(<span class="ts">"1.02"</span>) } ]
+})</pre>
+    <div class="hint"><strong>À noter —</strong> on passe la valeur en <b>chaîne</b> à <code>NumberDecimal("1.02")</code> pour éviter toute conversion par un <code>double</code> intermédiaire.</div>
+  </section>
+
+  <section class="step" id="java">
+    <span class="snum"><span class="dotnum">5</span> Lien</span>
+    <h2>La correspondance côté Java</h2>
+    <p class="goal">Les types MongoDB se retrouvent dans l'API Spring&nbsp;:</p>
+    <table class="maptab">
+      <thead><tr><th>BSON</th><th>Java</th></tr></thead>
+      <tbody>
+        <tr><td><code>int</code></td><td><code>int</code> / <code>Integer</code></td></tr>
+        <tr><td><code>long</code></td><td><code>long</code> / <code>Long</code></td></tr>
+        <tr><td><code>double</code></td><td><code>double</code> / <code>Double</code></td></tr>
+        <tr><td><code>decimal128</code></td><td><code>java.math.BigDecimal</code></td></tr>
+      </tbody>
+    </table>
+    <div class="hint"><strong>Cohérence —</strong> un <code>prixLitre</code> stocké en <code>decimal128</code> se mappe en <code>BigDecimal</code> dans l'entité Spring&nbsp;: la précision monétaire est préservée de bout en bout.</div>
+  </section>
+
+  <section class="step" id="recap">
+    <span class="snum"><span class="dotnum">6</span> Bilan</span>
+    <h2>En résumé</h2>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Règle simple pour le projet&nbsp;: <b>litres</b> en <code>NumberInt</code>, <b>prix et montants</b> en <code>NumberDecimal</code> (jamais en <code>double</code>). Côté Spring, <code>prixLitre</code> devient un <code>BigDecimal</code>. Tu évites ainsi les erreurs d'arrondi sur les factures de commande groupée.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>4 types&nbsp;: <code>double</code>, <code>int</code>, <code>long</code>, <code>decimal128</code>.</li>
+        <li>Dans mongosh, un nombre est un <code>double</code> par défaut&nbsp;: attention aux arrondis.</li>
+        <li>Entiers&nbsp;: <code>NumberInt</code>/<code>NumberLong</code>&nbsp;; argent&nbsp;: <code>NumberDecimal("…")</code>.</li>
+        <li>Correspondance&nbsp;: <code>decimal128</code> ↔ <code>BigDecimal</code> en Java.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch15.html">← Chapitre 15</a>
+    <a class="next" href="mongo-ch17.html">Chapitre 17 · Présentation d'Atlas →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 16 — Les types de nombre. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

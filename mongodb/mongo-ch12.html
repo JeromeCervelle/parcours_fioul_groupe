@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 12 — Les recherches textuelles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 12</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 12</div>
+    <span class="lbadge">Chapitre 12 / 17</span>
+    <h1>Les recherches textuelles</h1>
+    <p class="intro">Au-delà du <code>$regex</code> (chapitre 4), MongoDB propose une vraie <b>recherche plein-texte</b>&nbsp;: on crée un index texte, puis on interroge avec <code>$text</code>. C'est ce qui alimente une barre de recherche.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#regexvs">1 · $regex vs $text</a>
+    <a href="#index">2 · L'index texte</a>
+    <a href="#text">3 · Rechercher avec $text</a>
+    <a href="#score">4 · Le score de pertinence</a>
+    <a href="#operateurs">5 · Phrases &amp; exclusion</a>
+    <a href="#limites">6 · Limites</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="regexvs">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>$regex vs recherche plein-texte</h2>
+    <p class="goal"><code>$regex</code> cherche un <b>motif exact</b> dans une chaîne (bien pour « commence par »). La <b>recherche plein-texte</b> découpe le texte en mots, ignore la casse et les mots vides, gère les racines&nbsp;: idéale pour « chercher des mots dans une description ».</p>
+  </section>
+
+  <section class="step" id="index">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Créer un index texte</h2>
+    <p class="goal">La recherche plein-texte exige un index de type <code>text</code>, sur un ou plusieurs champs. Une collection ne peut avoir qu'<b>un seul</b> index texte (mais couvrant plusieurs champs).</p>
+<pre>db.campagnes.createIndex({ description: <span class="ts">"text"</span>, zone: <span class="ts">"text"</span> })
+
+<span class="tc">// préciser la langue (mots vides, racines) :</span>
+db.campagnes.createIndex(
+  { description: <span class="ts">"text"</span> },
+  { default_language: <span class="ts">"french"</span> }
+)</pre>
+  </section>
+
+  <section class="step" id="text">
+    <span class="snum"><span class="dotnum">3</span> Requête</span>
+    <h2>Rechercher avec $text</h2>
+    <p class="goal">On interroge l'index texte avec l'opérateur <code>$text</code> et <code>$search</code>.</p>
+<pre>db.campagnes.find({ <span class="ts">$text</span>: { <span class="ts">$search</span>: <span class="ts">"chauffage hiver"</span> } })</pre>
+    <p style="color:var(--ink-soft)">Cette requête renvoie les campagnes contenant « chauffage » <b>ou</b> « hiver » (dans les champs indexés en texte).</p>
+  </section>
+
+  <section class="step" id="score">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Le score de pertinence</h2>
+    <p class="goal">Chaque résultat reçoit un <b>score</b> de pertinence, qu'on récupère via <code>$meta</code> pour trier du plus pertinent au moins pertinent.</p>
+<pre>db.campagnes.find(
+  { <span class="ts">$text</span>: { <span class="ts">$search</span>: <span class="ts">"chauffage hiver"</span> } },
+  { score: { <span class="ts">$meta</span>: <span class="ts">"textScore"</span> } }
+).sort({ score: { <span class="ts">$meta</span>: <span class="ts">"textScore"</span> } })</pre>
+  </section>
+
+  <section class="step" id="operateurs">
+    <span class="snum"><span class="dotnum">5</span> Requête</span>
+    <h2>Phrases exactes &amp; exclusion</h2>
+    <p class="goal">On affine la recherche&nbsp;: guillemets pour une <b>phrase exacte</b>, tiret pour <b>exclure</b> un mot.</p>
+<pre><span class="tc">// contient la phrase exacte "commande groupée"</span>
+{ <span class="ts">$search</span>: <span class="ts">"\"commande groupée\""</span> }
+
+<span class="tc">// contient "fioul" mais PAS "gaz"</span>
+{ <span class="ts">$search</span>: <span class="ts">"fioul -gaz"</span> }</pre>
+  </section>
+
+  <section class="step" id="limites">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Limites &amp; alternative</h2>
+    <p class="goal">La recherche <code>$text</code> couvre les besoins simples. Pour de la recherche avancée (fautes de frappe, pertinence fine, facettes), MongoDB propose <b>Atlas Search</b> (basé sur Lucene), disponible sur l'hébergement Atlas.</p>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Ajoute un champ <code>description</code> aux campagnes et un index texte en <code>french</code>. La barre de recherche de l'appli enverra le texte saisi à un endpoint qui fera un <code>$text</code>/<code>$search</code>, trié par score. C'est un bon exercice de bout en bout&nbsp;: saisie Flutter → endpoint Spring → requête texte MongoDB.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li><code>$regex</code> = motif exact&nbsp;; recherche plein-texte = mots, casse et racines.</li>
+        <li>Un index <code>text</code> (un seul par collection), avec <code>default_language</code>.</li>
+        <li><code>$text</code> + <code>$search</code>&nbsp;; tri par <code>$meta: "textScore"</code>.</li>
+        <li>Phrase exacte entre guillemets, exclusion avec <code>-mot</code>. Aller plus loin&nbsp;: Atlas Search.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch11.html">← Chapitre 11</a>
+    <a class="next" href="mongo-ch13.html">Chapitre 13 · Recherches géospatiales →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 12 — Les recherches textuelles. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 09 — Partie Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 09</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 09</div>
+  <span class="lbadge">Chapitre 09 / 19</span>
+  <h1>Spring Boot — la partie Data</h1>
+  <p class="intro">La couche de persistance avec <b>Spring Data MongoDB</b>&nbsp;: entités <code>@Document</code>, repositories, et méthodes de requête « devinées » d'après leur nom.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#springdata">1 · Spring Data</a><a href="#entite">2 · L'entité</a><a href="#repo">3 · Le repository</a><a href="#derivees">4 · Méthodes dérivées</a></div></nav>
+<main class="wrap">
+  <section class="step" id="springdata">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Spring Data, le principe</h2>
+    <p class="goal">Spring Data fournit le CRUD <b>sans écrire d'implémentation</b>&nbsp;: on déclare une interface, Spring génère le code à l'exécution. Le starter <code>spring-boot-starter-data-mongodb</code> ajoute le support Mongo.</p>
+  </section>
+  <section class="step" id="entite">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>L'entité @Document</h2>
+    <p class="goal">Une classe annotée <code>@Document</code> correspond à une collection. Elle reflète le document modélisé au parcours 1.</p>
+<pre><span class="tn">@Document</span>(collection = <span class="ts">"campagnes"</span>)
+<span class="tk">public class</span> <span class="tf">Campagne</span> {
+    <span class="tn">@Id</span> <span class="tk">private</span> String id;
+    <span class="tk">private</span> String zone;
+    <span class="tk">private</span> Statut statut;
+    <span class="tk">private</span> Instant dateLimite;
+    <span class="tk">private</span> String fournisseurId;
+    <span class="tk">private</span> List&lt;Commande&gt; commandes = <span class="tk">new</span> ArrayList&lt;&gt;();
+}</pre>
+  </section>
+  <section class="step" id="repo">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Le repository</h2>
+    <p class="goal">Une interface qui étend <code>MongoRepository</code> hérite de <code>findAll</code>, <code>findById</code>, <code>save</code>, <code>deleteById</code>…</p>
+<pre><span class="tk">public interface</span> <span class="tf">CampagneRepository</span>
+        <span class="tk">extends</span> MongoRepository&lt;Campagne, String&gt; { }</pre>
+  </section>
+  <section class="step" id="derivees">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Les méthodes dérivées</h2>
+    <p class="goal">Spring déduit la requête du <b>nom</b> de la méthode.</p>
+<pre>List&lt;Campagne&gt; findByStatut(Statut statut);
+List&lt;Campagne&gt; findByZoneAndStatut(String zone, Statut statut);</pre>
+    <div class="hint"><strong>Requêtes sur mesure —</strong> pour aller plus loin (agrégations, requêtes complexes), on utilise <code>@Query</code> ou le <code>MongoTemplate</code>.</div>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Crée <code>Campagne</code>, <code>Commande</code> (embarquée), <code>Fournisseur</code> et leurs repositories. <code>findByZoneAndStatut</code> produit exactement la requête écrite à la main au parcours 1 (chapitre 4).</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Spring Data génère le CRUD à partir d'une interface.</li>
+      <li><code>@Document</code>/<code>@Id</code> mappent l'entité à la collection.</li>
+      <li>Méthodes dérivées&nbsp;: le nom = la requête&nbsp;; <code>@Query</code> pour le sur-mesure.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch08.html">← Chapitre 08</a><a class="next" href="spring-ch10.html">Chapitre 10 · Projet — couche Data →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 09 — Partie Data. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

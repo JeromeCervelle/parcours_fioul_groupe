@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 17 — Google Maps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 17</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 17</div>
+  <span class="lbadge">Chapitre 17 / 19</span>
+  <h1>Utilisation de Google Maps</h1>
+  <p class="intro">Afficher une carte, y placer des marqueurs, et la centrer sur une position&nbsp;: idéal pour visualiser les zones des campagnes.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#paquet">1 · Le paquet &amp; la clé</a><a href="#carte">2 · Afficher la carte</a><a href="#markers">3 · Les marqueurs</a><a href="#lancer">4 · Ouvrir un itinéraire</a></div></nav>
+<main class="wrap">
+  <section class="step" id="paquet">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>google_maps_flutter &amp; la clé d'API</h2>
+    <p class="goal">On ajoute <code>google_maps_flutter</code> et une <b>clé d'API Google Maps</b> (dans la configuration Android/iOS).</p>
+    <div class="warn"><strong>Cyber —</strong> la clé d'API se restreint (par application/package) et ne se commite pas en clair&nbsp;; on la gère comme un secret.</div>
+  </section>
+  <section class="step" id="carte">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Afficher la carte</h2>
+    <p class="goal">Le widget <code>GoogleMap</code> affiche la carte, centrée par <code>initialCameraPosition</code>.</p>
+<pre>GoogleMap(
+  initialCameraPosition: <span class="tk">const</span> CameraPosition(
+    target: LatLng(<span class="tn">45.6006</span>, <span class="tn">1.1367</span>), zoom: <span class="tn">11</span>),
+)</pre>
+  </section>
+  <section class="step" id="markers">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Placer des marqueurs</h2>
+    <p class="goal">Chaque campagne devient un <code>Marker</code> à sa position, avec une info-bulle.</p>
+<pre>markers: campagnes.map((c) =&gt; Marker(
+  markerId: MarkerId(c.id),
+  position: LatLng(c.lat, c.lon),
+  infoWindow: InfoWindow(title: c.zone, snippet: <span class="ts">'${c.volumeTotal} L'</span>),
+)).toSet()</pre>
+  </section>
+  <section class="step" id="lancer">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Ouvrir un itinéraire</h2>
+    <p class="goal"><code>url_launcher</code> peut ouvrir l'app de cartes du téléphone vers une adresse de livraison.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Ajoute un écran « carte » affichant les campagnes ouvertes autour de la position de l'utilisateur (marqueurs). Au tap sur un marqueur, propose d'ouvrir le détail. Les coordonnées viennent du champ <code>localisation</code> (GeoJSON) stocké dans MongoDB.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>google_maps_flutter</code> + clé d'API (restreinte, secrète).</li>
+      <li><code>GoogleMap</code> centré par <code>CameraPosition</code>&nbsp;; <code>Marker</code> par campagne.</li>
+      <li><code>url_launcher</code> pour un itinéraire externe.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch16.html">← Chapitre 16</a><a class="next" href="flutter-ch18.html">Chapitre 18 · Publication sur le Store →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 17 — Google Maps. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

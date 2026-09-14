@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter — Les bases (cours FR)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+.res-out{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:10px;padding:12px 15px;margin:12px 0;font-family:"JetBrains Mono";font-size:.8rem;color:var(--ink-soft);overflow-x:auto;line-height:1.5;white-space:pre-wrap}
+.mini-toc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);margin-top:26px}
+.mini-toc strong{display:block;font-family:"Instrument Sans";font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.mini-toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+@media(max-width:600px){.mini-toc ol{columns:1}}
+.mini-toc li{margin:5px 0;font-size:.92rem}
+.reslist{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+@media(max-width:760px){.reslist{grid-template-columns:1fr}}
+/* petite maquette de téléphone pour visualiser un résultat d'écran */
+.phone{max-width:230px;border:8px solid #1d2733;border-radius:26px;background:var(--surface);margin:12px 0;overflow:hidden;box-shadow:var(--shadow)}
+.phone .pbar{background:var(--accent);color:#fff;padding:12px 14px;font-weight:700;font-size:.85rem}
+.phone .pcontent{padding:12px 14px;font-size:.85rem;color:var(--ink-soft)}
+.phone .row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.phone .row:last-child{border-bottom:0}
+.phone .av{width:30px;height:30px;border-radius:50%;background:var(--accent-wash);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:.8rem;flex:0 0 auto}
+</style>
+</head>
+<body data-track="flutter">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Cours — Flutter, les bases (FR)</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="../mongodb/tuto-mongodb.html">Cours MongoDB</a>
+      <a href="../springboot/tuto-spring.html">Cours Spring</a>
+      <a href="tuto-flutter.html" class="on">Cours Flutter</a>
+      <a href="parcours-flutter.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Cours Flutter — les bases</div>
+    <span class="lbadge">📱 Cours de base — en français</span>
+    <h1>Flutter, les bases</h1>
+    <p class="intro">Un cours court et progressif pour créer sa première application mobile avec Flutter et le langage Dart, dans l'esprit des tutoriels simples&nbsp;: une notion par section, la <strong>syntaxe</strong>, un <strong>exemple</strong> et le <strong>rendu</strong>. On construit petit à petit un mini-écran de liste de <code>produits</code>.</p>
+    <div class="mini-toc">
+      <strong>Sommaire</strong>
+      <ol>
+        <li><a href="#intro">Qu'est-ce que Flutter&nbsp;?</a></li>
+        <li><a href="#projet">Créer &amp; lancer un projet</a></li>
+        <li><a href="#widgets">Tout est widget</a></li>
+        <li><a href="#appli">Une première appli</a></li>
+        <li><a href="#layout">Organiser (layout)</a></li>
+        <li><a href="#etat">Stateless vs Stateful</a></li>
+        <li><a href="#listes">Afficher une liste</a></li>
+        <li><a href="#navigation">Naviguer entre écrans</a></li>
+        <li><a href="#http">Appeler une API (HTTP)</a></li>
+        <li><a href="#formulaire">Un formulaire</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#intro">Intro</a>
+    <a href="#projet">Projet</a>
+    <a href="#widgets">Widgets</a>
+    <a href="#appli">Appli</a>
+    <a href="#layout">Layout</a>
+    <a href="#etat">État</a>
+    <a href="#listes">Listes</a>
+    <a href="#navigation">Navigation</a>
+    <a href="#http">HTTP</a>
+    <a href="#formulaire">Formulaire</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- INTRO -->
+  <section class="step" id="intro">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce que Flutter&nbsp;?</h2>
+    <p class="goal"><b>Flutter</b> est un framework de Google pour créer des applications <b>multiplateformes</b> (Android, iOS, web, desktop) à partir d'un <b>seul code</b>. Il utilise le langage <b>Dart</b>. Son principe fondateur&nbsp;: <b>tout est widget</b> — chaque élément de l'interface (texte, bouton, marge, écran entier) est un widget.</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Un seul code</b> pour Android et iOS.</li>
+      <li><b>Hot reload</b> — les modifications s'affichent instantanément, sans tout recompiler.</li>
+      <li><b>Widgets</b> — on décrit l'interface en composant des widgets les uns dans les autres.</li>
+    </ul>
+    <div class="hint"><strong>À retenir —</strong> en Flutter, on ne « dessine » pas l'écran&nbsp;: on <em>décrit</em> une arborescence de widgets, et Flutter s'occupe du rendu.</div>
+  </section>
+
+  <!-- PROJET -->
+  <section class="step" id="projet">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Créer &amp; lancer un projet</h2>
+    <p class="goal">On crée un projet avec la commande <code>flutter create</code>, puis on le lance sur un émulateur ou un téléphone branché avec <code>flutter run</code>.</p>
+    <p class="term-cap">Commandes</p>
+<pre>flutter create fioul_app      <span class="tc"># crée le projet</span>
+cd fioul_app
+flutter run                   <span class="tc"># lance sur l'appareil/émulateur</span></pre>
+    <p class="term-cap">Fichiers importants</p>
+<pre>lib/main.dart          <span class="tc"># le point d'entrée de l'application</span>
+pubspec.yaml           <span class="tc"># dépendances (paquets) et ressources</span></pre>
+    <div class="tip"><strong>Hot reload —</strong> pendant que l'appli tourne, enregistre le fichier (ou tape <code>r</code> dans la console)&nbsp;: le changement apparaît en moins d'une seconde.</div>
+  </section>
+
+  <!-- WIDGETS -->
+  <section class="step" id="widgets">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Tout est widget</h2>
+    <p class="goal">Un widget décrit une partie de l'interface. Des widgets simples&nbsp;: <code>Text</code> (du texte), <code>Icon</code> (une icône), <code>Image</code>. Des widgets « contenants » reçoivent d'autres widgets via leur propriété <code>child</code> (un enfant) ou <code>children</code> (plusieurs).</p>
+    <p class="term-cap">Exemples de widgets</p>
+<pre>Text(<span class="ts">'Bonjour'</span>)
+Icon(Icons.local_gas_station)
+Padding(
+  padding: EdgeInsets.all(<span class="tn">16</span>),   <span class="tc">// une marge de 16 px</span>
+  child: Text(<span class="ts">'Avec une marge'</span>),  <span class="tc">// son enfant</span>
+)</pre>
+    <div class="hint"><strong>À retenir —</strong> l'interface est un <b>arbre de widgets</b>&nbsp;: un widget en contient d'autres, qui en contiennent d'autres… C'est la brique de base de tout Flutter.</div>
+  </section>
+
+  <!-- APPLI -->
+  <section class="step" id="appli">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Une première application</h2>
+    <p class="goal">On lance l'appli avec <code>runApp()</code>. <code>MaterialApp</code> pose le style Material&nbsp;; <code>Scaffold</code> fournit la structure d'un écran (barre en haut <code>AppBar</code>, corps <code>body</code>).</p>
+    <p class="term-cap">lib/main.dart</p>
+<pre><span class="tk">import</span> <span class="ts">'package:flutter/material.dart'</span>;
+
+<span class="tk">void</span> main() =&gt; runApp(<span class="tk">const</span> MonAppli());
+
+<span class="tk">class</span> <span class="tf">MonAppli</span> <span class="tk">extends</span> StatelessWidget {
+  <span class="tk">const</span> MonAppli({super.key});
+  <span class="tn">@override</span>
+  Widget build(BuildContext context) {
+    <span class="tk">return</span> MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: <span class="tk">const</span> Text(<span class="ts">'Fioul Groupé'</span>)),
+        body: <span class="tk">const</span> Center(child: Text(<span class="ts">'Bonjour !'</span>)),
+      ),
+    );
+  }
+}</pre>
+    <p class="term-cap">Rendu</p>
+    <div class="phone">
+      <div class="pbar">Fioul Groupé</div>
+      <div class="pcontent" style="text-align:center;padding:30px 14px">Bonjour !</div>
+    </div>
+    <div class="hint"><strong>À retenir —</strong> la méthode <code>build()</code> renvoie l'arbre de widgets à afficher. <code>Center</code> centre son enfant à l'écran.</div>
+  </section>
+
+  <!-- LAYOUT -->
+  <section class="step" id="layout">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Organiser l'écran (layout)</h2>
+    <p class="goal">Deux widgets essentiels pour placer les éléments&nbsp;: <code>Column</code> (les empile verticalement) et <code>Row</code> (les aligne horizontalement). Ils prennent une liste <code>children</code>.</p>
+    <p class="term-cap">Exemple — une colonne</p>
+<pre>Column(
+  children: <span class="tk">const</span> [
+    Text(<span class="ts">'Campagne Ladignac'</span>),
+    Text(<span class="ts">'Volume : 4200 L'</span>),
+    Text(<span class="ts">'Prix : 1,02 €/L'</span>),
+  ],
+)</pre>
+    <p class="term-cap">Rendu</p>
+    <div class="phone">
+      <div class="pbar">Détail campagne</div>
+      <div class="pcontent">Campagne Ladignac<br>Volume : 4200 L<br>Prix : 1,02 €/L</div>
+    </div>
+    <div class="tip"><strong>Astuce —</strong> <code>mainAxisAlignment</code> et <code>crossAxisAlignment</code> règlent l'alignement dans une <code>Column</code>/<code>Row</code>. <code>Expanded</code> fait qu'un enfant occupe l'espace restant.</div>
+  </section>
+
+  <!-- ETAT -->
+  <section class="step" id="etat">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>Stateless vs Stateful</h2>
+    <p class="goal">Un <b>StatelessWidget</b> est figé (il ne change pas après affichage). Un <b>StatefulWidget</b> a un <b>état</b> qui peut évoluer&nbsp;: on appelle <code>setState()</code> pour dire à Flutter de redessiner l'écran.</p>
+    <p class="term-cap">Exemple — un compteur (état qui change)</p>
+<pre><span class="tk">class</span> <span class="tf">Compteur</span> <span class="tk">extends</span> StatefulWidget {
+  <span class="tk">const</span> Compteur({super.key});
+  <span class="tn">@override</span>
+  State&lt;Compteur&gt; createState() =&gt; _CompteurState();
+}
+
+<span class="tk">class</span> <span class="tf">_CompteurState</span> <span class="tk">extends</span> State&lt;Compteur&gt; {
+  <span class="tk">int</span> _valeur = <span class="tn">0</span>;
+
+  <span class="tn">@override</span>
+  Widget build(BuildContext context) {
+    <span class="tk">return</span> Column(children: [
+      Text(<span class="ts">'Litres : $_valeur'</span>),
+      ElevatedButton(
+        onPressed: () =&gt; setState(() =&gt; _valeur += <span class="tn">100</span>),
+        child: <span class="tk">const</span> Text(<span class="ts">'+100 L'</span>),
+      ),
+    ]);
+  }
+}</pre>
+    <div class="hint"><strong>À retenir —</strong> sans <code>setState()</code>, modifier <code>_valeur</code> ne rafraîchit pas l'écran. C'est <code>setState()</code> qui déclenche un nouveau <code>build()</code>.</div>
+  </section>
+
+  <!-- LISTES -->
+  <section class="step" id="listes">
+    <span class="snum"><span class="dotnum">7</span> Notion</span>
+    <h2>Afficher une liste</h2>
+    <p class="goal"><code>ListView</code> affiche une liste défilante. <code>ListView.builder</code> construit les éléments à la demande&nbsp;: idéal pour une liste venant de données (ex. des campagnes).</p>
+    <p class="term-cap">Exemple</p>
+<pre><span class="tk">final</span> produits = [<span class="ts">'Fioul 500L'</span>, <span class="ts">'Fioul 1000L'</span>, <span class="ts">'Fioul 2000L'</span>];
+
+ListView.builder(
+  itemCount: produits.length,
+  itemBuilder: (context, i) =&gt; ListTile(
+    leading: <span class="tk">const</span> Icon(Icons.local_gas_station),
+    title: Text(produits[i]),
+  ),
+)</pre>
+    <p class="term-cap">Rendu</p>
+    <div class="phone">
+      <div class="pbar">Produits</div>
+      <div class="pcontent">
+        <div class="row"><span class="av">⛽</span> Fioul 500L</div>
+        <div class="row"><span class="av">⛽</span> Fioul 1000L</div>
+        <div class="row"><span class="av">⛽</span> Fioul 2000L</div>
+      </div>
+    </div>
+    <div class="hint"><strong>À retenir —</strong> <code>ListTile</code> est un widget prêt à l'emploi pour une ligne de liste (icône, titre, sous-titre, action).</div>
+  </section>
+
+  <!-- NAVIGATION -->
+  <section class="step" id="navigation">
+    <span class="snum"><span class="dotnum">8</span> Notion</span>
+    <h2>Naviguer entre écrans</h2>
+    <p class="goal">On passe d'un écran à un autre avec le <code>Navigator</code>&nbsp;: <code>push</code> empile un nouvel écran, <code>pop</code> revient en arrière.</p>
+    <p class="term-cap">Aller vers un écran de détail</p>
+<pre>onTap: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) =&gt; <span class="tk">const</span> DetailCampagne(),
+    ),
+  );
+}</pre>
+    <p class="term-cap">Revenir en arrière (depuis l'écran de détail)</p>
+<pre>Navigator.pop(context);</pre>
+    <div class="hint"><strong>À retenir —</strong> le <code>Navigator</code> fonctionne comme une pile&nbsp;: chaque <code>push</code> ajoute un écran par-dessus, chaque <code>pop</code> retire celui du dessus.</div>
+  </section>
+
+  <!-- HTTP -->
+  <section class="step" id="http">
+    <span class="snum"><span class="dotnum">9</span> Notion</span>
+    <h2>Appeler une API (HTTP)</h2>
+    <p class="goal">Le paquet <code>http</code> permet d'interroger une API REST (comme celle construite avec Spring). Les appels réseau sont <b>asynchrones</b>&nbsp;: on utilise <code>async</code>/<code>await</code>.</p>
+    <p class="term-cap">Ajouter le paquet (pubspec.yaml)</p>
+<pre>dependencies:
+  http: ^1.2.0</pre>
+    <p class="term-cap">Récupérer des données et les transformer</p>
+<pre><span class="tk">import</span> <span class="ts">'package:http/http.dart'</span> <span class="tk">as</span> http;
+<span class="tk">import</span> <span class="ts">'dart:convert'</span>;
+
+Future&lt;List&gt; chargerCampagnes() <span class="tk">async</span> {
+  <span class="tk">final</span> url = Uri.parse(<span class="ts">'http://10.0.2.2:8080/api/campagnes'</span>);
+  <span class="tk">final</span> reponse = <span class="tk">await</span> http.get(url);
+  <span class="tk">if</span> (reponse.statusCode == <span class="tn">200</span>) {
+    <span class="tk">return</span> jsonDecode(reponse.body);   <span class="tc">// JSON → liste Dart</span>
+  }
+  <span class="tk">throw</span> Exception(<span class="ts">'Erreur de chargement'</span>);
+}</pre>
+    <div class="warn"><strong>Émulateur Android —</strong> pour joindre une API sur ton PC, l'adresse est <code>10.0.2.2</code> (et non <code>localhost</code>, qui désignerait l'émulateur lui-même).</div>
+    <div class="tip"><strong>Afficher le résultat —</strong> on combine souvent <code>FutureBuilder</code> (gère chargement/erreur/données) avec <code>ListView.builder</code> pour afficher la liste reçue de l'API.</div>
+  </section>
+
+  <!-- FORMULAIRE -->
+  <section class="step" id="formulaire">
+    <span class="snum"><span class="dotnum">10</span> Notion</span>
+    <h2>Un formulaire</h2>
+    <p class="goal">Un <code>TextField</code> saisit du texte&nbsp;; un <code>TextEditingController</code> en récupère la valeur. Un bouton déclenche l'action (ex. envoyer en POST à l'API).</p>
+    <p class="term-cap">Exemple — saisir une quantité de litres</p>
+<pre><span class="tk">final</span> _litres = TextEditingController();
+
+Column(children: [
+  TextField(
+    controller: _litres,
+    keyboardType: TextInputType.number,
+    decoration: <span class="tk">const</span> InputDecoration(labelText: <span class="ts">'Litres'</span>),
+  ),
+  ElevatedButton(
+    onPressed: () {
+      <span class="tk">final</span> valeur = _litres.text;   <span class="tc">// la saisie</span>
+      <span class="tc">// ... envoyer à l'API : POST /campagnes/{id}/commandes</span>
+    },
+    child: <span class="tk">const</span> Text(<span class="ts">'Rejoindre la campagne'</span>),
+  ),
+])</pre>
+    <div class="hint"><strong>Le lien avec le projet —</strong> ces bases suffisent à afficher les campagnes et à s'y inscrire. Pour l'appli complète, écran par écran (modèle → service → liste → détail → état → formulaire → auth JWT), voir le <a href="parcours-flutter.html">guide pas à pas</a>.</div>
+  </section>
+
+  <!-- RESSOURCES -->
+  <section class="step" id="ressources">
+    <span class="snum"><span class="dotnum">＋</span> Pour aller plus loin</span>
+    <h2>Ressources Flutter</h2>
+    <div class="reslist">
+      <a class="res" href="parcours-flutter.html">
+        <div class="rtop"><span class="rname">Guide pas à pas — appli fioul <span class="ext">→</span></span><span class="tags"><span class="rt">Pratique</span><span class="rt fr">FR</span></span></div>
+        <span class="rdesc">Construire l'appli du projet écran par écran, sur cette plateforme.</span>
+        <span class="rurl">parcours-flutter.html</span>
+      </a>
+      <a class="res" href="https://docs.flutter.dev/get-started/codelab" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Flutter — Codelab officiel <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">« Write your first app »&nbsp;: le tutoriel pas à pas officiel pour débuter.</span>
+        <span class="rurl">docs.flutter.dev</span>
+      </a>
+      <a class="res" href="https://dart.dev/language" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Le langage Dart <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Les bases du langage&nbsp;: variables, fonctions, classes, async/await.</span>
+        <span class="rurl">dart.dev/language</span>
+      </a>
+      <a class="res" href="https://docs.flutter.dev/ui/widgets" target="_blank" rel="noopener">
+        <div class="rtop"><span class="rname">Catalogue des widgets <span class="ext">↗</span></span><span class="tags"><span class="rt off">Officiel</span><span class="rt off">EN</span></span></div>
+        <span class="rdesc">Tous les widgets Flutter, illustrés&nbsp;: la référence à garder sous la main.</span>
+        <span class="rurl">docs.flutter.dev/ui/widgets</span>
+      </a>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="../springboot/tuto-spring.html">← Cours Spring Boot</a>
+    <a class="next" href="parcours-flutter.html">Passer à la pratique&nbsp;: le guide pas à pas →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Cours Flutter de base, en français — rédigé pour la plateforme SIO WEB. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parcours Flutter pas à pas — Fioul Groupé</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Guide pas à pas — Flutter</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="../mongodb/parcours-mongodb.html">1 · MongoDB</a>
+      <a href="../springboot/parcours-api-spring.html">2 · API Spring</a>
+      <a href="parcours-flutter.html" class="on">3 · Flutter</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › Parcours 3 · Flutter</div>
+    <span class="lbadge">📱 Parcours 3 — Application mobile</span>
+    <h1>Construire l'appli mobile, écran par écran</h1>
+    <p class="intro">Même démarche en couches, côté client&nbsp;: <strong>modèle → service HTTP → liste → détail → état → formulaire → authentification</strong>. À chaque étape, l'exemple médiathèque puis l'adaptation au fioul. L'appli consomme la <strong>vraie API</strong> du parcours&nbsp;2.</p>
+    <div class="howto">
+      <div class="h ex"><span class="b">1</span><div><strong>J'observe l'écran</strong><span>Code Dart/Flutter commenté sur l'exemple « Livre ».</span></div></div>
+      <div class="h ad"><span class="b">2</span><div><strong>Je fais le mien</strong><span>Le même écran pour les campagnes de fioul.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#e0">0 · Le projet</a>
+    <a href="#e1">1 · Modèle</a>
+    <a href="#e2">2 · Service HTTP</a>
+    <a href="#e3">3 · Écran liste</a>
+    <a href="#e4">4 · Écran détail</a>
+    <a href="#e5">5 · État (Provider)</a>
+    <a href="#e6">6 · Formulaire</a>
+    <a href="#e7">7 · Auth JWT</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <div class="hint" style="margin-top:26px">
+    <strong>La symétrie avec l'API —</strong> chaque couche Flutter reflète une couche Spring&nbsp;:
+    <table class="maptab">
+      <thead><tr><th>Côté Spring (parcours 2)</th><th></th><th>Côté Flutter (ici)</th></tr></thead>
+      <tbody>
+        <tr><td>DTO (JSON)</td><td>↔</td><td>Modèle Dart + <code>fromJson</code></td></tr>
+        <tr><td>Endpoints REST</td><td>↔</td><td>Service HTTP (<code>http.get/post</code>)</td></tr>
+        <tr><td><code>GET /campagnes</code></td><td>↔</td><td>Écran liste</td></tr>
+        <tr><td><code>POST /commandes</code></td><td>↔</td><td>Formulaire d'inscription</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ETAPE 0 -->
+  <section class="step" id="e0">
+    <span class="snum"><span class="dotnum">0</span> Étape 0</span>
+    <h2>Créer le projet &amp; l'organiser</h2>
+    <p class="goal">Un projet Flutter avec une structure de dossiers claire&nbsp;: on sépare modèles, services et écrans dès le départ.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Arborescence</div>
+        <div class="pbody">
+<pre>flutter create mediatheque_app
+
+lib/
+├── models/      <span class="tc">// classes de données</span>
+├── services/    <span class="tc">// appels HTTP</span>
+├── providers/   <span class="tc">// état</span>
+├── screens/     <span class="tc">// les écrans</span>
+└── main.dart</pre>
+          <p>Dans <code>pubspec.yaml</code>, on ajoute les paquets <code>http</code> et <code>provider</code>.</p>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Le projet mobile</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>flutter create fioul_app</code> (dossier <code>mobile/</code> du dépôt).</li>
+            <li>Reproduis la même arborescence (<code>models</code>, <code>services</code>, <code>providers</code>, <code>screens</code>).</li>
+            <li>Ajoute <code>http</code> et <code>provider</code> dans <code>pubspec.yaml</code>.</li>
+            <li>Définis une constante <code>apiBaseUrl</code> vers ton API Spring.</li>
+          </ul>
+          <div class="warn"><strong>Émulateur Android —</strong> pour joindre une API locale, utilise <code>http://10.0.2.2:8080</code> (et non <code>localhost</code>).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 1 -->
+  <section class="step" id="e1">
+    <span class="snum"><span class="dotnum">1</span> Étape 1</span>
+    <h2>Le modèle Dart</h2>
+    <p class="goal">Une classe qui reflète le DTO renvoyé par l'API, avec un constructeur <code>fromJson</code> pour transformer la réponse JSON en objet Dart.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Livre</div>
+        <div class="pbody">
+<pre><span class="tk">class</span> <span class="tf">Livre</span> {
+  <span class="tk">final</span> String id;
+  <span class="tk">final</span> String titre;
+  <span class="tk">final</span> <span class="tk">double</span> noteMoyenne;
+
+  Livre({<span class="tk">required this</span>.id,
+        <span class="tk">required this</span>.titre,
+        <span class="tk">required this</span>.noteMoyenne});
+
+  <span class="tk">factory</span> Livre.fromJson(Map&lt;String, dynamic&gt; j) =&gt; Livre(
+    id: j[<span class="ts">'id'</span>],
+    titre: j[<span class="ts">'titre'</span>],
+    noteMoyenne: (j[<span class="ts">'noteMoyenne'</span>] <span class="tk">as</span> num).toDouble(),
+  );
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Campagne</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée la classe <code>Campagne</code> qui reflète ton <code>CampagneDTO</code>.</li>
+            <li>Champs&nbsp;: <code>id</code>, <code>zone</code>, <code>statut</code>, <code>volumeTotal</code>, <code>prixLitre</code>.</li>
+            <li>Écris <code>Campagne.fromJson()</code> (attention aux nombres&nbsp;: <code>as num</code>).</li>
+            <li>Crée aussi un modèle <code>Commande</code> pour le formulaire.</li>
+          </ul>
+          <div class="tip"><strong>Astuce —</strong> le nom des champs JSON doit correspondre <em>exactement</em> à ceux de ton DTO Spring. En cas de doute, regarde la réponse dans Swagger.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 2 -->
+  <section class="step" id="e2">
+    <span class="snum"><span class="dotnum">2</span> Étape 2</span>
+    <h2>Le service HTTP</h2>
+    <p class="goal">Une classe qui appelle l'API et renvoie des objets Dart. C'est le pendant du contrôleur Spring, vu du client.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreService</div>
+        <div class="pbody">
+<pre><span class="tk">class</span> <span class="tf">LivreService</span> {
+  <span class="tk">static const</span> _base = <span class="ts">'http://10.0.2.2:8080/api'</span>;
+
+  Future&lt;List&lt;Livre&gt;&gt; getAll() <span class="tk">async</span> {
+    <span class="tk">final</span> r = <span class="tk">await</span> http.get(Uri.parse(<span class="ts">'$_base/livres'</span>));
+    <span class="tk">if</span> (r.statusCode != <span class="tn">200</span>) <span class="tk">throw</span> Exception(<span class="ts">'Erreur API'</span>);
+    <span class="tk">final</span> List data = jsonDecode(r.body);
+    <span class="tk">return</span> data.map((j) =&gt; Livre.fromJson(j)).toList();
+  }
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneService</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagneService</code> avec <code>getOuvertes({String? zone})</code>.</li>
+            <li>Construis l'URL avec le filtre&nbsp;: <code>/campagnes?zone=Ladignac</code>.</li>
+            <li>Ajoute <code>getDetail(String id)</code>.</li>
+            <li>Prépare <code>rejoindre(id, Commande)</code> en <code>http.post</code> (utilisé à l'étape 6).</li>
+          </ul>
+          <div class="hint"><strong>Bon réflexe —</strong> centralise la gestion d'erreurs ici (codes 400/401/409 renvoyés par l'API) plutôt que dans chaque écran.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 3 -->
+  <section class="step" id="e3">
+    <span class="snum"><span class="dotnum">3</span> Étape 3</span>
+    <h2>L'écran liste</h2>
+    <p class="goal">Afficher la liste renvoyée par l'API avec <code>FutureBuilder</code> (gestion du chargement/erreur) et <code>ListView.builder</code>.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Liste des livres</div>
+        <div class="pbody">
+<pre>FutureBuilder&lt;List&lt;Livre&gt;&gt;(
+  future: LivreService().getAll(),
+  builder: (ctx, snap) {
+    <span class="tk">if</span> (!snap.hasData) <span class="tk">return</span> CircularProgressIndicator();
+    <span class="tk">final</span> livres = snap.data!;
+    <span class="tk">return</span> ListView.builder(
+      itemCount: livres.length,
+      itemBuilder: (_, i) =&gt; ListTile(
+        title: Text(livres[i].titre),
+        trailing: Text(<span class="ts">'★ ${livres[i].noteMoyenne}'</span>),
+      ),
+    );
+  },
+)</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Liste des campagnes</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagnesScreen</code> avec un <code>FutureBuilder</code>.</li>
+            <li>Chaque item&nbsp;: une <code>Card</code> avec la <code>zone</code>, le <code>volumeTotal</code> et le <code>prixLitre</code>.</li>
+            <li>Gère l'état de <b>chargement</b> et l'état d'<b>erreur</b> (message clair).</li>
+            <li>Ajoute un « pull-to-refresh » (<code>RefreshIndicator</code>).</li>
+          </ul>
+          <div class="tip"><strong>Touche produit —</strong> affiche une petite <b>jauge</b> de progression du volume vers le prochain palier (widget <code>LinearProgressIndicator</code>).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 4 -->
+  <section class="step" id="e4">
+    <span class="snum"><span class="dotnum">4</span> Étape 4</span>
+    <h2>L'écran détail &amp; la navigation</h2>
+    <p class="goal">Passer d'un écran à l'autre en transmettant un identifiant, puis charger le détail depuis l'API.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Détail d'un livre</div>
+        <div class="pbody">
+<pre><span class="tc">// depuis la liste :</span>
+onTap: () =&gt; Navigator.push(ctx, MaterialPageRoute(
+  builder: (_) =&gt; LivreDetail(id: livres[i].id),
+));
+
+<span class="tc">// dans LivreDetail : charger le détail + afficher les avis</span></pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Détail d'une campagne</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Au tap sur une campagne, navigue vers <code>CampagneDetail(id)</code>.</li>
+            <li>Charge le détail (<code>getDetail</code>) et affiche zone, date limite, volume, prix.</li>
+            <li>Affiche la jauge volume → palier, plus grande.</li>
+            <li>Ajoute un bouton « Rejoindre cette campagne » (mène au formulaire de l'étape 6).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 5 -->
+  <section class="step" id="e5">
+    <span class="snum"><span class="dotnum">5</span> Étape 5</span>
+    <h2>La gestion d'état avec Provider</h2>
+    <p class="goal">Partager les données entre écrans et rafraîchir l'UI automatiquement, sans tout recharger à la main, grâce à <code>ChangeNotifier</code>.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> LivreProvider</div>
+        <div class="pbody">
+<pre><span class="tk">class</span> <span class="tf">LivreProvider</span> <span class="tk">extends</span> ChangeNotifier {
+  List&lt;Livre&gt; _livres = [];
+  List&lt;Livre&gt; <span class="tk">get</span> livres =&gt; _livres;
+
+  Future&lt;<span class="tk">void</span>&gt; charger() <span class="tk">async</span> {
+    _livres = <span class="tk">await</span> LivreService().getAll();
+    notifyListeners();   <span class="tc">// l'UI se met à jour</span>
+  }
+}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> CampagneProvider</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Crée <code>CampagneProvider extends ChangeNotifier</code>.</li>
+            <li>Méthodes&nbsp;: <code>charger(zone)</code>, <code>rejoindre(...)</code>.</li>
+            <li>Après une inscription, appelle <code>notifyListeners()</code> pour rafraîchir la jauge.</li>
+            <li>Enregistre le provider avec <code>ChangeNotifierProvider</code> en haut de l'app.</li>
+            <li>Consomme-le dans les écrans avec <code>Consumer&lt;CampagneProvider&gt;</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 6 -->
+  <section class="step" id="e6">
+    <span class="snum"><span class="dotnum">6</span> Étape 6</span>
+    <h2>Le formulaire &amp; l'envoi (POST)</h2>
+    <p class="goal">Saisir des données validées et les envoyer à l'API. C'est le miroir de la validation Spring de l'étape 6 côté serveur.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Ajouter un avis</div>
+        <div class="pbody">
+<pre><span class="tk">final</span> _form = GlobalKey&lt;FormState&gt;();
+
+TextFormField(
+  decoration: InputDecoration(labelText: <span class="ts">'Note /5'</span>),
+  keyboardType: TextInputType.number,
+  validator: (v) {
+    <span class="tk">final</span> n = int.tryParse(v ?? <span class="ts">''</span>);
+    <span class="tk">if</span> (n == <span class="tk">null</span> || n &lt; <span class="tn">0</span> || n &gt; <span class="tn">5</span>) <span class="tk">return</span> <span class="ts">'Note entre 0 et 5'</span>;
+    <span class="tk">return</span> <span class="tk">null</span>;
+  },
+)
+<span class="tc">// à la validation : if (_form.currentState!.validate()) { ...post... }</span></pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> S'inscrire à une campagne</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Formulaire&nbsp;: <code>litres</code> (nombre), <code>commune</code>, <code>adresse</code>.</li>
+            <li>Validation client&nbsp;: litres ≥ 500 (aligné sur la règle serveur).</li>
+            <li>À la soumission&nbsp;: <code>POST /campagnes/{id}/commandes</code>.</li>
+            <li>Affiche un <code>SnackBar</code> de succès, ou l'erreur renvoyée par l'API (ex. campagne clôturée).</li>
+            <li>Rafraîchis le détail (volume + prix mis à jour).</li>
+          </ul>
+          <div class="hint"><strong>Double validation —</strong> le client valide pour le confort, le serveur valide pour la sécurité. Les deux sont nécessaires.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETAPE 7 -->
+  <section class="step" id="e7">
+    <span class="snum"><span class="dotnum">7</span> Étape 7</span>
+    <h2>L'authentification JWT</h2>
+    <p class="goal">Se connecter, stocker le jeton, et l'envoyer dans l'en-tête <code>Authorization</code> des requêtes protégées. Le pendant client de la sécurité Spring.</p>
+    <div class="panels">
+      <div class="panel ex">
+        <div class="ph"><span class="tagp">Exemple</span> Connexion &amp; jeton</div>
+        <div class="pbody">
+<pre>Future&lt;String&gt; login(String email, String mdp) <span class="tk">async</span> {
+  <span class="tk">final</span> r = <span class="tk">await</span> http.post(
+    Uri.parse(<span class="ts">'$_base/auth/login'</span>),
+    headers: {<span class="ts">'Content-Type'</span>: <span class="ts">'application/json'</span>},
+    body: jsonEncode({<span class="ts">'email'</span>: email, <span class="ts">'motDePasse'</span>: mdp}),
+  );
+  <span class="tk">return</span> jsonDecode(r.body)[<span class="ts">'token'</span>];   <span class="tc">// le JWT</span>
+}
+
+<span class="tc">// requête protégée :</span>
+headers: {<span class="ts">'Authorization'</span>: <span class="ts">'Bearer $token'</span>}</pre>
+        </div>
+      </div>
+      <div class="panel ad">
+        <div class="ph"><span class="tagp">À toi — Fioul</span> Connexion des utilisateurs</div>
+        <div class="pbody">
+          <ul class="check">
+            <li>Écran de connexion / inscription (particulier, coordinateur).</li>
+            <li>Stocke le jeton (paquet <code>flutter_secure_storage</code>).</li>
+            <li>Ajoute le header <code>Authorization</code> à toutes les requêtes protégées.</li>
+            <li>Réserve « ouvrir une campagne » au rôle <b>coordinateur</b>.</li>
+          </ul>
+          <div class="warn"><strong>Passerelle Cyber —</strong> ne stocke jamais le jeton en clair&nbsp;; gère son expiration&nbsp;; ne fais pas confiance au rôle côté client (le serveur reste l'autorité).</div>
+          <div class="hint"><strong>Bilan du parcours —</strong> l'appli mobile consomme l'API sécurisée, de bout en bout&nbsp;: MongoDB → Spring → Flutter. Le produit Fioul Groupé est complet.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="../springboot/parcours-api-spring.html">← Parcours 2 · API Spring</a>
+    <a class="next" href="../index.html">Retour au portail →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">Guide pas à pas Flutter — exemple médiathèque à transposer au projet. BTS SIO SLAM, lycée Suzanne Valadon.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

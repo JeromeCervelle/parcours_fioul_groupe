@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 07 — Les projections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 07</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 07</div>
+    <span class="lbadge">Chapitre 07 / 17</span>
+    <h1>Les projections</h1>
+    <p class="intro">Une <b>projection</b> choisit les champs renvoyés par une requête. Bien projeter, c'est renvoyer <b>moins de données</b> (plus rapide, plus léger sur le réseau) et ne montrer au client que ce qui le concerne.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#principe">1 · Principe</a>
+    <a href="#inclusion">2 · Inclusion</a>
+    <a href="#exclusion">3 · Exclusion</a>
+    <a href="#id">4 · Le cas _id</a>
+    <a href="#tableaux">5 · Projeter un tableau</a>
+    <a href="#imbrique">6 · Champs imbriqués</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="principe">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Le principe</h2>
+    <p class="goal">La projection est le <b>second argument</b> de <code>find()</code>&nbsp;: un objet qui indique, champ par champ, ce qu'on garde (<code>1</code>) ou ce qu'on retire (<code>0</code>).</p>
+<pre>db.collection.find( <span class="tc">filtre</span>, <span class="tc">projection</span> )</pre>
+    <div class="hint"><strong>À retenir —</strong> le filtre décide <em>quels documents</em>&nbsp;; la projection décide <em>quels champs</em> de ces documents.</div>
+  </section>
+
+  <section class="step" id="inclusion">
+    <span class="snum"><span class="dotnum">2</span> Mode</span>
+    <h2>Inclusion — ne garder que certains champs</h2>
+    <p class="goal">On liste les champs à <b>inclure</b> avec <code>1</code>. Tous les autres sont exclus (sauf <code>_id</code>, cas particulier).</p>
+<pre>db.clients.find({}, { nom: <span class="tn">1</span>, points: <span class="tn">1</span> })</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ _id: ObjectId("..."), nom: "Dupont", points: 120 }
+{ _id: ObjectId("..."), nom: "Martin", points: 80 }</div>
+  </section>
+
+  <section class="step" id="exclusion">
+    <span class="snum"><span class="dotnum">3</span> Mode</span>
+    <h2>Exclusion — tout garder sauf…</h2>
+    <p class="goal">À l'inverse, on liste les champs à <b>exclure</b> avec <code>0</code>. Tous les autres sont conservés.</p>
+<pre>db.clients.find({}, { adresse: <span class="tn">0</span> })   <span class="tc">// tout sauf l'adresse</span></pre>
+    <div class="warn"><strong>Règle —</strong> on ne <b>mélange pas</b> inclusion et exclusion dans la même projection (erreur), à la seule exception de <code>_id</code> qu'on peut exclure tout en incluant d'autres champs.</div>
+  </section>
+
+  <section class="step" id="id">
+    <span class="snum"><span class="dotnum">4</span> Cas</span>
+    <h2>Le cas particulier _id</h2>
+    <p class="goal"><code>_id</code> est renvoyé <b>par défaut</b>, même en mode inclusion. Pour le masquer, il faut l'exclure explicitement.</p>
+<pre>db.clients.find({}, { nom: <span class="tn">1</span>, _id: <span class="tn">0</span> })</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ nom: "Dupont" }
+{ nom: "Martin" }</div>
+  </section>
+
+  <section class="step" id="tableaux">
+    <span class="snum"><span class="dotnum">5</span> Avancé</span>
+    <h2>Projeter une partie d'un tableau</h2>
+    <p class="goal"><code>$slice</code> limite le nombre d'éléments renvoyés d'un tableau&nbsp;; <code>$elemMatch</code> (en projection) ne renvoie que le premier élément qui correspond.</p>
+<pre><span class="tc">// ne renvoyer que les 2 premières commandes de chaque campagne</span>
+db.campagnes.find({}, { zone: <span class="tn">1</span>, commandes: { <span class="ts">$slice</span>: <span class="tn">2</span> } })
+
+<span class="tc">// ne renvoyer que la commande de Ladignac</span>
+db.campagnes.find(
+  { },
+  { commandes: { <span class="ts">$elemMatch</span>: { commune: <span class="ts">"Ladignac"</span> } } }
+)</pre>
+  </section>
+
+  <section class="step" id="imbrique">
+    <span class="snum"><span class="dotnum">6</span> Avancé</span>
+    <h2>Projeter des champs imbriqués</h2>
+    <p class="goal">On cible un champ dans un sous-document avec la notation pointée.</p>
+<pre>db.clients.find({}, { <span class="ts">"nom"</span>: <span class="tn">1</span>, <span class="ts">"adresse.ville"</span>: <span class="tn">1</span>, _id: <span class="tn">0</span> })</pre>
+    <p class="term-cap">Résultat</p>
+    <div class="res-out">{ nom: "Dupont", adresse: { ville: "Limoges" } }</div>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Pour l'écran « liste des campagnes », on ne renvoie pas tout&nbsp;: juste <code>zone</code>, <code>statut</code>, <code>dateLimite</code> (projection en inclusion, <code>_id: 0</code> si inutile). La grosse liste des <code>commandes</code> n'est chargée que sur l'écran de détail. C'est exactement le rôle des DTO côté Spring&nbsp;: décider quoi exposer.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>Projection = 2<sup>e</sup> argument de <code>find()</code>&nbsp;: <code>1</code> inclut, <code>0</code> exclut.</li>
+        <li>Pas de mélange inclusion/exclusion (sauf <code>_id</code>).</li>
+        <li><code>_id</code> est renvoyé par défaut&nbsp;; <code>_id: 0</code> pour le masquer.</li>
+        <li>Tableaux&nbsp;: <code>$slice</code>, <code>$elemMatch</code>&nbsp;; imbriqué&nbsp;: notation pointée.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongo-ch06.html">← Chapitre 06</a>
+    <a class="next" href="mongo-ch08.html">Chapitre 08 · Modéliser une base →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 07 — Les projections. Plateforme SIO WEB.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

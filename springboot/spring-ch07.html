@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring · Chapitre 07 — Partie Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="spring">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Spring Boot · Chapitre 07</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="spring-chapitres.html">Chapitres</a><a href="tuto-spring.html">Cours de base</a><a href="parcours-api-spring.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="spring-chapitres.html">Spring Boot</a> › Chapitre 07</div>
+  <span class="lbadge">Chapitre 07 / 19</span>
+  <h1>Spring Boot — la partie Services</h1>
+  <p class="intro">La couche qui porte la logique métier. On y applique le clean code et les principes SOLID, et on comprend l'injection de dépendances comme outil de découplage.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#role">1 · Rôle du service</a><a href="#injection">2 · Injection</a><a href="#solid">3 · SOLID</a><a href="#trans">4 · Transactions</a></div></nav>
+<main class="wrap">
+  <section class="step" id="role">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Le rôle de la couche service</h2>
+    <p class="goal">Le service <b>décide</b>&nbsp;: il applique les règles métier, orchestre les appels au repository, transforme entités ↔ DTO. C'est le seul endroit où vit la logique — pas dans le contrôleur, pas dans le repository.</p>
+    <p><code>@Service</code> déclare la classe comme un bean géré par Spring.</p>
+  </section>
+  <section class="step" id="injection">
+    <span class="snum"><span class="dotnum">2</span> Bonne pratique</span>
+    <h2>L'injection par constructeur</h2>
+    <p class="goal">On injecte les dépendances via le constructeur (et non par champ)&nbsp;: c'est testable, immuable (<code>final</code>) et explicite.</p>
+<pre><span class="tn">@Service</span>
+<span class="tk">public class</span> <span class="tf">CampagneService</span> {
+    <span class="tk">private final</span> CampagneRepository repo;
+    <span class="tk">private final</span> FournisseurRepository fournisseurs;
+    <span class="tk">public</span> CampagneService(CampagneRepository r, FournisseurRepository f) {
+        <span class="tk">this</span>.repo = r; <span class="tk">this</span>.fournisseurs = f;
+    }
+}</pre>
+  </section>
+  <section class="step" id="solid">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Un aperçu de SOLID</h2>
+    <p class="goal">Cinq principes pour un code maintenable&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>S</b> — une classe, une responsabilité.</li>
+      <li><b>O</b> — ouverte à l'extension, fermée à la modification.</li>
+      <li><b>L</b> — substituabilité des sous-types.</li>
+      <li><b>I</b> — interfaces spécifiques plutôt qu'une géante.</li>
+      <li><b>D</b> — dépendre d'abstractions (interfaces), pas d'implémentations.</li>
+    </ul>
+    <div class="hint"><strong>En pratique —</strong> le « D » est exactement ce que fait l'injection Spring&nbsp;: le service dépend de l'interface <code>CampagneRepository</code>, pas d'une implémentation concrète.</div>
+  </section>
+  <section class="step" id="trans">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>Transactions</h2>
+    <p class="goal"><code>@Transactional</code> garantit qu'un ensemble d'opérations réussit ou échoue en bloc. (Support selon la base&nbsp;: MongoDB gère les transactions multi-documents sur un replica set / Atlas.)</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Prépare <code>CampagneService</code> avec ses dépendances injectées par constructeur. Au chapitre 8, on y écrit les vraies règles&nbsp;: rejoindre une campagne, calculer le palier, refuser une campagne clôturée.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Le service porte la logique métier&nbsp;; <code>@Service</code>.</li>
+      <li>Injection par constructeur (testable, <code>final</code>).</li>
+      <li>SOLID pour la maintenabilité&nbsp;; <code>@Transactional</code> pour l'atomicité.</li></ul></div>
+  </section>
+  <div class="pager"><a href="spring-ch06.html">← Chapitre 06</a><a class="next" href="spring-ch08.html">Chapitre 08 · Projet — couche Services →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Spring Boot · Chapitre 07 — Partie Services. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

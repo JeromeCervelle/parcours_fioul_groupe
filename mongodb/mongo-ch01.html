@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chapitre 01 — Introduction à MongoDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>
+.fioul-box{background:var(--fioul-wash);border:1px solid color-mix(in srgb,var(--fioul) 30%,var(--line));border-radius:12px;padding:16px 18px;margin-top:22px}
+.fioul-box .ttl{font-weight:700;color:var(--fioul-ink);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fioul-box p,.fioul-box li{color:var(--ink-soft);font-size:.93rem}
+.res-out{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 15px;margin:12px 0;font-family:"JetBrains Mono";font-size:.8rem;color:var(--ink-soft);overflow-x:auto;line-height:1.5;white-space:pre-wrap}
+.recap{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-top:22px}
+.recap strong{display:block;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:8px}
+.recap ul{margin:0;padding-left:20px;color:var(--ink-soft);font-size:.93rem}
+</style>
+</head>
+<body data-track="mongo">
+
+<header class="top">
+  <div class="wrap row">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>MongoDB · Chapitre 01</small></span></a>
+    <nav class="nav" id="nav">
+      <a href="../index.html">Accueil</a>
+      <a href="mongodb-chapitres.html">Chapitres</a>
+      <a href="tuto-mongodb.html">Cours de base</a>
+      <a href="parcours-mongodb.html">Guide pas à pas</a>
+    </nav>
+    <button class="icon-btn push" id="theme" title="Changer de thème" aria-label="Changer de thème">◐</button>
+    <button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<section class="lesson-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="mongodb-chapitres.html">MongoDB</a> › Chapitre 01</div>
+    <span class="lbadge">Chapitre 01 / 17</span>
+    <h1>Introduction à MongoDB</h1>
+    <p class="intro">Comprendre ce qu'est une base NoSQL orientée documents, en quoi elle diffère du modèle relationnel, et de quoi se compose l'écosystème MongoDB. C'est le socle de tout le parcours.</p>
+  </div>
+</section>
+
+<nav class="stepnav" id="stepnav">
+  <div class="wrap">
+    <a href="#nosql">1 · NoSQL</a>
+    <a href="#document">2 · Le document</a>
+    <a href="#collection">3 · Collections &amp; base</a>
+    <a href="#sqlvs">4 · SQL vs MongoDB</a>
+    <a href="#quand">5 · Quand l'utiliser</a>
+    <a href="#ecosysteme">6 · L'écosystème</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section class="step" id="nosql">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>Qu'est-ce qu'une base NoSQL&nbsp;?</h2>
+    <p class="goal">Les bases <b>relationnelles</b> (MySQL, PostgreSQL…) stockent les données dans des <b>tables</b> avec un schéma rigide (colonnes fixes, types imposés) et relient les tables par des clés. Les bases <b>NoSQL</b> (« Not Only SQL ») assouplissent ce modèle pour gagner en flexibilité et en montée en charge.</p>
+    <p style="color:var(--ink-soft);margin-top:10px">Il existe plusieurs familles de NoSQL&nbsp;: clé-valeur (Redis), colonnes (Cassandra), graphes (Neo4j) et <b>documents</b>. MongoDB appartient à la famille <b>orientée documents</b>&nbsp;: c'est la plus proche de la façon dont on manipule les données dans le code (objets JSON).</p>
+    <div class="hint"><strong>À retenir —</strong> NoSQL ne veut pas dire « sans structure » ni « sans SQL supérieur »&nbsp;: c'est un <em>autre</em> compromis, adapté à des données souples, hétérogènes ou très volumineuses.</div>
+  </section>
+
+  <section class="step" id="document">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>Le document, unité de base</h2>
+    <p class="goal">Dans MongoDB, on ne stocke pas des lignes mais des <b>documents</b>&nbsp;: des structures clé-valeur au format proche du JSON. Un document peut contenir des <b>tableaux</b> et des <b>sous-documents</b> imbriqués.</p>
+    <p class="term-cap">Un document (vue JSON)</p>
+<pre>{
+  <span class="ts">"_id"</span>: ObjectId(<span class="ts">"652f1a..."</span>),
+  <span class="ts">"nom"</span>: <span class="ts">"Dupont"</span>,
+  <span class="ts">"adresse"</span>: { <span class="ts">"ville"</span>: <span class="ts">"Limoges"</span>, <span class="ts">"cp"</span>: <span class="ts">"87000"</span> },   <span class="tc">// sous-document</span>
+  <span class="ts">"commandes"</span>: [ <span class="tn">500</span>, <span class="tn">1000</span> ]                              <span class="tc">// tableau</span>
+}</pre>
+    <p style="color:var(--ink-soft)">En interne, MongoDB stocke ces documents au format <b>BSON</b> (<i>Binary JSON</i>)&nbsp;: une version binaire du JSON, plus compacte et enrichie de types que JSON ne connaît pas (dates, entiers 64 bits, <code>ObjectId</code>…).</p>
+    <div class="hint"><strong>JSON vs BSON —</strong> on <em>écrit</em> et on <em>lit</em> du JSON&nbsp;; MongoDB <em>stocke</em> du BSON. Le BSON ajoute des types (Date, Int32, Decimal128…) et permet un parcours rapide des documents.</div>
+  </section>
+
+  <section class="step" id="collection">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>Collections &amp; base de données</h2>
+    <p class="goal">Les documents sont regroupés dans des <b>collections</b> (l'équivalent des tables), elles-mêmes contenues dans une <b>base de données</b>. Contrairement à une table, une collection <b>n'impose pas de schéma</b>&nbsp;: deux documents d'une même collection peuvent avoir des champs différents.</p>
+    <table class="maptab">
+      <thead><tr><th>Concept</th><th>Rôle</th></tr></thead>
+      <tbody>
+        <tr><td>Base de données</td><td>conteneur de collections (ex. <code>fioul</code>)</td></tr>
+        <tr><td>Collection</td><td>groupe de documents (ex. <code>campagnes</code>)</td></tr>
+        <tr><td>Document</td><td>un enregistrement (ex. une campagne)</td></tr>
+        <tr><td>Champ</td><td>une propriété du document (ex. <code>zone</code>)</td></tr>
+      </tbody>
+    </table>
+    <div class="hint"><strong>Souplesse —</strong> cette absence de schéma imposé est un atout (on fait évoluer les données sans migration lourde) mais demande de la <em>discipline</em>&nbsp;: on verra au chapitre 10 comment poser des règles avec la validation de schéma.</div>
+  </section>
+
+  <section class="step" id="sqlvs">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>SQL vs MongoDB — le vocabulaire</h2>
+    <p class="goal">Pour qui vient du relationnel, voici la table de correspondance des termes et des opérations.</p>
+    <table class="maptab">
+      <thead><tr><th>Monde SQL</th><th>Monde MongoDB</th></tr></thead>
+      <tbody>
+        <tr><td>Table</td><td>Collection</td></tr>
+        <tr><td>Ligne / enregistrement</td><td>Document</td></tr>
+        <tr><td>Colonne</td><td>Champ</td></tr>
+        <tr><td>Clé primaire</td><td>Champ <code>_id</code></td></tr>
+        <tr><td><code>INSERT INTO</code></td><td><code>insertOne()</code> / <code>insertMany()</code></td></tr>
+        <tr><td><code>SELECT</code></td><td><code>find()</code></td></tr>
+        <tr><td><code>UPDATE</code></td><td><code>updateOne()</code> / <code>updateMany()</code></td></tr>
+        <tr><td><code>DELETE</code></td><td><code>deleteOne()</code> / <code>deleteMany()</code></td></tr>
+        <tr><td><code>JOIN</code></td><td>documents imbriqués ou <code>$lookup</code></td></tr>
+        <tr><td><code>GROUP BY</code></td><td><code>aggregate()</code> avec <code>$group</code></td></tr>
+      </tbody>
+    </table>
+    <div class="hint"><strong>Différence de fond —</strong> en SQL on répartit les données dans plusieurs tables reliées&nbsp;; en MongoDB on regroupe souvent dans <em>un seul document</em> ce qu'on lit ensemble. On y reviendra au chapitre 8 (modélisation).</div>
+  </section>
+
+  <section class="step" id="quand">
+    <span class="snum"><span class="dotnum">5</span> Notion</span>
+    <h2>Quand choisir MongoDB&nbsp;?</h2>
+    <p class="goal">MongoDB brille quand les données sont <b>souples, hiérarchiques ou évolutives</b>, et quand on veut itérer vite. Il n'est pas toujours le bon choix&nbsp;: pour des transactions financières complexes multi-tables, le relationnel reste souvent préférable.</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>Bon terrain</b> — catalogues, profils utilisateurs, données de capteurs, contenus variés, prototypage rapide.</li>
+      <li><b>Terrain plus délicat</b> — comptabilité stricte, données fortement relationnelles avec beaucoup de jointures.</li>
+    </ul>
+    <div class="hint"><strong>À retenir —</strong> le bon réflexe n'est pas « NoSQL contre SQL » mais « quel modèle colle à mes données et à mes accès&nbsp;? ».</div>
+  </section>
+
+  <section class="step" id="ecosysteme">
+    <span class="snum"><span class="dotnum">6</span> Notion</span>
+    <h2>L'écosystème MongoDB</h2>
+    <p class="goal">Autour du serveur, plusieurs outils qu'on utilisera tout au long du parcours&nbsp;:</p>
+    <ul style="color:var(--ink-soft);padding-left:20px">
+      <li><b>mongod</b> — le serveur de base de données (le processus qui stocke et répond).</li>
+      <li><b>mongosh</b> — le shell en ligne de commande (chapitre 2).</li>
+      <li><b>MongoDB Compass</b> — l'interface graphique pour explorer visuellement.</li>
+      <li><b>Les drivers</b> — les bibliothèques pour piloter MongoDB depuis un langage (ex. Spring Data MongoDB en Java, le paquet <code>mongodb</code> en Node.js).</li>
+      <li><b>MongoDB Atlas</b> — l'hébergement géré dans le cloud (chapitre 17).</li>
+    </ul>
+    <div class="fioul-box">
+      <div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Notre application stockera ses données dans une base <code>fioul</code>, avec des collections comme <code>campagnes</code>, <code>fournisseurs</code> et <code>utilisateurs</code>. On commencera en local (mongod + mongosh + Compass), puis on hébergera la base sur Atlas pour que l'API Spring et l'appli Flutter s'y connectent. Le caractère « documents » tombe à pic&nbsp;: une <b>campagne</b> et ses <b>commandes</b> forment naturellement un seul document.</p>
+    </div>
+    <div class="recap">
+      <strong>Ce qu'il faut retenir du chapitre</strong>
+      <ul>
+        <li>MongoDB est une base <b>NoSQL orientée documents</b> (format JSON/BSON).</li>
+        <li>Hiérarchie&nbsp;: base → collections → documents → champs.</li>
+        <li>Pas de schéma imposé&nbsp;: souplesse + discipline.</li>
+        <li>Écosystème&nbsp;: mongod, mongosh, Compass, drivers, Atlas.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="pager">
+    <a href="mongodb-chapitres.html">← Sommaire</a>
+    <a class="next" href="mongo-ch02.html">Chapitre 02 · Le shell mongo →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap fr">
+    <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a>
+    <p class="muted">MongoDB · Chapitre 01 — Introduction. Plateforme SIO WEB, BTS SIO SLAM.</p>
+  </div>
+</footer>
+
+<script src="../assets/js/parcours.js"></script>
+</body>
+</html>

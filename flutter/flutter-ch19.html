@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 19 — Authentification JWT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+<style>.done-box{background:linear-gradient(150deg,var(--accent-wash),var(--fioul-wash));border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-top:24px}.done-box h3{font-size:1.15rem;margin-bottom:8px}.done-box p{color:var(--ink-soft);font-size:.95rem}</style>
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 19</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 19</div>
+  <span class="lbadge">Chapitre 19 / 19 · dernier · 🛡️</span>
+  <h1>Authentification avec JWT</h1>
+  <p class="intro">Connecter l'appli à la sécurité de l'API&nbsp;: se connecter, stocker le jeton en sécurité, l'envoyer à chaque requête protégée, et gérer l'état de connexion. Dernier chapitre du parcours.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#login">1 · Se connecter</a><a href="#stocker">2 · Stocker le token</a><a href="#header">3 · L'en-tête</a><a href="#etat">4 · État de connexion</a><a href="#bilan">5 · Bilan</a></div></nav>
+<main class="wrap">
+  <section class="step" id="login">
+    <span class="snum"><span class="dotnum">1</span> Étape</span>
+    <h2>Se connecter</h2>
+    <p class="goal">Un écran login envoie email/mot de passe à <code>/api/auth/login</code> et reçoit un JWT.</p>
+<pre>Future&lt;String&gt; login(String email, String mdp) <span class="tk">async</span> {
+  <span class="tk">final</span> r = <span class="tk">await</span> http.post(Uri.parse(<span class="ts">'$_base/auth/login'</span>),
+    headers: {<span class="ts">'Content-Type'</span>: <span class="ts">'application/json'</span>},
+    body: jsonEncode({<span class="ts">'email'</span>: email, <span class="ts">'motDePasse'</span>: mdp}));
+  <span class="tk">return</span> jsonDecode(r.body)[<span class="ts">'token'</span>];
+}</pre>
+  </section>
+  <section class="step" id="stocker">
+    <span class="snum"><span class="dotnum">2</span> Étape</span>
+    <h2>Stocker le jeton en sécurité</h2>
+    <p class="goal">On stocke le JWT avec <code>flutter_secure_storage</code> (chiffré par l'OS), <b>jamais</b> en clair dans un fichier ordinaire.</p>
+<pre><span class="tk">await</span> storage.write(key: <span class="ts">'jwt'</span>, value: token);</pre>
+  </section>
+  <section class="step" id="header">
+    <span class="snum"><span class="dotnum">3</span> Étape</span>
+    <h2>Envoyer le jeton</h2>
+    <p class="goal">Chaque requête protégée porte l'en-tête <code>Authorization</code>.</p>
+<pre>headers: { <span class="ts">'Authorization'</span>: <span class="ts">'Bearer $token'</span> }</pre>
+    <div class="warn"><strong>Cyber —</strong> gérer l'expiration (401 → reconnexion/refresh)&nbsp;; ne jamais journaliser le token&nbsp;; ne pas se fier au rôle côté client (le serveur reste l'autorité).</div>
+  </section>
+  <section class="step" id="etat">
+    <span class="snum"><span class="dotnum">4</span> Étape</span>
+    <h2>L'état de connexion</h2>
+    <p class="goal">Un <code>AuthProvider</code> (ChangeNotifier) expose l'utilisateur connecté&nbsp;; l'UI adapte l'affichage (bouton « ouvrir une campagne » réservé au coordinateur, écran login si non connecté).</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Implémente login/inscription, stocke le JWT (secure storage), injecte l'en-tête dans <code>CampagneService</code>, et conditionne les actions selon le rôle. L'appli parle maintenant à l'API <b>sécurisée</b> — la boucle Mongo → Spring → Flutter est bouclée.</p></div>
+    <div class="done-box"><h3>🎉 Parcours Flutter terminé</h3>
+      <p>Des widgets de base jusqu'à une appli mobile connectée, sécurisée et publiable, tu as construit le client du projet Fioul Groupé. Les trois technos se rejoignent&nbsp;: le produit est complet. Reste à le versionner et le présenter — voir le <a href="../parcours-forge.html">parcours Forge</a> et le <a href="parcours-flutter.html">guide pas à pas</a>.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li>Login → JWT&nbsp;; stockage chiffré (<code>flutter_secure_storage</code>).</li>
+      <li>En-tête <code>Authorization: Bearer</code> sur les requêtes protégées.</li>
+      <li>État de connexion via un provider&nbsp;; le serveur reste l'autorité des rôles.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch18.html">← Chapitre 18</a><a class="next" href="flutter-chapitres.html">Retour au sommaire →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 19 — Authentification JWT. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>

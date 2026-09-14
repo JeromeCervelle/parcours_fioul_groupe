@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flutter · Chapitre 07 — Widgets de listes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body data-track="flutter">
+<header class="top"><div class="wrap row">
+  <a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé<small>Flutter · Chapitre 07</small></span></a>
+  <nav class="nav" id="nav"><a href="../index.html">Accueil</a><a href="flutter-chapitres.html">Chapitres</a><a href="tuto-flutter.html">Cours de base</a><a href="parcours-flutter.html">Guide pas à pas</a></nav>
+  <button class="icon-btn push" id="theme" aria-label="Thème">◐</button><button class="icon-btn nav-toggle" id="burger" aria-label="Menu" aria-expanded="false">☰</button>
+</div></header>
+<section class="lesson-hero"><div class="wrap">
+  <div class="crumbs"><a href="../index.html">Accueil</a> › <a href="flutter-chapitres.html">Flutter</a> › Chapitre 07</div>
+  <span class="lbadge">Chapitre 07 / 19</span>
+  <h1>Widgets relatifs aux listes</h1>
+  <p class="intro">Afficher des collections&nbsp;: ListView et surtout ListView.builder pour des listes issues de données, ListTile pour une ligne toute faite, et GridView pour une grille.</p>
+</div></section>
+<nav class="stepnav" id="stepnav"><div class="wrap"><a href="#listview">1 · ListView</a><a href="#builder">2 · ListView.builder</a><a href="#tile">3 · ListTile</a><a href="#grid">4 · GridView</a></div></nav>
+<main class="wrap">
+  <section class="step" id="listview">
+    <span class="snum"><span class="dotnum">1</span> Notion</span>
+    <h2>ListView, la liste défilante</h2>
+    <p class="goal"><code>ListView</code> affiche une liste qui défile. Pour un petit nombre d'éléments connus, on passe directement <code>children</code>.</p>
+  </section>
+  <section class="step" id="builder">
+    <span class="snum"><span class="dotnum">2</span> Notion</span>
+    <h2>ListView.builder pour des données</h2>
+    <p class="goal">Pour une liste issue d'une collection (les campagnes), <code>ListView.builder</code> construit les éléments <b>à la demande</b> (performant, même pour de longues listes).</p>
+<pre>ListView.builder(
+  itemCount: campagnes.length,
+  itemBuilder: (context, i) {
+    <span class="tk">final</span> c = campagnes[i];
+    <span class="tk">return</span> CarteCampagne(c);
+  },
+)</pre>
+  </section>
+  <section class="step" id="tile">
+    <span class="snum"><span class="dotnum">3</span> Notion</span>
+    <h2>ListTile, une ligne prête</h2>
+    <p class="goal"><code>ListTile</code> propose une ligne standard&nbsp;: <code>leading</code> (icône/avatar), <code>title</code>, <code>subtitle</code>, <code>trailing</code>, et <code>onTap</code>.</p>
+<pre>ListTile(
+  leading: <span class="tk">const</span> Icon(Icons.local_gas_station),
+  title: Text(c.zone),
+  subtitle: Text(<span class="ts">'${c.volumeTotal} L'</span>),
+  trailing: Text(<span class="ts">'${c.prixLitre} €/L'</span>),
+  onTap: () { <span class="tc">/* détail */</span> },
+)</pre>
+  </section>
+  <section class="step" id="grid">
+    <span class="snum"><span class="dotnum">4</span> Notion</span>
+    <h2>GridView</h2>
+    <p class="goal"><code>GridView.builder</code> affiche les éléments en grille (plusieurs colonnes), utile pour des vignettes.</p>
+    <div class="fioul-box"><div class="ttl">🛢️ Sur le projet Fioul Groupé</div>
+      <p>Affiche la liste des campagnes avec <code>ListView.builder</code> et une <code>Card</code>/<code>ListTile</code> par campagne (zone, volume, prix, tap → détail). Pour l'instant les données peuvent être en dur&nbsp;; on les branchera sur l'API au chapitre 13.</p></div>
+    <div class="recap"><strong>À retenir</strong><ul>
+      <li><code>ListView.builder</code> pour les listes de données (à la demande).</li>
+      <li><code>ListTile</code> = ligne prête (leading/title/subtitle/trailing/onTap).</li>
+      <li><code>GridView.builder</code> pour une grille.</li></ul></div>
+  </section>
+  <div class="pager"><a href="flutter-ch06.html">← Chapitre 06</a><a class="next" href="flutter-ch08.html">Chapitre 08 · Date, BottomNav &amp; cycle de vie →</a></div>
+</main>
+<footer><div class="wrap fr"><a class="brand" href="../index.html"><span class="mk">🛢️</span><span>Parcours Fioul Groupé</span></a><p class="muted">Flutter · Chapitre 07 — Widgets de listes. Plateforme SIO WEB.</p></div></footer>
+<script src="../assets/js/parcours.js"></script>
+</body></html>
